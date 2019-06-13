@@ -1,0 +1,39 @@
+.loginPage{
+  background-image: url(../../assets/images/title.jpg);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+
+
+  .loginHeader{
+    text-align: center;
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-top: 20px;
+  }
+
+  .loginBody{
+    text-align: center;
+    color: #ffffff;
+    margin: auto;
+    width: 60%;
+    padding: 10px;
+    background:rgba(0,0,0,0.5);
+    border-radius: 25px;
+  }
+}
+
+:host {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+

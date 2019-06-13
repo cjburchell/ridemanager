@@ -1,0 +1,15 @@
+version: '2'
+services:
+  mongodb:
+    image: "mongo:3"
+    ports:
+     - "27017:27017"
+  server:
+    build: .
+    environment:
+         - DATABASE_URL=mongodb:27017
+         - LOG_CONSOLE=true
+         - LOG_LEVEL=Debug
+         - LOG_FILE=false
+    ports:
+     - "8099:8088"
