@@ -18,12 +18,9 @@ func handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	setting := vars["Setting"]
 
-	switch setting {
-
-	}
-
 	reply, _ := json.Marshal(setting)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	_, err := w.Write(reply)
 	if err != nil {
 		log.Error(err)

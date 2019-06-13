@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"mime"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/cjburchell/ridemanager/routes"
 
 	"github.com/robfig/cron"
 
@@ -21,26 +22,47 @@ import (
 )
 
 func main() {
-
 	err := settings.SetupLogger()
 	if err != nil {
 		log.Warn(err, "Unable to Connect to logger")
 	}
 
-	err = mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
-	err = mime.AddExtensionType(".html", "text/html; charset=utf-8")
+	srv := startHttpServer(env.GetInt("PORT", 8091))
+	defer stopHttpServer(srv)
 
-	r := mux.NewRouter()
-	//routes.Setup*Route(r)
+	cronTasks := startProcessor(env.Get("POLL_INTERVAL", "@hourly"))
+	defer cronTasks.Stop()
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "ridemanager-client/dist/ridemanager-client/index.html")
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	log.Print("shutting down")
+	os.Exit(0)
+}
+
+func startProcessor(interval string) *cron.Cron {
+	cronTasks := cron.New()
+	err := cronTasks.AddFunc(interval, func() {
+
 	})
 
-	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("ridemanager-client/dist/ridemanager-client"))))
+	if err != nil {
+		log.Error(err)
+	}
+
+	cronTasks.Start()
+
+	return cronTasks
+}
+
+func startHttpServer(port int) *http.Server {
+	r := mux.NewRouter()
+	routes.SetupStatusRoute(r)
+	routes.SetupSettingsRoute(r)
+	routes.SetupClientRoute(r)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
-	port := env.GetInt("PORT", 8091)
 
 	log.Printf("Starting Server at port %d", port)
 	srv := &http.Server{
@@ -56,31 +78,14 @@ func main() {
 		}
 	}()
 
-	interval := env.Get("POLL_INTERVAL", "@hourly")
+	return srv
+}
 
-	cronTasks := cron.New()
-	err = cronTasks.AddFunc(interval, func() {
-
-	})
-
-	if err != nil {
-		log.Error(err)
-	}
-
-	cronTasks.Start()
-	defer cronTasks.Stop()
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
-
+func stopHttpServer(srv *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
-	err = srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
 	if err != nil {
 		log.Error(err)
 	}
-
-	log.Print("shutting down")
-	os.Exit(0)
 }
