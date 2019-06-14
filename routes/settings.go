@@ -2,7 +2,12 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/cjburchell/go.strava"
+
+	"github.com/cjburchell/tools-go/env"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/gorilla/mux"
@@ -18,7 +23,20 @@ func handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	setting := vars["Setting"]
 
-	reply, _ := json.Marshal(setting)
+	result := ""
+	switch setting {
+	case "stravaClientId":
+		result = fmt.Sprintf("%d", strava.ClientId)
+	case "stravaRedirect":
+		result = env.Get("STRAVA_REDIRECT_URI", "http://localhost:8091/api/v3/login")
+	}
+
+	if result == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	reply, _ := json.Marshal(result)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write(reply)

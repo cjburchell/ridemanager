@@ -8,29 +8,39 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/cjburchell/ridemanager/service/data"
+	"github.com/cjburchell/ridemanager/settings"
+
+	"github.com/cjburchell/go.strava"
+
 	"github.com/cjburchell/ridemanager/routes"
 
 	"github.com/robfig/cron"
 
-	"github.com/cjburchell/tools-go/env"
-
 	"github.com/cjburchell/go-uatu"
-	"github.com/cjburchell/go-uatu/settings"
+	logSettings "github.com/cjburchell/go-uatu/settings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	err := settings.SetupLogger()
+	err := logSettings.SetupLogger()
 	if err != nil {
 		log.Warn(err, "Unable to Connect to logger")
 	}
 
-	srv := startHttpServer(env.GetInt("PORT", 8091))
+	dataService, err := data.NewService(settings.MongoUrl)
+	if err != nil {
+		log.Warn(err, "Unable to Connect to mongo")
+	}
+
+	setupStrava()
+
+	srv := startHttpServer(settings.Port, dataService)
 	defer stopHttpServer(srv)
 
-	cronTasks := startProcessor(env.Get("POLL_INTERVAL", "@hourly"))
+	cronTasks := startProcessor(settings.PollInterval)
 	defer cronTasks.Stop()
 
 	c := make(chan os.Signal, 1)
@@ -39,6 +49,11 @@ func main() {
 
 	log.Print("shutting down")
 	os.Exit(0)
+}
+
+func setupStrava() {
+	strava.ClientId = settings.StravaClientId
+	strava.ClientSecret = settings.StravaClientSecret
 }
 
 func startProcessor(interval string) *cron.Cron {
@@ -56,8 +71,9 @@ func startProcessor(interval string) *cron.Cron {
 	return cronTasks
 }
 
-func startHttpServer(port int) *http.Server {
+func startHttpServer(port int, service data.IService) *http.Server {
 	r := mux.NewRouter()
+	routes.SetupLoginRoute(r, service)
 	routes.SetupStatusRoute(r)
 	routes.SetupSettingsRoute(r)
 	routes.SetupClientRoute(r)

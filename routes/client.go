@@ -31,5 +31,13 @@ func SetupClientRoute(r *mux.Router) {
 		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
+	r.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, clientLocation+"/index.html")
+	})
+
+	r.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, clientLocation+"/index.html")
+	})
+
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(clientLocation))))
 }

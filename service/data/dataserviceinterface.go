@@ -5,8 +5,9 @@ import "github.com/cjburchell/ridemanager/service/data/models"
 type IService interface {
 	GetUsers() ([]models.User, error)
 	GetUser(athleteId models.AthleteId) (*models.User, error)
+	GetStravaUser(athleteId int64) (*models.User, error)
 
-	AddUser(user models.User) error
+	AddUser(user *models.User) error
 	UpdateUser(user models.User) error
 	DeleteUser(athleteId string) error
 
@@ -30,7 +31,7 @@ type IService interface {
 	GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) ([]models.Activity, error)
 	GetActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error)
 
-	AddActivity(user models.User) error
+	AddActivity(user *models.Activity) error
 	UpdateActivity(activity models.Activity) error
 	DeleteActivity(activityId models.ActivityId) error
 }

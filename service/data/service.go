@@ -30,10 +30,13 @@ func (s service) GetUsers() ([]models.User, error) {
 
 	return users, nil
 }
-
-func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
+func (s service) GetStravaUser(athleteId int64) (*models.User, error) {
 	var user models.User
-	err := s.db.C(usersCollection).Find(bson.M{"id": athleteId}).One(&user)
+	err := s.db.C(usersCollection).Find(bson.M{"strava_athlete_id": athleteId}).One(&user)
+
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -42,7 +45,22 @@ func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
 	return &user, err
 }
 
-func (s service) AddUser(user models.User) error {
+func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
+	var user models.User
+	err := s.db.C(usersCollection).Find(bson.M{"id": athleteId}).One(&user)
+
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &user, err
+}
+
+func (s service) AddUser(user *models.User) error {
 	if user.Id == "" {
 		user.Id = models.AthleteId(uuid.Must(uuid.NewV4()).String())
 	}
@@ -74,6 +92,10 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 	var activities []models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"owner_id": ownerId}).All(&activities)
 
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -87,6 +109,7 @@ func (s service) getParticipantActivities(athleteId models.AthleteId) ([]string,
 	}
 
 	err := s.db.C(participantCollection).Find(bson.M{"athlete_id": athleteId}).All(&results)
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -213,7 +236,7 @@ func (s service) GetActivitiesByState(athleteId models.AthleteId, state models.A
 	panic("implement me")
 }
 
-func (s service) AddActivity(user models.User) error {
+func (s service) AddActivity(activity *models.Activity) error {
 	panic("implement me")
 }
 
