@@ -1,6 +1,6 @@
 <div class="main-header">
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <a class="navbar-brand" href="/main">Ride Manager</a>
+    <div class="navbar-brand">Ride Manager</div>
 
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myNavbar">
       <span class="navbar-toggler-icon"></span>
@@ -8,24 +8,23 @@
 
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Manage</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">History</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="showToMain()" >Home</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="showManageActivities()">Manage</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="showUserHistory()">History</a></li>
         </ul>
 
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbardrop" >
-              <img class="rounded-circle" [src]="profile" width="24" height="24"/> {{firstname}} {{lastname}}
+            <a class="nav-link dropdown-toggle user-dropdown" data-toggle="dropdown" href="#" id="navbardrop" >
+              <img class="rounded-circle" [src]="user?.profile_medium" width="24" height="24"/> {{user?.first_name}} {{user?.last_name}}
             </a>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="https://www.strava.com/athletes/<%= athlete.id %>" target="_blank">Profile</a>
-              <a class="dropdown-item" href="#">Log Out</a>
+              <a class="dropdown-item" [href]="'https://www.strava.com/athletes/' + user?.strava_athlete_id" target="_blank">Profile</a>
+              <a class="dropdown-item" (click)="onLogOut()">Log Out</a>
             </div>
           </li>
           <li class="nav-item">
-            <a class="poweredbywrapper" style="padding-top: 10px; padding-bottom: 0; padding-right: 0; padding-left: 0" href="http://www.strava.com" target="_blank">
+            <a class="poweredbywrapper" href="http://www.strava.com" target="_blank">
               <img class="poweredbystrava" src="../../../assets/images/api_logo_pwrdBy_strava_horiz_light.png"/>
             </a>
           </li>

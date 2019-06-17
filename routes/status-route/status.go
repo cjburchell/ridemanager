@@ -1,4 +1,4 @@
-package routes
+package status_route
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupStatusRoute(r *mux.Router) {
+func Setup(r *mux.Router) {
 	r.HandleFunc("/@status", handleGetStatus).Methods("GET")
 }
 

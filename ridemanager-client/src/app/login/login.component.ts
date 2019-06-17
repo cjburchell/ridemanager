@@ -28,7 +28,8 @@ export class LoginComponent implements OnInit {
       this.stravaRedirect = stravaRedirect;
     });
 
-    if (this.tokenService.getToken() !== null) {
+    const token = this.tokenService.getToken();
+    if ( token !== null) {
       this.tokenService.validateToken().subscribe((isLoggedIn: boolean) => {
         if (isLoggedIn) {
           this.router.navigate([`/main`]);

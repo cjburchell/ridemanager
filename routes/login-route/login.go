@@ -1,9 +1,10 @@
-package routes
+package login_route
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"github.com/cjburchell/ridemanager/routes/token"
 
 	"github.com/cjburchell/ridemanager/service/data/models"
 
@@ -17,18 +18,20 @@ import (
 )
 
 var authenticator = &strava.OAuthAuthenticator{}
-var dataService data.IService
 
 // SetupDataRoute setup the route
-func SetupLoginRoute(r *mux.Router, service data.IService) {
-	dataService = service
+func Setup(r *mux.Router, service data.IService) {
 	dataRoute := r.PathPrefix("/api/v1/login").Subrouter()
-	dataRoute.HandleFunc("/validate", authenticator.HandlerFunc(oAuthSuccess, oAuthFailure)).Methods("GET").Queries("code", "{code}", "scope", "{scope}")
+	dataRoute.HandleFunc("/validate", authenticator.HandlerFunc(func(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
+		oAuthSuccess(auth, w, r, service)
+	}, oAuthFailure)).Methods("GET").Queries("code", "{code}", "scope", "{scope}")
 
-	dataRoute.HandleFunc("/status", validateTokenMiddleware(getLoginStatus)).Methods("GET")
+	dataRoute.HandleFunc("/status", token.ValidateMiddleware(func(writer http.ResponseWriter, request *http.Request) {
+		getLoginStatus(writer, request, service)
+	})).Methods("GET")
 }
 
-func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
+func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request, dataService data.IService) {
 	log.Debugf("Access Token: %s", auth.AccessToken)
 
 	user, err := dataService.GetStravaUser(auth.Athlete.Id)
@@ -36,11 +39,11 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 		log.Error(err)
 	}
 
-	name := fmt.Sprintf("%s %s", auth.Athlete.FirstName, auth.Athlete.LastName)
 	if user == nil {
 		user = models.NewUser(auth.Athlete.Id)
 		user.StravaToken = auth.AccessToken
-		user.Name = name
+		user.FirstName = auth.Athlete.FirstName
+		user.LastName = auth.Athlete.LastName
 		user.ProfileMediumImage = auth.Athlete.ProfileMedium
 		user.ProfileImage = auth.Athlete.Profile
 		user.Gender = auth.Athlete.Gender
@@ -50,7 +53,8 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 		}
 	} else {
 		user.StravaToken = auth.AccessToken
-		user.Name = name
+		user.FirstName = auth.Athlete.FirstName
+		user.LastName = auth.Athlete.LastName
 		user.ProfileMediumImage = auth.Athlete.ProfileMedium
 		user.ProfileImage = auth.Athlete.Profile
 		user.Gender = auth.Athlete.Gender
@@ -60,7 +64,7 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 		}
 	}
 
-	tokenString, err := buildToken(user.Id)
+	tokenString, err := token.Build(user.Id)
 	if err != nil {
 		log.Error(err)
 	}
@@ -88,13 +92,20 @@ func oAuthFailure(err error, w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
-func getLoginStatus(w http.ResponseWriter, r *http.Request) {
-	user, err := getUser(r, dataService)
+func getLoginStatus(w http.ResponseWriter, r *http.Request, dataService data.IService) {
+	user, err := token.GetUser(r, dataService)
 	if err != nil {
 		log.Error(err)
+		reply, _ := json.Marshal(false)
+		w.WriteHeader(http.StatusNotFound)
+		_, err = w.Write(reply)
+		if err != nil {
+			log.Error(err)
+		}
+		return
 	}
 
-	log.Debugf("name %s,  userId: %s", user.Name, user.Id)
+	log.Debugf("name %s %s,  userId: %s", user.FirstName, user.LastName, user.Id)
 
 	reply, _ := json.Marshal(true)
 	w.WriteHeader(http.StatusOK)

@@ -17,7 +17,8 @@ type User struct {
 	StravaToken         string        `json:"strava_token" bson:"strava_token"`
 	Role                Role          `json:"role" bson:"role"`
 	MaxActiveActivities int           `json:"max_active_activities" bson:"max_active_activities"`
-	Name                string        `json:"name" bson:"name"`
+	FirstName           string        `json:"first_name" bson:"first_name"`
+	LastName            string        `json:"last_name" bson:"last_name"`
 	Gender              strava.Gender `json:"sex" bson:"sex"`
 	ProfileImage        string        `json:"profile" bson:"profile"`
 	ProfileMediumImage  string        `json:"profile_medium" bson:"profile_medium"`

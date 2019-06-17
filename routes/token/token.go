@@ -1,4 +1,4 @@
-package routes
+package token
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/context"
 )
 
-func buildToken(userId models.AthleteId) (string, error) {
+func Build(userId models.AthleteId) (string, error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -30,14 +30,14 @@ func buildToken(userId models.AthleteId) (string, error) {
 	return tokenString, nil
 }
 
-func getUser(r *http.Request, dataService data.IService) (*models.User, error) {
+func GetUser(r *http.Request, dataService data.IService) (*models.User, error) {
 	decoded := context.Get(r, "decoded")
 	claims := decoded.(jwt.MapClaims)
 	userId := claims["user"].(string)
 	return dataService.GetUser(models.AthleteId(userId))
 }
 
-func validateTokenMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		authorizationHeader := req.Header.Get("Authorization")
 		if authorizationHeader != "" {

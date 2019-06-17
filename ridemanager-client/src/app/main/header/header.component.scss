@@ -1,6 +1,9 @@
 
 .main-header {
-}
+  .user-dropdown{
+    padding-bottom: 0;
+    padding-top: 12px;
+  }
 
   .poweredbywrapper {
     display: block;
@@ -9,11 +12,16 @@
     margin-bottom: 0;
     margin-left: 5px;
     color: #999999;
-    padding: 0;
+    padding: 3px 0 0;
+
+    .poweredbystrava {
+      height: 35px !important;
+    }
   }
 
-  .poweredbystrava {
-    height: 35px !important;
-  }
+
+}
+
+
 
 

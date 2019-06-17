@@ -8,12 +8,19 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/cjburchell/ridemanager/routes/client-route"
+	"github.com/cjburchell/ridemanager/routes/ride-route"
+	"github.com/cjburchell/ridemanager/routes/settings-route"
+	"github.com/cjburchell/ridemanager/routes/status-route"
+	"github.com/cjburchell/ridemanager/routes/strava-route"
+	"github.com/cjburchell/ridemanager/routes/user-route"
+
 	"github.com/cjburchell/ridemanager/service/data"
 	"github.com/cjburchell/ridemanager/settings"
 
-	"github.com/cjburchell/go.strava"
+	"github.com/cjburchell/ridemanager/routes/login-route"
 
-	"github.com/cjburchell/ridemanager/routes"
+	"github.com/cjburchell/go.strava"
 
 	"github.com/robfig/cron"
 
@@ -73,10 +80,13 @@ func startProcessor(interval string) *cron.Cron {
 
 func startHttpServer(port int, service data.IService) *http.Server {
 	r := mux.NewRouter()
-	routes.SetupLoginRoute(r, service)
-	routes.SetupStatusRoute(r)
-	routes.SetupSettingsRoute(r)
-	routes.SetupClientRoute(r)
+	login_route.Setup(r, service)
+	user_route.Setup(r, service)
+	ride_route.Setup(r, service)
+	strava_route.Setup(r)
+	status_route.Setup(r)
+	settings_route.Setup(r)
+	client_route.Setup(r)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 

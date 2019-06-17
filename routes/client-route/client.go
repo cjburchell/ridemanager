@@ -1,4 +1,4 @@
-package routes
+package client_route
 
 import (
 	"mime"
@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupClientRoute(r *mux.Router) {
+func Setup(r *mux.Router) {
 	clientLocation := env.Get("CLIENT_LOCATION", "ridemanager-client/dist/ridemanager-client")
 
 	err := mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
@@ -32,6 +32,10 @@ func SetupClientRoute(r *mux.Router) {
 	})
 
 	r.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, clientLocation+"/index.html")
+	})
+
+	r.HandleFunc("/main/{mode}", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 

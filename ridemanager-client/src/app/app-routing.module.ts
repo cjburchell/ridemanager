@@ -5,7 +5,7 @@ import {MainComponent} from './main/main.component';
 import {TokenComponent} from './token/token.component';
 
 const routes: Routes = [
-  {path: 'main', component: MainComponent },
+  {path: 'main/:pageId', component: MainComponent },
   {path: 'login', component: LoginComponent },
   {path: 'token', component: TokenComponent },
   {path: '', pathMatch: 'full', redirectTo: 'login'}

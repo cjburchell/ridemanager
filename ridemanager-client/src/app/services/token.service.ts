@@ -20,6 +20,10 @@ export class TokenService {
     localStorage.setItem(this.tokenKey, token);
   }
 
+  logOut() {
+    localStorage.removeItem(this.tokenKey);
+  }
+
   validateToken(): Observable<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({

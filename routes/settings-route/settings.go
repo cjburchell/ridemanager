@@ -1,4 +1,4 @@
-package routes
+package settings_route
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ import (
 )
 
 // SetupDataRoute setup the route
-func SetupSettingsRoute(r *mux.Router) {
+func Setup(r *mux.Router) {
 	dataRoute := r.PathPrefix("/api/v1/settings").Subrouter()
 	dataRoute.HandleFunc("/{Setting}", handleGetSettings).Methods("GET")
 }

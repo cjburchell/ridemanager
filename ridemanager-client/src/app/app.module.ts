@@ -9,9 +9,9 @@ import { TokenComponent } from './token/token.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './main/footer/footer.component';
 import { HeaderComponent } from './main/header/header.component';
-import { ActionsComponent } from './main/actions/actions.component';
-import { HelpComponent } from './main/help/help.component';
-import { ResultSummaryComponent } from './main/result-summary/result-summary.component';
+import { ActionsComponent  } from './main/main-menu/actions/actions.component';
+import { HelpComponent } from './main/main-menu/help/help.component';
+import { ResultSummaryComponent } from './main/main-menu/result-summary/result-summary.component';
 import { MainMenuComponent } from './main/main-menu/main-menu.component';
 
 @NgModule({

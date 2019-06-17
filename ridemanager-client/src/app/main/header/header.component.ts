@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import {IUser, UserService} from '../../services/user.service';
+import {TokenService} from '../../services/token.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -7,14 +10,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
 
-  public profile = 'https://dgalywyr863hv.cloudfront.net/pictures/athletes/10018917/3021422/4/medium.jpg';
-  public firstname = 'Christiaan';
-  public lastname = 'Burchell';
+  @Input() public user: IUser;
 
-  constructor() {
+  constructor(private tokenService: TokenService,
+              private router: Router) {
   }
 
   ngOnInit() {
   }
 
+  onLogOut() {
+    this.tokenService.logOut();
+    this.router.navigate([`/login`]);
+  }
+
+  showToMain() {
+    this.router.navigate([`/main`]);
+  }
+
+  showManageActivities() {
+    this.router.navigate([`/main/manage`]);
+  }
+
+  showUserHistory() {
+    this.router.navigate([`/main/history`]);
+  }
 }
