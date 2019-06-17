@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { LoginComponent } from './login/login.component';
 import { MainComponent } from './main/main.component';
 import { TokenComponent } from './token/token.component';
@@ -11,6 +10,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './main/footer/footer.component';
 import { HeaderComponent } from './main/header/header.component';
 import { ActionsComponent } from './main/actions/actions.component';
+import { HelpComponent } from './main/help/help.component';
+import { ResultSummaryComponent } from './main/result-summary/result-summary.component';
+import { MainMenuComponent } from './main/main-menu/main-menu.component';
 
 @NgModule({
   declarations: [
@@ -20,13 +22,15 @@ import { ActionsComponent } from './main/actions/actions.component';
     TokenComponent,
     FooterComponent,
     HeaderComponent,
-    ActionsComponent
+    ActionsComponent,
+    HelpComponent,
+    ResultSummaryComponent,
+    MainMenuComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
-    NgbModule
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

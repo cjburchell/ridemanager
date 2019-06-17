@@ -7,9 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
 
-  public profile: string;
-  public firstname: string;
-  public lastname: string;
+  public profile = 'https://dgalywyr863hv.cloudfront.net/pictures/athletes/10018917/3021422/4/medium.jpg';
+  public firstname = 'Christiaan';
+  public lastname = 'Burchell';
 
   constructor() {
   }
