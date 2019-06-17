@@ -2,15 +2,19 @@
   <app-header [user]="user"></app-header>
   <div class="container-fluid main-content" >
     <div class="row">
-      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
+      <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
         <app-main-menu></app-main-menu>
       </div>
-      <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
-        <div class="row">
-          {{pageId}}
-        </div>
+      <div class="col-lg-10 col-md-8 col-sm-8 col-xs-12">
+        <app-faq *ngIf="pageId === 'faq'"></app-faq>
+        <app-about *ngIf="pageId === 'about'"></app-about>
+        <app-history *ngIf="pageId === 'history'"></app-history>
+        <app-manage *ngIf="pageId === 'manage'"></app-manage>
+        <app-join *ngIf="pageId === 'join'"></app-join>
+        <app-create *ngIf="pageId === 'create'"></app-create>
+        <app-summery *ngIf="pageId === 'summery'"></app-summery>
       </div>
     </div>
   </div>
-  <app-footer></app-footer>
+  <!--<app-footer></app-footer>-->
 </div>

@@ -10,7 +10,7 @@ import {IUser, UserService} from '../services/user.service';
 })
 export class MainComponent implements OnInit {
   token: string;
-  pageId: string;
+  pageId = 'summery';
   user: IUser;
 
   constructor(private tokenService: TokenService,
@@ -36,6 +36,9 @@ export class MainComponent implements OnInit {
 
     this.activatedRoute.params.subscribe(params => {
       this.pageId = params.pageId;
+      if (this.pageId === undefined) {
+        this.pageId = 'summery';
+      }
     });
   }
 
