@@ -16,11 +16,6 @@ type IService interface {
 	GetAthleteActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error)
 	GetAthletePrivateActivities(athleteId models.AthleteId) ([]models.Activity, error)
 
-	GetActivityParticipants(activityId models.ActivityId) ([]models.Participant, error)
-	AddParticipant(participant models.Participant) error
-	UpdateParticipant(participant models.Participant) error
-	DeleteParticipant(activityId models.ActivityId, athleteId string) error
-
 	GetActivityParticipantsCount(activityId models.ActivityId) (int, error)
 	GetActivityComments(activityId models.ActivityId) ([]models.Comment, error)
 	AddComment(comment models.Comment) error
@@ -29,9 +24,10 @@ type IService interface {
 	GetFinishedActivitiesCount(athleteId models.AthleteId) (int, error)
 
 	GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) ([]models.Activity, error)
-	GetActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error)
+	GetActivitiesByState(state models.ActivityState) ([]models.Activity, error)
 
 	AddActivity(user *models.Activity) error
 	UpdateActivity(activity models.Activity) error
 	DeleteActivity(activityId models.ActivityId) error
+	GetActivity(activityId models.ActivityId) (models.Activity, error)
 }

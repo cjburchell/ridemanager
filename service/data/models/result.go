@@ -3,7 +3,6 @@ package models
 import "time"
 
 type Result struct {
-	SegmentId  string     `json:"segmentId"`
-	Time       time.Time  `json:"time"`
-	ActivityId ActivityId `json:"activityId"`
+	SegmentId string    `json:"segment_id" bson:"segment_id"`
+	Time      time.Time `json:"time" bson:"time"`
 }

@@ -18,7 +18,6 @@ type service struct {
 const dbName = "RideManager"
 const usersCollection = "Users"
 const activityCollection = "Activities"
-const participantCollection = "Participants"
 
 func (s service) GetUsers() ([]models.User, error) {
 	var users []models.User
@@ -104,22 +103,7 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 }
 
 func (s service) getParticipantActivities(athleteId models.AthleteId) ([]string, error) {
-	var results []struct {
-		Id string `bson:"activity_id"`
-	}
-
-	err := s.db.C(participantCollection).Find(bson.M{"athlete_id": athleteId}).All(&results)
-
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var activityIds = make([]string, len(results))
-	for index, result := range results {
-		activityIds[index] = result.Id
-	}
-
-	return activityIds, nil
+	panic("implement me")
 }
 
 func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Activity, error) {
@@ -161,7 +145,7 @@ func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]mode
 	}
 
 	var activities []models.Activity
-	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "Privacy": models.PrivateActivity}).All(&activities)
+	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "privacy": models.PrivateActivity}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -169,47 +153,14 @@ func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]mode
 	return activities, nil
 }
 
-func (s service) GetActivityParticipants(activityId models.ActivityId) ([]models.Participant, error) {
-	var results []models.Participant
-	err := s.db.C(participantCollection).Find(bson.M{"activity_id": activityId}).All(&results)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return results, nil
-}
-
-func (s service) AddParticipant(participant models.Participant) error {
-	err := s.db.C(participantCollection).Insert(participant)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
-}
-
-func (s service) UpdateParticipant(participant models.Participant) error {
-	err := s.db.C(participantCollection).Update(bson.M{"athlete_id": participant.AthleteId, "activity_id": participant.ActivityId}, participant)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
-}
-
-func (s service) DeleteParticipant(activityId models.ActivityId, athleteId string) error {
-	err := s.db.C(participantCollection).Remove(bson.M{"athlete_id": athleteId, "activity_id": activityId})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
-}
-
 func (s service) GetActivityParticipantsCount(activityId models.ActivityId) (int, error) {
-	result, err := s.db.C(participantCollection).Find(bson.M{"activity_id": activityId}).Count()
+	var activity models.Activity
+	err := s.db.C(usersCollection).Find(bson.M{"activity_id": activityId}).One(&activity)
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
 
-	return result, nil
+	return len(activity.Participants), nil
 }
 
 func (s service) GetActivityComments(activityId models.ActivityId) ([]models.Comment, error) {
@@ -229,23 +180,66 @@ func (s service) GetFinishedActivitiesCount(athleteId models.AthleteId) (int, er
 }
 
 func (s service) GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) ([]models.Activity, error) {
-	panic("implement me")
+	var activities []models.Activity
+	err := s.db.C(activityCollection).Find(bson.M{"privacy": activityPrivacy}).All(&activities)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return activities, nil
 }
 
-func (s service) GetActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error) {
-	panic("implement me")
+func (s service) GetActivitiesByState(state models.ActivityState) ([]models.Activity, error) {
+	var activities []models.Activity
+	err := s.db.C(activityCollection).Find(bson.M{"state": state}).All(&activities)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return activities, nil
 }
 
 func (s service) AddActivity(activity *models.Activity) error {
-	panic("implement me")
+	if activity.ActivityId == "" {
+		activity.ActivityId = models.ActivityId(uuid.Must(uuid.NewV4()).String())
+	}
+
+	err := s.db.C(activityCollection).Insert(activity)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }
 
 func (s service) UpdateActivity(activity models.Activity) error {
-	panic("implement me")
+	err := s.db.C(usersCollection).Update(bson.M{"activity_id": activity.ActivityId}, activity)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }
 
-func (service) DeleteActivity(activityId models.ActivityId) error {
-	panic("implement me")
+func (s service) DeleteActivity(activityId models.ActivityId) error {
+	err := s.db.C(usersCollection).Remove(bson.M{"activity_id": activityId})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+func (s service) GetActivity(activityId models.ActivityId) (*models.Activity, error) {
+	var activity models.Activity
+	err := s.db.C(activityCollection).Find(bson.M{"activity_id": activityId}).One(&activity)
+
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &activity, err
 }
 
 func (s *service) setup(address string) error {

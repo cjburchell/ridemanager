@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/cjburchell/ridemanager/routes/activity-route"
 	"github.com/cjburchell/ridemanager/routes/client-route"
-	"github.com/cjburchell/ridemanager/routes/ride-route"
 	"github.com/cjburchell/ridemanager/routes/settings-route"
 	"github.com/cjburchell/ridemanager/routes/status-route"
 	"github.com/cjburchell/ridemanager/routes/strava-route"
@@ -82,7 +82,7 @@ func startHttpServer(port int, service data.IService) *http.Server {
 	r := mux.NewRouter()
 	login_route.Setup(r, service)
 	user_route.Setup(r, service)
-	ride_route.Setup(r, service)
+	activity_route.Setup(r, service)
 	strava_route.Setup(r)
 	status_route.Setup(r)
 	settings_route.Setup(r)

@@ -3,13 +3,16 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {TokenService} from './token.service';
 
+export type Role = 'user' | 'admin';
+export type Gender = 'M' | 'F' | '';
+
 export interface IUser {
   strava_athlete_id: number;
-  role: string;
+  role: Role;
   max_active_activities: number;
   first_name: string;
   last_name: string;
-  sex: string;
+  sex: Gender;
   profile: string;
   profile_medium: string;
 }

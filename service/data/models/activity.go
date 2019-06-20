@@ -20,7 +20,7 @@ const (
 type ActivityState string
 
 const (
-	UpcommingActivity  ActivityState = "upcoming"
+	UpcomingActivity   ActivityState = "upcoming"
 	InProgressActivity ActivityState = "in_progress"
 	FinishedActivity   ActivityState = "finished"
 )
@@ -28,22 +28,23 @@ const (
 type ActivityId string
 
 type Activity struct {
-	ActivityId      ActivityId `json:"activity_id" bson:"activity_id"`
-	ActivityType    ActivityType
-	OwnerId         AthleteId `json:"owner_id" bson:"owner_id"`
-	Name            string
-	Description     string
-	StartTime       time.Time
-	EndTime         time.Time
-	TotalDistance   int
-	Duration        float64
-	TimeLeft        float64
-	StartsIn        float64
+	ActivityId      ActivityId      `json:"activity_id" bson:"activity_id"`
+	ActivityType    ActivityType    `json:"activity_type" bson:"activity_type"`
+	OwnerId         AthleteId       `json:"owner_id" bson:"owner_id"`
+	Name            string          `json:"name" bson:"name"`
+	Description     string          `json:"description" bson:"description"`
+	StartTime       time.Time       `json:"start_time" bson:"start_time"`
+	EndTime         time.Time       `json:"end_time" bson:"end_time"`
+	TotalDistance   int             `json:"total_distance" bson:"total_distance"`
+	Duration        float64         `json:"duration" bson:"duration"`
+	TimeLeft        float64         `json:"time_left" bson:"time_left"`
+	StartsIn        float64         `json:"starts_in" bson:"starts_in"`
 	Privacy         ActivityPrivacy `json:"privacy" bson:"privacy"`
-	Categories      []Category
-	Stages          []Stage
-	State           ActivityState `json:"state" bson:"state"`
-	MaxParticipants int
+	Categories      []Category      `json:"categories" bson:"categories"`
+	Stages          []Stage         `json:"stages" bson:"stages"`
+	Participants    []Participant   `json:"participants" bson:"participants"`
+	State           ActivityState   `json:"state" bson:"state"`
+	MaxParticipants int             `json:"max_participants" bson:"max_participants"`
 }
 
 func (activity *Activity) UpdateActivityState() {
@@ -60,6 +61,6 @@ func (activity *Activity) UpdateActivityState() {
 	} else if activity.StartsIn <= 0 {
 		activity.State = InProgressActivity
 	} else {
-		activity.State = UpcommingActivity
+		activity.State = UpcomingActivity
 	}
 }
