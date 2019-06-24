@@ -11,7 +11,7 @@ import (
 )
 
 func Setup(r *mux.Router) {
-	clientLocation := env.Get("CLIENT_LOCATION", "ridemanager-client/dist/ridemanager-client")
+	clientLocation := env.Get("CLIENT_LOCATION", "client/dist/ridemanager-client")
 
 	err := mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
 	if err != nil {
