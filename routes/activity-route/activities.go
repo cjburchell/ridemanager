@@ -1,6 +1,7 @@
 package activity_route
 
 import (
+	"encoding/json"
 	"net/http"
 
 	log "github.com/cjburchell/go-uatu"
@@ -67,18 +68,25 @@ func handleGetActivities(writer http.ResponseWriter, request *http.Request, serv
 
 }
 
-func handleGetActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func handleGetActivity(w http.ResponseWriter, r *http.Request, service data.IService) {
 
-	vars := mux.Vars(request)
+	vars := mux.Vars(r)
 	activityId := models.ActivityId(vars["ActivityId"])
 
 	activity, err := service.GetActivity(activityId)
 	if err != nil {
 		log.Error(err)
-		writer.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
+	reply, _ := json.Marshal(activity)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write(reply)
+	if err != nil {
+		log.Error(err)
+	}
 
 }

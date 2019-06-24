@@ -29,5 +29,5 @@ type IService interface {
 	AddActivity(user *models.Activity) error
 	UpdateActivity(activity models.Activity) error
 	DeleteActivity(activityId models.ActivityId) error
-	GetActivity(activityId models.ActivityId) (models.Activity, error)
+	GetActivity(activityId models.ActivityId) (*models.Activity, error)
 }

@@ -61,7 +61,8 @@ func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
 
 func (s service) AddUser(user *models.User) error {
 	if user.Id == "" {
-		user.Id = models.AthleteId(uuid.Must(uuid.NewV4()).String())
+		u1 := uuid.Must(uuid.NewV4(), errors.New("unable to create uuid"))
+		user.Id = models.AthleteId(u1.String())
 	}
 
 	err := s.db.C(usersCollection).Insert(user)
@@ -201,7 +202,8 @@ func (s service) GetActivitiesByState(state models.ActivityState) ([]models.Acti
 
 func (s service) AddActivity(activity *models.Activity) error {
 	if activity.ActivityId == "" {
-		activity.ActivityId = models.ActivityId(uuid.Must(uuid.NewV4()).String())
+		u1 := uuid.Must(uuid.NewV4(), errors.New("unable to create uuid"))
+		activity.ActivityId = models.ActivityId(u1.String())
 	}
 
 	err := s.db.C(activityCollection).Insert(activity)
