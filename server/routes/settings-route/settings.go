@@ -3,11 +3,10 @@ package settings_route
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cjburchell/ridemanager/settings"
 	"net/http"
 
 	"github.com/cjburchell/go.strava"
-
-	"github.com/cjburchell/tools-go/env"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/gorilla/mux"
@@ -28,7 +27,7 @@ func handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	case "stravaClientId":
 		result = fmt.Sprintf("%d", strava.ClientId)
 	case "stravaRedirect":
-		result = env.Get("STRAVA_REDIRECT_URI", "http://localhost:8091/api/v3/login")
+		result = settings.StravaRedirectURI
 	}
 
 	if result == "" {

@@ -1,17 +1,16 @@
 package client_route
 
 import (
+	"github.com/cjburchell/ridemanager/settings"
 	"mime"
 	"net/http"
-
-	"github.com/cjburchell/tools-go/env"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/gorilla/mux"
 )
 
 func Setup(r *mux.Router) {
-	clientLocation := env.Get("CLIENT_LOCATION", "client/dist/ridemanager-client")
+
 
 	err := mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
 	if err != nil {
@@ -24,24 +23,24 @@ func Setup(r *mux.Router) {
 	}
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/main/{mode}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
-	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(clientLocation))))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(settings.ClientLocation))))
 }
