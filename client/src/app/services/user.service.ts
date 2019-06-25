@@ -7,6 +7,7 @@ export type Role = 'user' | 'admin';
 export type Gender = 'M' | 'F' | '';
 
 export interface IUser {
+  id: string;
   strava_athlete_id: number;
   role: Role;
   max_active_activities: number;

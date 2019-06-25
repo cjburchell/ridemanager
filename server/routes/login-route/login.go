@@ -24,7 +24,7 @@ func Setup(r *mux.Router, service data.IService) {
 	dataRoute := r.PathPrefix("/api/v1/login").Subrouter()
 	dataRoute.HandleFunc("/validate", authenticator.HandlerFunc(func(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
 		oAuthSuccess(auth, w, r, service)
-	}, oAuthFailure)).Methods("GET").Queries("code", "{code}", "scope", "{scope}")
+	}, oAuthFailure)).Methods("GET").Queries("code", "{code}", "scope", "{scope}", "state", "{state}")
 
 	dataRoute.HandleFunc("/status", token.ValidateMiddleware(func(writer http.ResponseWriter, request *http.Request) {
 		getLoginStatus(writer, request, service)

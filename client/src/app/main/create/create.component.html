@@ -1,18 +1,15 @@
 <div class="create-activity">
-  <h2>
-    Create Activity
-  </h2>
-
+  <h2>Create Activity</h2>
   <div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
       <div class="row">
         <div class="col-4">
           <div class="form-group">
             <label for="type">Type:</label>
-              <select class="form-control" id="type" style="min-width: 100px">
+              <select class="form-control activity-type-select" id="type" [ngModel]="Activity.activity_type" (ngModelChange)="Activity.activity_type = $event">
                 <option value="group_ride">Ride</option>
-                <option value="group_run">Run</option>
-                <option value="group_ski">Ski</option>
+                <!-- <option value="group_run">Run</option>
+                <option value="group_ski">Ski</option> -->
                 <option value="race">Race</option>
                 <option value="triathlon">Triathlon</option>
               </select>
@@ -21,42 +18,39 @@
         <div class="col-8">
           <div class="form-group">
             <label for="activity-name">Name:</label>
-            <input type="text" class="form-control" id="activity-name" maxlength="300" style="min-width: 200px">
+            <input type="text" [ngModel]="Activity.name" (ngModelChange)="Activity.name = $event" class="form-control name-input" id="activity-name" maxlength="300">
           </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="description">Description:</label>
-        <textarea class="form-control" rows="5" id="description" maxlength="1000"></textarea>
+        <textarea class="form-control" rows="5" id="description" maxlength="1000" [ngModel]="Activity.description" (ngModelChange)="Activity.description = $event"></textarea>
       </div>
       <div class = "row">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
-            <label for="startTime">Start Time:</label>
-            <div class="dropdown" id="startTime">
-              <!-- <a class="dropdown-toggle" id="startTimeDropDown" role="button" data-toggle="dropdown" data-target="#" href="#">
-                <div class="input-group"><div class="form-control">{{activity.startTime | date: 'short'}}</div><span class="input-group-addon"><i class="fsa fa-calender-alt"></i></span>
-                </div>
-              </a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <datetimepicker data-ng-model="activity.startTime" data-datetimepicker-config="{ dropdownSelector: '#startTimeDropDown' }"/>
-              </ul>-->
-            </div>
+            <label>
+              Start Time:
+              <input [owlDateTime]="startTime" [ngModel]="Activity.start_time" (ngModelChange)="Activity.start_time = $event">
+              <span class="trigger" [owlDateTimeTrigger]="startTime">
+                  <i class="fas fa-calendar-alt"></i>
+                </span>
+              <owl-date-time #startTime></owl-date-time>
+            </label>
           </div>
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
-            <label for="endTime">End Time:</label>
-            <div class="dropdown" id="endTime">
-              <!--<a class="dropdown-toggle" id="endTimeDropDown" role="button" data-toggle="dropdown" data-target="#" href="#">
-                <div class="input-group"><div class="form-control">{{activity.endTime | date: 'short'}}</div><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                </div>
-              </a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                <datetimepicker data-ng-model="activity.endTime" data-datetimepicker-config="{ dropdownSelector: '#endTimeDropDown' }"/>
-              </ul> -->
+            <label>
+              End Time:
+              <input [owlDateTime]="endTime" [ngModel]="Activity.end_time" (ngModelChange)="Activity.end_time = $event">
+              <span class="trigger" [owlDateTimeTrigger]="endTime">
+                  <i class="fas fa-calendar-alt"></i>
+                </span>
+              <owl-date-time #endTime></owl-date-time>
+            </label>
             </div>
           </div>
         </div>
@@ -66,9 +60,9 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="privacy">Privacy:</label>
-            <select class="form-control" id='privacy'>
+            <select class="form-control" id='privacy' [ngModel]="Activity.privacy" (ngModelChange)="Activity.privacy = $event">
               <option value="public">Public</option>
-              <option value="hidden">Hidden</option>
+              <option value="private">Hidden</option>
             </select>
           </div>
         </div>
@@ -76,7 +70,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="maxParticipants">Maximum number of participants:</label>
-            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100">
+            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100" [ngModel]="Activity.max_participants" (ngModelChange)="Activity.max_participants = $event">
           </div>
         </div>
       </div>
@@ -164,11 +158,11 @@
 
         <button class="btn btn-default" data-toggle="modal" data-target="#addStageDialog" ng-click="showAddStage()">Add Stage</button>
 
-      </div>-->
+      </div>
+    </div>-->
     </div>
-  </div>
 
-  <button style="margin-top: 20px" class="btn btn-primary" (click)="create()">
+  <button class="btn btn-primary create-button" (click)="create()">
     Create Activity
   </button>
 

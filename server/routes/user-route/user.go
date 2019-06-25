@@ -6,8 +6,6 @@ import (
 
 	"github.com/cjburchell/go-uatu"
 
-	"github.com/cjburchell/ridemanager/routes/contract"
-
 	"github.com/cjburchell/ridemanager/routes/token"
 
 	"github.com/cjburchell/ridemanager/service/data"
@@ -30,9 +28,10 @@ func handleGetUser(w http.ResponseWriter, r *http.Request, dataService data.ISer
 		return
 	}
 
-	var contractUser = contract.NewUser(*user)
+	// clear out private data
+	user.StravaToken = ""
 
-	reply, _ := json.Marshal(contractUser)
+	reply, _ := json.Marshal(user)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
