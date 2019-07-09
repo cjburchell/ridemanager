@@ -4,6 +4,7 @@ import {
   IActivity
 } from '../../services/activity.service';
 import {IUser} from '../../services/user.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-create',
@@ -12,19 +13,18 @@ import {IUser} from '../../services/user.service';
 })
 export class CreateComponent implements OnInit {
 
-  @Input() Activity: IActivity;
+  Activity: IActivity;
   @Input() User: IUser;
 
-  constructor(private activityService: ActivityService) {
+  constructor(private activityService: ActivityService, private router: Router) {
   }
 
   ngOnInit() {
-    if (this.Activity === undefined) {
       this.Activity = {
         activity_id: undefined,
         activity_type: 'group_ride',
         owner_id: this.User.id,
-        name: undefined,
+        name: 'new',
         description: undefined,
         start_time: undefined,
         end_time: undefined,
@@ -39,10 +39,10 @@ export class CreateComponent implements OnInit {
         state: undefined,
         max_participants: 10
       };
-    }
   }
 
   back() {
+    this.router.navigate([`/main`]);
   }
 
   create() {
