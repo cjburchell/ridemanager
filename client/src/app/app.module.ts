@@ -20,8 +20,8 @@ import { HistoryComponent } from './main/history/history.component';
 import { CreateComponent } from './main/create/create.component';
 import { JoinComponent } from './main/join/join.component';
 import { SummeryComponent } from './main/summery/summery.component';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 import {FormsModule} from '@angular/forms';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 
 @NgModule({
@@ -48,9 +48,9 @@ import {FormsModule} from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

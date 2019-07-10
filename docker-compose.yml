@@ -11,5 +11,11 @@ services:
          - LOG_CONSOLE=true
          - LOG_LEVEL=Debug
          - LOG_USE_NATS=false
+         - LOG_USE_NATS=false;
+         - LOG_LEVEL=Debug;
+         - MONGO_URL=localhost:32768;
+         - STRAVA_CLIENT_ID=12880;
+         - STRAVA_CLIENT_SECRET=c61800b62c34c0866c20a22bd4cddf6a1b40aa23;
+         - STRAVA_REDIRECT_URI=http://localhost:8091/api/v1/login/validate
     ports:
      - "8091:8091"

@@ -1,4 +1,4 @@
-<div class="create-activity">
+<div class="create-activity" *ngIf="Activity">
   <h2>Create Activity</h2>
   <div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
@@ -6,7 +6,7 @@
         <div class="col-4">
           <div class="form-group">
             <label for="type">Type:</label>
-              <select class="form-control activity-type-select" id="type" [ngModel]="Activity.activity_type" (ngModelChange)="Activity.activity_type = $event">
+              <select class="form-control activity-type-select" id="type" [ngModel]="Activity?.activity_type" (ngModelChange)="Activity.activity_type = $event">
                 <option value="group_ride">Ride</option>
                 <!-- <option value="group_run">Run</option>
                 <option value="group_ski">Ski</option> -->
@@ -18,26 +18,23 @@
         <div class="col-8">
           <div class="form-group">
             <label for="activity-name">Name:</label>
-            <input type="text" [ngModel]="Activity.name" (ngModelChange)="Activity.name = $event" class="form-control name-input" id="activity-name" maxlength="300">
+            <input type="text" [ngModel]="Activity?.name" (ngModelChange)="Activity.name = $event" class="form-control name-input" id="activity-name" maxlength="300">
           </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="description">Description:</label>
-        <textarea class="form-control" rows="5" id="description" maxlength="1000" [ngModel]="Activity.description" (ngModelChange)="Activity.description = $event"></textarea>
+        <textarea class="form-control" rows="5" id="description" maxlength="1000" [ngModel]="Activity?.description" (ngModelChange)="Activity.description = $event"></textarea>
       </div>
       <div class = "row">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
-            <label>
-              Start Time:
-              <input [owlDateTime]="startTime" [ngModel]="Activity.start_time" (ngModelChange)="Activity.start_time = $event">
-              <span class="trigger" [owlDateTimeTrigger]="startTime">
-                  <i class="fas fa-calendar-alt"></i>
-                </span>
-              <owl-date-time #startTime></owl-date-time>
-            </label>
+            <label for="startTime">Start Time:</label>
+            <div class="input-group">
+              <input id="startTime" [owlDateTime]="dt" placeholder="Date Time">
+              <span [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
+              <owl-date-time #dt></owl-date-time>
           </div>
         </div>
 
@@ -45,11 +42,7 @@
           <div class="form-group">
             <label>
               End Time:
-              <input [owlDateTime]="endTime" [ngModel]="Activity.end_time" (ngModelChange)="Activity.end_time = $event">
-              <span class="trigger" [owlDateTimeTrigger]="endTime">
-                  <i class="fas fa-calendar-alt"></i>
-                </span>
-              <owl-date-time #endTime></owl-date-time>
+             <!-- <datetime-popup id= 'endTime' [(value)]="Activity.end_time"></datetime-popup> -->
             </label>
             </div>
           </div>
@@ -60,7 +53,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="privacy">Privacy:</label>
-            <select class="form-control" id='privacy' [ngModel]="Activity.privacy" (ngModelChange)="Activity.privacy = $event">
+            <select class="form-control" id='privacy' [ngModel]="Activity?.privacy" (ngModelChange)="Activity.privacy = $event">
               <option value="public">Public</option>
               <option value="private">Hidden</option>
             </select>
@@ -70,14 +63,14 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="maxParticipants">Maximum number of participants:</label>
-            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100" [ngModel]="Activity.max_participants" (ngModelChange)="Activity.max_participants = $event">
+            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100" [ngModel]="Activity?.max_participants" (ngModelChange)="Activity.max_participants = $event">
           </div>
         </div>
       </div>
 
-     <!-- <div class="well">
+    <div class="card">
         <label>Categories:</label>
-        <div ng-if="activity.categories.length !== 0">
+        <div *ngIf="Activity?.categories.length !== 0">
           <table class="table table-striped">
             <thead>
             <tr>
@@ -86,34 +79,33 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="category in activity.categories">
+            <tr *ngFor="let category of Activity?.categories">
               <td style="vertical-align:center">{{category.name}}</td>
-              <td><a ng-click="deleteCategory(category)"> <span class="glyphicon glyphicon-remove-circle"></span>
-              </a></td>
+              <td><button type="button" class="close" (click)="deleteCategory(category)">x</button></td>
             </tr>
             </tbody>
           </table>
         </div>
-        <div ng-if="activity.categories.length === 0">
-          <p style="color: red">No catagories, You must have at least one catagory</p>
+        <div *ngIf="Activity?.categories.length === 0">
+          <p style="color: red">No categories, You must have at least one catagory</p>
         </div>
-        <button class="btn btn-default" data-toggle="modal" data-target="#addCategoryDialog" ng-click="showAddCategory()">Add Catagory</button>
-      </div>-->
-
+        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#addCategoryDialog" (click)="showAddCategory()">Add Category</button>
+      </div>
     </div>
+
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-      <!-- <div class="well">
-        <label ng-if="activity.routeId">Route:</label>
-        <p ng-if="activity.routeId"><a ng-href="https://www.strava.com/routes/{{activity.routeId}}" target="_blank">{{activity.routeName}}</a> {{activity.routeDistance/1000 | number : 2}}km</p>
-        <div ng-if="activity.activityType !== 'race' && activity.activityType !== 'triathlon'">
-          <div ng-if="activity.stages.length === 0 && !activity.routeId ">
+     <div class="card">
+        <label *ngIf="Activity.route">Route:</label>
+        <p *ngIf="Activity.route"><a [href]="'https://www.strava.com/routes/' + Activity.route?.id " target="_blank">{{Activity.route?.name}}</a> {{Activity.route?.distance/1000 | number : '2'}}km</p>
+        <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon'">
+          <div *ngIf="Activity.stages.length === 0 && !Activity.route ">
             <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
           </div>
         </div>
-        <button class="btn btn-default" data-toggle="modal" data-target="#addRouteDialog" ng-click="showRoutes()">Set Route</button>
-        <button ng-if="activity.routeId" class="btn btn-default" ng-click="clearRoute()">Clear Route</button>
+        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="showRoutes()">Set Route</button>
+        <button *ngIf="Activity.route" class="btn btn-outline-secondary" (click)="clearRoute()">Clear Route</button>
       </div>
-      <div class="well">
+       <!-- <div class="well">
         <div ng-if="activity.stages.length != 0">
           <label>Timed Stages:</label>
           <table class="table table-striped">
@@ -133,9 +125,9 @@
               <td style="vertical-align:center"><a ng-href="https://www.strava.com/segments/{{stage.segmentId}}" target="_blank">{{stage.name}}</a></td>
               <td style="vertical-align:center">{{stage.distance/1000 | number : 2}}km</td>
               <td class="btn-group">
-                <button class="btn btn-default" ng-disabled="stage.number === 1" ng-click="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
-                <button class="btn btn-default" ng-disabled="stage.number === activity.stages.length" ng-click="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
-                <button class="btn btn-default" ng-click="deleteStage(stage)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                <button class="btn btn-outline-secondary" ng-disabled="stage.number === 1" ng-click="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
+                <button class="btn btn-outline-secondary" ng-disabled="stage.number === activity.stages.length" ng-click="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
+                <button class="btn btn-outline-secondary" ng-click="deleteStage(stage)"><span class="glyphicon glyphicon-remove-circle"></span></button>
               </td>
             </tr>
             </tbody>
@@ -156,7 +148,7 @@
 
         <p><label>Total Distance</label> {{activity.totalDistance/1000 | number : 2}}km</p>
 
-        <button class="btn btn-default" data-toggle="modal" data-target="#addStageDialog" ng-click="showAddStage()">Add Stage</button>
+        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" ng-click="showAddStage()">Add Stage</button>
 
       </div>
     </div>-->
@@ -166,5 +158,26 @@
     Create Activity
   </button>
 
-  <button class="btn btn-default back-button" (click)="back()">Cancel</button>
+  <button class="btn btn-outline-secondary back-button" (click)="back()">Cancel</button>
+
+  <div  class="modal fade" id="addCategoryDialog" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Add Category {{ newCategory?.name }}</h4>
+          <button type="button" class="close" data-dismiss="modal">x</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" [ngModel]="newCategory?.name" (ngModelChange)="newCategory.name = $event">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button [disabled]="newCategory?.name === ''" type="button" class="btn btn-primary" data-dismiss="modal" (click)="addCategory(newCategory)">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

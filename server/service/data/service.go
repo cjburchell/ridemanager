@@ -61,7 +61,7 @@ func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
 
 func (s service) AddUser(user *models.User) error {
 	if user.Id == "" {
-		u1 := uuid.Must(uuid.NewV4(), errors.New("unable to create uuid"))
+		u1 := uuid.NewV4()
 		user.Id = models.AthleteId(u1.String())
 	}
 

@@ -20,12 +20,19 @@ export interface IActivity {
   duration: number;
   time_left: number;
   starts_in: number;
+  route: IRoute;
   privacy: ActivityPrivacy;
   categories: ICategory[];
   stages: IStage[];
   participants: IParticipant[];
   state: ActivityState;
   max_participants: number;
+}
+
+export interface IRoute {
+  id: number;
+  name: string;
+  distance: number;
 }
 
 export interface IParticipant {

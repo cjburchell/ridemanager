@@ -11,7 +11,7 @@
         <app-history *ngIf="pageId === 'history'"></app-history>
         <app-manage *ngIf="pageId === 'manage'"></app-manage>
         <app-join *ngIf="pageId === 'join'"></app-join>
-        <app-create *ngIf="pageId === 'create'"></app-create>
+        <app-create *ngIf="pageId === 'create'" [user] = "user"></app-create>
         <app-summery *ngIf="pageId === 'summery'"></app-summery>
       </div>
     </div>

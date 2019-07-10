@@ -94,8 +94,11 @@ func oAuthFailure(err error, w http.ResponseWriter, r *http.Request) {
 
 func getLoginStatus(w http.ResponseWriter, r *http.Request, dataService data.IService) {
 	user, err := token.GetUser(r, dataService)
-	if err != nil {
-		log.Error(err)
+	if err != nil || user == nil {
+		if err != nil{
+			log.Error(err)
+		}
+
 		reply, _ := json.Marshal(false)
 		w.WriteHeader(http.StatusNotFound)
 		_, err = w.Write(reply)
