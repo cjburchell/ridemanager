@@ -7,6 +7,7 @@ import (
 )
 
 type IService interface {
+	StaredSegments() ([]*strava.SegmentSummary, error)
 }
 
 type service struct {

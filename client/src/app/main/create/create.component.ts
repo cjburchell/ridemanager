@@ -6,6 +6,7 @@ import {
 import {IUser} from '../../services/user.service';
 import {Router} from '@angular/router';
 import * as uuid from 'uuid';
+import {ISegmentSummary, StravaService} from '../../services/strava.service';
 
 @Component({
   selector: 'app-create',
@@ -18,7 +19,12 @@ export class CreateComponent implements OnChanges {
   newCategory: ICategory;
   @Input() user: IUser;
 
-  constructor(private activityService: ActivityService, private router: Router) {
+  stageSearchText: string;
+  loadingStages: boolean;
+  stages: ISegmentSummary[];
+  selectedStage: ISegmentSummary;
+
+  constructor(private activityService: ActivityService, private router: Router, private stravaService: StravaService) {
   }
 
   ngOnChanges() {
@@ -83,14 +89,39 @@ export class CreateComponent implements OnChanges {
 
 
   showAddStage() {
+    this.selectedStage = undefined;
+    this.stages = undefined;
+    this.getStages();
   }
 
   deleteStage(stage: IStage) {
+    const index = this.Activity.stages.indexOf(stage, 0);
+    if (index > -1) {
+      this.Activity.stages.splice(index, 1);
+    }
   }
 
   moveStageUp(stage: IStage) {
   }
 
   moveStageDown(stage: IStage) {
+  }
+
+  selectStage(stage: ISegmentSummary) {
+    this.selectedStage = stage;
+  }
+
+  getStages() {
+    this.loadingStages = true;
+    this.stravaService.getStaredSegments().subscribe((segments: ISegmentSummary[]) => {
+      this.stages = segments;
+      this.loadingStages = false;
+    });
+  }
+
+  addStage(stage: ISegmentSummary) {
+    this.Activity.stages.push({
+      segment_id: stage.id
+    });
   }
 }

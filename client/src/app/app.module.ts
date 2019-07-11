@@ -23,6 +23,7 @@ import { SummeryComponent } from './main/summery/summery.component';
 import {FormsModule} from '@angular/forms';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { ActivityTypeToImagePipe } from './pipes/activity-type-to-image.pipe';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     HistoryComponent,
     CreateComponent,
     JoinComponent,
-    SummeryComponent
+    SummeryComponent,
+    ActivityTypeToImagePipe
   ],
   imports: [
     BrowserModule,

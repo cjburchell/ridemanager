@@ -57,12 +57,11 @@ export interface ICategory {
 }
 
 export interface IStage {
-  segment_id: string;
+  segment_id: number;
   distance: number;
   number: number;
   activity_type: ActivityType;
   name: string;
-
 }
 
 @Injectable({

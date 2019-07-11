@@ -4,26 +4,32 @@ import "time"
 
 type ActivityType string
 
-const (
-	GroupRideActivity ActivityType = "group_ride"
-	RaceActivity      ActivityType = "race"
-	TriathlonActivity ActivityType = "triathlon"
-)
+var  ActivityTypes = struct {
+	GroupRide ActivityType
+	Race      ActivityType
+	Triathlon ActivityType
+}{"group_ride", "race", "triathlon"}
 
 type ActivityPrivacy string
 
-const (
-	PublicActivity  ActivityPrivacy = "public"
-	PrivateActivity ActivityPrivacy = "private"
-)
+var Privacy = struct {
+	Public ActivityPrivacy
+	Private ActivityPrivacy
+}{"public", "private"}
 
 type ActivityState string
 
-const (
-	UpcomingActivity   ActivityState = "upcoming"
-	InProgressActivity ActivityState = "in_progress"
-	FinishedActivity   ActivityState = "finished"
-)
+var ActivityStates = struct {
+	Upcoming ActivityState
+	InProgress ActivityState
+	Finished   ActivityState
+}{"upcoming", "in_progress", "finished"}
+
+type Route struct {
+	RouteId  int    `json:"id" bson:"id"`
+	Name     string `json:"name" bson:"name"`
+	Distance int    `json:"distance" bson:"distance"`
+}
 
 type ActivityId string
 
@@ -39,6 +45,7 @@ type Activity struct {
 	Duration        float64         `json:"duration" bson:"duration"`
 	TimeLeft        float64         `json:"time_left" bson:"time_left"`
 	StartsIn        float64         `json:"starts_in" bson:"starts_in"`
+	Route           *Route          `json:"route" bson:"route"`
 	Privacy         ActivityPrivacy `json:"privacy" bson:"privacy"`
 	Categories      []Category      `json:"categories" bson:"categories"`
 	Stages          []Stage         `json:"stages" bson:"stages"`
@@ -57,10 +64,10 @@ func (activity *Activity) UpdateActivityState() {
 	activity.Duration = activity.EndTime.Sub(activity.EndTime).Seconds()
 	activity.TimeLeft = activity.EndTime.Sub(time.Now()).Seconds()
 	if activity.TimeLeft <= 0 {
-		activity.State = FinishedActivity
+		activity.State = ActivityStates.Finished
 	} else if activity.StartsIn <= 0 {
-		activity.State = InProgressActivity
+		activity.State = ActivityStates.InProgress
 	} else {
-		activity.State = UpcomingActivity
+		activity.State = ActivityStates.Upcoming
 	}
 }
