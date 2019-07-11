@@ -1,7 +1,7 @@
 import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {
   ActivityService,
-  IActivity, ICategory
+  IActivity, ICategory, IStage
 } from '../../services/activity.service';
 import {IUser} from '../../services/user.service';
 import {Router} from '@angular/router';
@@ -82,4 +82,15 @@ export class CreateComponent implements OnChanges {
   }
 
 
+  showAddStage() {
+  }
+
+  deleteStage(stage: IStage) {
+  }
+
+  moveStageUp(stage: IStage) {
+  }
+
+  moveStageDown(stage: IStage) {
+  }
 }

@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="navbar-brand">Ride Manager</div>
 
-    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myNavbar">
+   <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -13,21 +13,21 @@
           <li class="nav-item"><a class="nav-link" (click)="showUserHistory()">History</a></li>
         </ul>
 
-        <ul class="navbar-nav">
+        <ul class="navbar-nav" *ngIf="user">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle user-dropdown" data-toggle="dropdown" href="#" id="navbardrop" >
+           <a class="nav-link dropdown-toggle user-dropdown" data-toggle="dropdown" href="#" id="navbardrop" >
               <img class="rounded-circle" [src]="user?.profile_medium" width="24" height="24"/> {{user?.first_name}} {{user?.last_name}}
-            </a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" [href]="'https://www.strava.com/athletes/' + user?.strava_athlete_id" target="_blank">Profile</a>
-              <a class="dropdown-item" (click)="onLogOut()">Log Out</a>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="poweredbywrapper" href="http://www.strava.com" target="_blank">
-              <img class="poweredbystrava" src="../../../assets/images/api_logo_pwrdBy_strava_horiz_light.png"/>
-            </a>
-          </li>
+           </a>
+           <div class="dropdown-menu">
+             <a class="dropdown-item" [href]="'https://www.strava.com/athletes/' + user?.strava_athlete_id" target="_blank">Profile</a>
+             <a class="dropdown-item" (click)="onLogOut()">Log Out</a>
+           </div>
+         </li>
+         <li class="nav-item">
+           <a class="poweredbywrapper" href="http://www.strava.com" target="_blank">
+             <img class="poweredbystrava" src="../../../assets/images/api_logo_pwrdBy_strava_horiz_light.png"/>
+           </a>
+         </li>
         </ul>
       </div>
   </nav>

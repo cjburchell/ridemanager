@@ -32,20 +32,21 @@
           <div class="form-group">
             <label for="startTime">Start Time:</label>
             <div class="input-group">
-              <input id="startTime" [owlDateTime]="dt" placeholder="Date Time">
-              <span [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
-              <owl-date-time #dt></owl-date-time>
-          </div>
+                <input id="startTime" [owlDateTime]="dt" placeholder="Date Time" [(ngModel)]="Activity.start_time">
+                <span [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
+                <owl-date-time #dt></owl-date-time>
+            </div>
         </div>
-
+        </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
-            <label>
-              End Time:
-             <!-- <datetime-popup id= 'endTime' [(value)]="Activity.end_time"></datetime-popup> -->
-            </label>
+            <label for="endTime">End Time:</label>
+            <div class="input-group">
+              <input id="endTime" [owlDateTime]="dtEnd" placeholder="Date Time" [(ngModel)]="Activity.end_time">
+              <span [owlDateTimeTrigger]="dtEnd"><i class="fa fa-calendar"></i></span>
+              <owl-date-time #dtEnd></owl-date-time>
             </div>
-          </div>
+            </div>
         </div>
       </div>
 
@@ -105,8 +106,8 @@
         <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="showRoutes()">Set Route</button>
         <button *ngIf="Activity.route" class="btn btn-outline-secondary" (click)="clearRoute()">Clear Route</button>
       </div>
-       <!-- <div class="well">
-        <div ng-if="activity.stages.length != 0">
+     <div class="card">
+        <div *ngIf="Activity.stages.length != 0">
           <label>Timed Stages:</label>
           <table class="table table-striped">
             <thead>
@@ -119,39 +120,35 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="stage in activity.stages | orderBy : 'number'">
+            <tr *ngFor="let stage of Activity.stages">
               <td style="vertical-align:center">{{stage.number}}</td>
-              <td style="vertical-align:center"><img ng-src="{{stage.activity_type | typeToIcon}}" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
-              <td style="vertical-align:center"><a ng-href="https://www.strava.com/segments/{{stage.segmentId}}" target="_blank">{{stage.name}}</a></td>
-              <td style="vertical-align:center">{{stage.distance/1000 | number : 2}}km</td>
+              <td style="vertical-align:center"><img [src]="stage.activity_type" height="20" width="20" data-toggle="tooltip" [title]="stage.activity_type"/></td>
+              <td style="vertical-align:center"><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
+              <td style="vertical-align:center">{{stage.distance/1000 | number : '2'}}km</td>
               <td class="btn-group">
-                <button class="btn btn-outline-secondary" ng-disabled="stage.number === 1" ng-click="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
-                <button class="btn btn-outline-secondary" ng-disabled="stage.number === activity.stages.length" ng-click="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
-                <button class="btn btn-outline-secondary" ng-click="deleteStage(stage)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
+                <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
+                <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><span class="glyphicon glyphicon-remove-circle"></span></button>
               </td>
             </tr>
             </tbody>
           </table>
         </div>
 
-        <div ng-if="activity.activityType === 'race' || activity.activityType === 'triathlon'">
-          <div ng-if="activity.stages.length === 0">
+        <div *ngIf="(Activity.activity_type === 'race' || Activity.activity_type === 'triathlon') && Activity.stages.length === 0">
             <p style="color: red">You must have at least one stage, please add a stage</p>
-          </div>
         </div>
 
-        <div ng-if="activity.activityType !== 'race' && activity.activityType !== 'triathlon'">
-          <div ng-if="activity.stages.length === 0 && !activity.routeId ">
+        <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon' && Activity.stages.length === 0 && !Activity.route">
             <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
-          </div>
         </div>
 
-        <p><label>Total Distance</label> {{activity.totalDistance/1000 | number : 2}}km</p>
+        <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '2'}}km</p>
 
-        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" ng-click="showAddStage()">Add Stage</button>
+        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="showAddStage()">Add Stage</button>
 
       </div>
-    </div>-->
+    </div>
     </div>
 
   <button class="btn btn-primary create-button" (click)="create()">
