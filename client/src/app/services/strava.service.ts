@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TokenService} from './token.service';
+import {SegmentType} from './activity.service';
 
 
 export interface ISegmentSummary {
   id: number;
   name: string;
-  activity_type: string;
+  activity_type: SegmentType;
   distance: number;
   average_grade: number;
   maximum_grade: number;
@@ -21,6 +22,23 @@ export interface ISegmentSummary {
   country: string;
   private: boolean;
   starred: boolean;
+  map: IMap;
+}
+
+export interface IMap {
+  id: string;
+  polyline: string;
+  summary_polyline: string;
+}
+
+
+export interface IRouteSummary {
+  id: number;
+  name: string;
+  distance: number;
+  type: number;
+  segments: ISegmentSummary[];
+  map: IMap;
 }
 
 @Injectable({
@@ -37,6 +55,36 @@ export class StravaService {
       })
     };
 
-    return this.http.get<ISegmentSummary[]>(`api/v1/activity`, httpOptions);
+    return this.http.get<ISegmentSummary[]>(`api/v1/strava/segments/starred`, httpOptions);
+  }
+
+  getRoutes(): Observable<IRouteSummary[]> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IRouteSummary[]>(`api/v1/strava/routes`, httpOptions);
+  }
+
+  getRoute(routeId: number): Observable<IRouteSummary> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IRouteSummary>(`api/v1/strava/routes/` + routeId, httpOptions);
+  }
+
+  getSegment(segmentId: number): Observable<ISegmentSummary> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<ISegmentSummary>(`api/v1/strava/segments/` + segmentId, httpOptions);
   }
 }

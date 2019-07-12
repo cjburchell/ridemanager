@@ -6,14 +6,14 @@ import {ActivityType} from '../services/activity.service';
 })
 export class ActivityTypeToImagePipe implements PipeTransform {
 
-  transform(value: ActivityType): any {
+  transform(value: ActivityType): string {
     switch (value) {
       case 'group_ride':
         return '/assets/images/bike.svg';
-      /*case 'group_run':
-        return '/images/run.svg';
+      case 'group_run':
+        return '/assets/images/run.svg';
       case 'group_ski':
-        return '/images/ski.svg';*/
+        return '/assets/images/ski.svg';
       case 'race':
         return '/assets/images/race.svg';
       case 'triathlon':

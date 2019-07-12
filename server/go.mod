@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/cjburchell/go-uatu v0.0.0-20190613111335-704bf7438382
-	github.com/cjburchell/go.strava v0.0.0-20180612235916-99ebe972ba16
+	github.com/cjburchell/go.strava v0.0.0-20190712204833-0b2c2c607cf6
 	github.com/cjburchell/tools-go v0.0.0-20181126150745-9a148bb98f00
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/context v1.1.1

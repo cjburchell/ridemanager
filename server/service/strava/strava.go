@@ -7,7 +7,10 @@ import (
 )
 
 type IService interface {
-	StaredSegments() ([]*strava.SegmentSummary, error)
+	GetStaredSegments() ([]*strava.SegmentSummary, error)
+	GetRoutes(athleteId int64) ([]*strava.Route, error)
+	GetRoute(routeId int64) (*strava.Route, error)
+	GetSegment(segmentId int64) (*strava.SegmentDetailed, error)
 }
 
 type service struct {
@@ -34,9 +37,9 @@ func (s service) GetSegmentStream(segmentId int64, streamTypes []strava.StreamTy
 	return routes.Get(segmentId, streamTypes).Do()
 }
 
-func (s service) StaredSegments() ([]*strava.SegmentSummary, error) {
+func (s service) GetStaredSegments() ([]*strava.SegmentSummary, error) {
 	segments := strava.NewSegmentsService(s.client)
-	return segments.Starred().Do()
+	return segments.Starred().PerPage(100).Do()
 }
 
 func (s service) SegmentsListEfforts(segmentId int64, athleteId int64, startTime time.Time, endTime time.Time) ([]*strava.SegmentEffortSummary, error) {
@@ -44,7 +47,7 @@ func (s service) SegmentsListEfforts(segmentId int64, athleteId int64, startTime
 	return segments.ListEfforts(segmentId).AthleteId(athleteId).DateRange(startTime, endTime).Do()
 }
 
-func (s service) SegmentMap(segmentId int64) (*strava.SegmentDetailed, error) {
+func (s service) GetSegment(segmentId int64) (*strava.SegmentDetailed, error) {
 	segments := strava.NewSegmentsService(s.client)
 	return segments.Get(segmentId).Do()
 }

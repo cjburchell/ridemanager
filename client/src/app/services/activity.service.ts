@@ -3,10 +3,46 @@ import {Gender} from './user.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TokenService} from './token.service';
 import {Observable} from 'rxjs';
+import {IMap} from './strava.service';
 
-export type ActivityType = 'group_ride' | 'race' | 'triathlon';
+export type ActivityType = 'group_ride' | 'race' | 'triathlon' | 'group_run' | 'group_ski';
 export type ActivityState = 'upcoming' |'in_progress' |'finished';
 export type ActivityPrivacy = 'public' | 'private';
+
+export type SegmentType =
+  'Ride'
+  | 'AlpineSki'
+  | 'BackcountrySki'
+  | 'Hike'
+  | 'IceSkate'
+  | 'InlineSkate'
+  | 'NordicSki'
+  | 'RollerSki'
+  | 'Run'
+  | 'Walk'
+  | 'Workout'
+  | 'Snowboard'
+  | 'Snowshoe'
+  | 'Kitesurf'
+  | 'Windsurf'
+  | 'Swim'
+  | 'VirtualRide'
+  | 'EBikeRide'
+  | 'WaterSport'
+  | 'Canoeing'
+  | 'Kayaking'
+  | 'Rowing'
+  | 'StandUpPaddling'
+  | 'Surfing'
+  | 'Crossfit'
+  | 'Elliptical'
+  | 'RockClimbing'
+  | 'StairStepper'
+  | 'WeightTraining'
+  | 'Yoga'
+  | 'WinterSport'
+  | 'CrossCountrySkiing';
+
 
 export interface IActivity {
   activity_id: string;
@@ -33,6 +69,7 @@ export interface IRoute {
   id: number;
   name: string;
   distance: number;
+  map: IMap;
 }
 
 export interface IParticipant {
@@ -60,8 +97,11 @@ export interface IStage {
   segment_id: number;
   distance: number;
   number: number;
-  activity_type: ActivityType;
+  activity_type: SegmentType;
   name: string;
+  map: IMap;
+  start_latlng: number[];
+  end_latlng: number[];
 }
 
 @Injectable({

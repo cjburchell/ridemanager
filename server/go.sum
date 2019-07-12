@@ -2,6 +2,16 @@ github.com/cjburchell/go-uatu v0.0.0-20190613111335-704bf7438382 h1:W3rzIUtWx1xJ
 github.com/cjburchell/go-uatu v0.0.0-20190613111335-704bf7438382/go.mod h1:OKlHw8ugzzn2zt1N0M4VDSOs6WYXzeJ6QO/Hxr4gilY=
 github.com/cjburchell/go.strava v0.0.0-20180612235916-99ebe972ba16 h1:LLrcHSd/pyYln+O2NvmyK4DSGG8rey1iOeSyUErV3B8=
 github.com/cjburchell/go.strava v0.0.0-20180612235916-99ebe972ba16/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
+github.com/cjburchell/go.strava v0.0.0-20190712130057-0db5c41b69a4 h1:4JxZYPxlDqdQ4d9nxtCnMzNzQqLqwxS3P44LB8C/hj8=
+github.com/cjburchell/go.strava v0.0.0-20190712130057-0db5c41b69a4/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
+github.com/cjburchell/go.strava v0.0.0-20190712203749-efbd452b20ce h1:ciiKl0iJrxOV67uAAO/zdM33Uuu3eQtFnttnJXw5GkQ=
+github.com/cjburchell/go.strava v0.0.0-20190712203749-efbd452b20ce/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
+github.com/cjburchell/go.strava v0.0.0-20190712204248-806334189bc2 h1:2jMbyla0BS7XqBXhgFqSpZI399TH3idFQ8pZ4ULItow=
+github.com/cjburchell/go.strava v0.0.0-20190712204248-806334189bc2/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
+github.com/cjburchell/go.strava v0.0.0-20190712204539-69a77d3a48c1 h1:AQ6X7aeoEjONkk+iLVNiz1T/kWfahKO1fVgw42hkJJ4=
+github.com/cjburchell/go.strava v0.0.0-20190712204539-69a77d3a48c1/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
+github.com/cjburchell/go.strava v0.0.0-20190712204833-0b2c2c607cf6 h1:lghwIlPsPiCZkqHxjRceHBJ9kuF2nniv9GmZ1+XNxPU=
+github.com/cjburchell/go.strava v0.0.0-20190712204833-0b2c2c607cf6/go.mod h1:AE5P3uagy7BoEnjyelc60Eb99EtsQa1CzoKHazY3Unw=
 github.com/cjburchell/tools-go v0.0.0-20181126150745-9a148bb98f00 h1:kYM2it0mrYMbpCmsnsqFEbdf47XT9RpzWyu/m9gBUCY=
 github.com/cjburchell/tools-go v0.0.0-20181126150745-9a148bb98f00/go.mod h1:aofm7KiFub/eWlMKyrg0/3tQlQSFqAway9igbRWNAX0=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=

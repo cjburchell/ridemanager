@@ -83,7 +83,7 @@ func startHttpServer(port int, service data.IService) *http.Server {
 	login_route.Setup(r, service)
 	user_route.Setup(r, service)
 	activity_route.Setup(r, service)
-	strava_route.Setup(r)
+	strava_route.Setup(r, service)
 	status_route.Setup(r)
 	settings_route.Setup(r)
 	client_route.Setup(r)

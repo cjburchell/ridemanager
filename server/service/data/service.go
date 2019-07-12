@@ -146,7 +146,7 @@ func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]mode
 	}
 
 	var activities []models.Activity
-	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "privacy": models.PrivateActivity}).All(&activities)
+	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "privacy": models.Privacy.Private}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

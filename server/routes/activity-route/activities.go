@@ -196,7 +196,7 @@ func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, se
 }
 
 func handleGetPublicActivities(writer http.ResponseWriter, _ *http.Request, service data.IService) {
-	activities, err := service.GetActivitiesByPrivacy(models.PublicActivity)
+	activities, err := service.GetActivitiesByPrivacy(models.Privacy.Public)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)

@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type ActivityType string
 
@@ -29,6 +31,13 @@ type Route struct {
 	RouteId  int    `json:"id" bson:"id"`
 	Name     string `json:"name" bson:"name"`
 	Distance int    `json:"distance" bson:"distance"`
+	Map      Map    `json:"map" bson:"map"`
+}
+
+type Map struct {
+	Id              string `json:"id" bson:"id"`
+	Polyline        string `json:"polyline" bson:"polyline"`
+	SummaryPolyline string `json:"summary_polyline" bson:"summary_polyline"`
 }
 
 type ActivityId string

@@ -24,6 +24,8 @@ import {FormsModule} from '@angular/forms';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { ActivityTypeToImagePipe } from './pipes/activity-type-to-image.pipe';
+import { StageTypeToImagePipe } from './pipes/stage-type-to-image.pipe';
+import { RouteTypeToIconPipe } from './pipes/route-type-to-icon.pipe';
 
 
 @NgModule({
@@ -45,7 +47,9 @@ import { ActivityTypeToImagePipe } from './pipes/activity-type-to-image.pipe';
     CreateComponent,
     JoinComponent,
     SummeryComponent,
-    ActivityTypeToImagePipe
+    ActivityTypeToImagePipe,
+    StageTypeToImagePipe,
+    RouteTypeToIconPipe
   ],
   imports: [
     BrowserModule,
