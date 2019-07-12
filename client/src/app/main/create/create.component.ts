@@ -113,6 +113,7 @@ export class CreateComponent implements OnChanges {
     const index = this.Activity.stages.indexOf(stage, 0);
     if (index > -1) {
       this.Activity.stages.splice(index, 1);
+      this.updateDistance();
     }
   }
 
@@ -149,6 +150,7 @@ export class CreateComponent implements OnChanges {
           start_latlng: fullSegment.start_latlng,
           end_latlng: fullSegment.end_latlng
         });
+        this.updateDistance();
     });
   }
 
@@ -177,5 +179,12 @@ export class CreateComponent implements OnChanges {
 
   selectRoute(route: IRouteSummary) {
     this.selectedRoute = route;
+  }
+
+  private updateDistance() {
+    this.Activity.total_distance = 0;
+    for (const stage of this.stages) {
+      this.Activity.total_distance += stage.distance;
+    }
   }
 }

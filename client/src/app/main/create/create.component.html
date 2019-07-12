@@ -97,7 +97,7 @@
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
      <div class="card">
         <label *ngIf="Activity.route">Route:</label>
-        <p *ngIf="Activity.route"><a [href]="'https://www.strava.com/routes/' + Activity.route?.id " target="_blank">{{Activity.route?.name}}</a> {{Activity.route?.distance/1000 | number : '2'}}km</p>
+        <p *ngIf="Activity.route"><a [href]="'https://www.strava.com/routes/' + Activity.route?.id " target="_blank">{{Activity.route?.name}}</a> {{Activity.route?.distance/1000 | number : '1.2-2'}}km</p>
         <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon'">
           <div *ngIf="Activity.stages.length === 0 && !Activity.route ">
             <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
@@ -124,7 +124,7 @@
               <td style="vertical-align:center">{{stage.number}}</td>
               <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" [title]="stage.activity_type"/></td>
               <td style="vertical-align:center"><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
-              <td style="vertical-align:center">{{stage.distance/1000 | number : '2'}}km</td>
+              <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>
               <td class="btn-group">
                 <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
                 <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
@@ -143,7 +143,7 @@
             <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
         </div>
 
-        <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '2'}}km</p>
+        <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '1.2-2'}}km</p>
 
         <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="showAddStage()">Add Stage</button>
 
@@ -214,7 +214,7 @@
                 <td style="vertical-align:center"><i *ngIf="stage === selectedStage" class="far fa-check-circle"></i></td>
                 <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
                 <td style="vertical-align:center"><a [href]=" 'https://www.strava.com/segments/' + stage.id" target="_blank">{{stage.name}}</a></td>
-                <td style="vertical-align:center">{{stage.distance/1000}}km</td>
+                <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>
               </tr>
               </tbody>
             </table>
@@ -264,7 +264,7 @@
                 <td style="vertical-align:center"><i *ngIf="route == selectedRoute" class="far fa-check-circle"></i></td>
                 <td style="vertical-align:center"><img [src]="route.type | routeTypeToIcon" height="20" width="20"/></td>
                 <td style="vertical-align:center"><a [href]="'https://www.strava.com/routes/' + route.id" target="_blank">{{route.name}}</a></td>
-                <td style="vertical-align:center">{{route.distance/1000}}km</td>
+                <td style="vertical-align:center">{{route.distance/1000 | number : '1.2-2'}}km</td>
               </tr>
               </tbody>
             </table>
