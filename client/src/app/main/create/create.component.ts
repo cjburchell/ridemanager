@@ -1,12 +1,14 @@
-import {ChangeDetectorRef, Component, Input, OnChanges} from '@angular/core';
+import { Component, Input, OnChanges, ViewChild} from '@angular/core';
 import {
   ActivityService,
   IActivity, ICategory, IStage
 } from '../../services/activity.service';
 import {IUser} from '../../services/user.service';
 import {Router} from '@angular/router';
-import * as uuid from 'uuid';
+
 import {IRouteSummary, ISegmentSummary, StravaService} from '../../services/strava.service';
+import {SelectStageComponent} from './select-stage/select-stage.component';
+import {SelectRouteComponent} from './select-route/select-route.component';
 
 @Component({
   selector: 'app-create',
@@ -16,24 +18,13 @@ import {IRouteSummary, ISegmentSummary, StravaService} from '../../services/stra
 export class CreateComponent implements OnChanges {
 
   Activity: IActivity;
-  newCategory: ICategory;
   @Input() user: IUser;
-
-  stageSearchText = '';
-  routeSearchText = '';
-  loadingRouts: boolean;
-  loadingStages: boolean;
-  stages: ISegmentSummary[];
-  selectedStage: ISegmentSummary;
-  autoAddStages: boolean;
-
-  routes: IRouteSummary[];
-  selectedRoute: IRouteSummary;
+  @ViewChild('selectStage',  {static: false}) selectStage: SelectStageComponent;
+  @ViewChild('selectRoute',  {static: false}) selectRoute: SelectRouteComponent;
 
   constructor(private activityService: ActivityService,
               private router: Router,
-              private stravaService: StravaService,
-              private ref: ChangeDetectorRef) {
+              private stravaService: StravaService) {
   }
 
   ngOnChanges() {
@@ -80,10 +71,6 @@ export class CreateComponent implements OnChanges {
   }
 
   showAddCategory() {
-    this.newCategory = {
-      category_id: uuid.v4().toString(),
-      name: undefined,
-    };
   }
 
   addCategory(newCategory: ICategory) {
@@ -91,22 +78,15 @@ export class CreateComponent implements OnChanges {
   }
 
   showRoutes() {
-    this.routeSearchText = '';
-    this.selectedRoute = undefined;
-    this.routes = undefined;
-    this.getRoutes();
+    this.selectRoute.show();
   }
 
   clearRoute() {
     this.Activity.route = undefined;
   }
 
-
   showAddStage() {
-    this.stageSearchText = '';
-    this.selectedStage = undefined;
-    this.stages = undefined;
-    this.getStages();
+    this.selectStage.show();
   }
 
   deleteStage(stage: IStage) {
@@ -118,24 +98,25 @@ export class CreateComponent implements OnChanges {
   }
 
   moveStageUp(stage: IStage) {
-    // TODO reorder stages
+    const otherStage = this.Activity.stages.find((item) => {
+      return item.number === (stage.number - 1);
+    });
+
+    if (otherStage) {
+      otherStage.number = stage.number;
+      stage.number--;
+    }
   }
 
   moveStageDown(stage: IStage) {
-    // TODO reorder stages
-  }
-
-  selectStage(stage: ISegmentSummary) {
-    this.selectedStage = stage;
-  }
-
-  getStages() {
-    this.loadingStages = true;
-    this.stravaService.getStaredSegments().subscribe((segments: ISegmentSummary[]) => {
-      this.stages = segments.filter(item => !item.private);
-      this.loadingStages = false;
-      this.ref.detectChanges();
+    const otherStage = this.Activity.stages.find((item) => {
+      return item.number === (stage.number + 1);
     });
+
+    if (otherStage) {
+      otherStage.number = stage.number;
+      stage.number++;
+    }
   }
 
   addStage(segment: ISegmentSummary) {
@@ -154,15 +135,6 @@ export class CreateComponent implements OnChanges {
     });
   }
 
-  getRoutes() {
-    this.loadingRouts = true;
-    this.stravaService.getRoutes().subscribe((routes: IRouteSummary[]) => {
-      this.routes = routes;
-      this.loadingRouts = false;
-      this.ref.detectChanges();
-    });
-  }
-
   setRoute(selectedRoute: IRouteSummary, addStages: boolean) {
     this.Activity.route = selectedRoute;
     this.stravaService.getRoute(selectedRoute.id).subscribe(
@@ -177,14 +149,7 @@ export class CreateComponent implements OnChanges {
     );
   }
 
-  selectRoute(route: IRouteSummary) {
-    this.selectedRoute = route;
-  }
-
   private updateDistance() {
-    this.Activity.total_distance = 0;
-    for (const stage of this.stages) {
-      this.Activity.total_distance += stage.distance;
-    }
+    this.Activity.total_distance = this.Activity.stages.reduce((total, item) => total + item.distance, 0);
   }
 }

@@ -1,0 +1,8 @@
+<div class="add-category">
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" class="form-control" id="name" [ngModel]="newCategory?.name" (ngModelChange)="newCategory.name = $event">
+  </div>
+  <button [disabled]="newCategory?.name === ''" type="button" class="btn btn-primary" data-dismiss="modal" (click)="addCategory.emit(newCategory)">Add</button>
+</div>
+
