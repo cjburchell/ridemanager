@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {TokenService} from '../services/token.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {IUser, UserService} from '../services/user.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-main',
@@ -29,6 +30,9 @@ export class MainComponent implements OnInit {
         if (!isLoggedIn) {
           this.router.navigate([`/login`]);
         }
+      }, (err: HttpErrorResponse) => {
+        console.log(err);
+        this.router.navigate([`/login`]);
       });
     } else {
       this.router.navigate([`/login`]);
