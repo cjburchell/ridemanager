@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {ActivityService, IActivity} from '../../services/activity.service';
 
 @Component({
   selector: 'app-manage',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ManageComponent implements OnInit {
 
-  constructor() { }
+  activities: IActivity[];
+  constructor(private activityService: ActivityService) { }
 
   ngOnInit() {
+    this.activityService.getMyActivities().subscribe(activities => this.activities = activities);
   }
-
 }

@@ -6,7 +6,7 @@
         <div class="col-4">
           <div class="form-group">
             <label for="type">Type:</label>
-              <select class="form-control activity-type-select" id="type" [ngModel]="Activity?.activity_type" (ngModelChange)="Activity.activity_type = $event">
+              <select class="form-control activity-type-select" id="type" [(ngModel)]="Activity?.activity_type">
                 <option value="group_ride">Ride</option>
                 <!-- <option value="group_run">Run</option>
                 <option value="group_ski">Ski</option> -->
@@ -18,14 +18,14 @@
         <div class="col-8">
           <div class="form-group">
             <label for="activity-name">Name:</label>
-            <input type="text" [ngModel]="Activity?.name" (ngModelChange)="Activity.name = $event" class="form-control name-input" id="activity-name" maxlength="300">
+            <input type="text" [(ngModel)]="Activity?.name" class="form-control name-input" id="activity-name" maxlength="300">
           </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="description">Description:</label>
-        <textarea class="form-control" rows="5" id="description" maxlength="1000" [ngModel]="Activity?.description" (ngModelChange)="Activity.description = $event"></textarea>
+        <textarea class="form-control" rows="5" id="description" maxlength="1000" [(ngModel)]="Activity?.description"></textarea>
       </div>
       <div class = "row">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -54,7 +54,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="privacy">Privacy:</label>
-            <select class="form-control" id='privacy' [ngModel]="Activity?.privacy" (ngModelChange)="Activity.privacy = $event">
+            <select class="form-control" id='privacy' [(ngModel)]="Activity?.privacy">
               <option value="public">Public</option>
               <option value="private">Hidden</option>
             </select>
@@ -64,7 +64,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="maxParticipants">Maximum number of participants:</label>
-            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100" [ngModel]="Activity?.max_participants" (ngModelChange)="Activity.max_participants = $event">
+            <input type="number" class="form-control" id="maxParticipants"  min="2" max="100" [(ngModel)]="Activity?.max_participants">
           </div>
         </div>
       </div>

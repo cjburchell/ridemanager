@@ -1,3 +1,10 @@
-<p>
-  history works!
-</p>
+
+<div>
+    <div *ngIf="activities.length == 0" class="alert alert-warning">
+        <strong>You have not joined any activities.</strong> You should join one! You can do this by selecting 'Join' in the actions
+    </div>
+    <h2 style="margin-top: 0">History</h2>
+
+    <app-activity-list *ngIf="activities.length !==0" [activities]="activities"></app-activity-list>
+</div>
+

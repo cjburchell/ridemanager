@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {ActivityService, IActivity} from '../../services/activity.service';
 
 @Component({
   selector: 'app-history',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HistoryComponent implements OnInit {
 
-  constructor() { }
+  activities: IActivity[];
+  constructor(private activityService: ActivityService) { }
 
   ngOnInit() {
+    this.activityService.getJoined().subscribe(activities => this.activities = activities);
   }
-
 }

@@ -1,3 +1,8 @@
-<p>
-  manage works!
-</p>
+<div>
+  <div *ngIf="activities.length == 0" class="alert alert-warning">
+    <strong>You have not created any activities.</strong>You should create a activity! You can do this by selecting selecting '<a href="/main/create">Create</a>' in the actions
+  </div>
+  <h2 style="margin-top: 0">History</h2>
+
+  <app-activity-list *ngIf="activities.length !==0" [activities]="activities"></app-activity-list>
+</div>

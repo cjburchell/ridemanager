@@ -1,0 +1,46 @@
+<div>
+  <div class="inner-addon right-addon" style="width: 50%;margin-bottom: 20px">
+    <i class="fas fa-search"></i>
+    <input type="text" class="form-control" [(ngModel)]="searchText">
+  </div>
+
+  <div *ngIf="isUpcoming && isInProgress ||
+                isUpcoming && isFinished ||
+                isFinished && isInProgress" style="text-align: center">
+        <div class="btn-group">
+            <input type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="">All
+            <input *ngIf="isUpcoming" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="upcoming">Upcoming
+            <input *ngIf="isInProgress" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="in_progress">In Progress
+            <input *ngIf="isFinished" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="finished">Finished
+        </div>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Creator</th>
+      <th>Stages</th>
+      <th>Length</th>
+      <th>Start</th>
+      <th>State</th>
+      <th>Privacy</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let activity of activities">
+      <td><a [href]="'/activity/details/' + activity.activity_id">{{activity.name}}</a></td>
+      <td><img [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/></td>
+      <td>{{activity.owner_id}}</td>
+      <td>{{activity.stages.length}}</td>
+      <td>{{activity.total_distance/1000 | number : '0.0-2'}} km</td>
+      <td>{{ activity.start_time | date: 'short'}}</td>
+      <td *ngIf="activity.state === 'upcoming'">Starts in {{ activity.starts_in | date : 'd' : 'UTC'}}d {{ activity.starts_in | date: 'H': 'UTC'}}h {{ activity.starts_in | date: 'm': 'UTC'}}m</td>
+      <td *ngIf="activity.state === 'in_progress'">Time left: {{ activity.time_left | date : 'd' : 'UTC'}}d {{ activity.time_left | date: 'H': 'UTC'}}h {{ activity.time_left | date: 'm': 'UTC'}}m</td>
+      <td *ngIf="activity.state === 'finished'">Finished</td>
+      <td>{{ activity.privacy }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

@@ -29,6 +29,7 @@ import { RouteTypeToIconPipe } from './pipes/route-type-to-icon.pipe';
 import { AddCategoryComponent } from './main/create/add-category/add-category.component';
 import { SelectStageComponent } from './main/create/select-stage/select-stage.component';
 import { SelectRouteComponent } from './main/create/select-route/select-route.component';
+import { ActivityListComponent } from './activity-list/activity-list.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { SelectRouteComponent } from './main/create/select-route/select-route.co
     RouteTypeToIconPipe,
     AddCategoryComponent,
     SelectStageComponent,
-    SelectRouteComponent
+    SelectRouteComponent,
+    ActivityListComponent
   ],
   imports: [
     BrowserModule,

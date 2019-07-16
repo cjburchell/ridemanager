@@ -158,6 +158,26 @@ export class ActivityService {
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity`, httpOptions);
+    return this.http.get<IActivity[]>(`api/v1/public`, httpOptions);
+  }
+
+  getJoined(): Observable<IActivity[]> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IActivity[]>(`api/v1/activity/joined`, httpOptions);
+  }
+
+  getMyActivities(): Observable<IActivity[]>{
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IActivity[]>(`api/v1/activity/my`, httpOptions);
   }
 }
