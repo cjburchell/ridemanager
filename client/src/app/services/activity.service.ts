@@ -158,7 +158,7 @@ export class ActivityService {
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/public`, httpOptions);
+    return this.http.get<IActivity[]>(`api/v1/activity/public`, httpOptions);
   }
 
   getJoined(): Observable<IActivity[]> {

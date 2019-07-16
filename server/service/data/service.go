@@ -104,7 +104,7 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 }
 
 func (s service) getParticipantActivities(athleteId models.AthleteId) ([]string, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Activity, error) {

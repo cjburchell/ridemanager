@@ -1,10 +1,14 @@
-
-<div>
-    <div *ngIf="activities.length == 0" class="alert alert-warning">
+<div *ngIf="activities != undefined">
+    <div *ngIf="activities === null || activities?.length == 0" class="alert alert-warning">
         <strong>You have not joined any activities.</strong> You should join one! You can do this by selecting 'Join' in the actions
     </div>
     <h2 style="margin-top: 0">History</h2>
+    <app-activity-list *ngIf="activities?.length > 0" [activities]="activities"></app-activity-list>
+</div>
 
-    <app-activity-list *ngIf="activities.length !==0" [activities]="activities"></app-activity-list>
+<div *ngIf="activities === undefined"  class="d-flex justify-content-center align-items-center">
+  <div class="spinner-border" role="status" style="margin-top: 20px">
+    <span class="sr-only">Loading...</span>
+  </div>
 </div>
 

@@ -1,8 +1,14 @@
-<div>
-  <div *ngIf="activities.length == 0" class="alert alert-warning">
+<div *ngIf="activities !== undefined">
+  <div *ngIf="activities=== null || activities.length == 0" class="alert alert-warning">
     <strong>You have not created any activities.</strong>You should create a activity! You can do this by selecting selecting '<a href="/main/create">Create</a>' in the actions
   </div>
-  <h2 style="margin-top: 0">History</h2>
+  <h2 style="margin-top: 0">Manage</h2>
 
-  <app-activity-list *ngIf="activities.length !==0" [activities]="activities"></app-activity-list>
+  <app-activity-list *ngIf="activities?.length > 0" [activities]="activities"></app-activity-list>
+</div>
+
+<div *ngIf="activities === undefined"  class="d-flex justify-content-center align-items-center">
+  <div class="spinner-border" role="status" style="margin-top: 20px">
+    <span class="sr-only">Loading...</span>
+  </div>
 </div>
