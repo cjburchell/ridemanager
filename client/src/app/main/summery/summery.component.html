@@ -1,15 +1,15 @@
 <div>
-  <div *ngIf="activitiesUpcoming.length !== 0">
+  <div *ngIf="activitiesUpcoming?.length > 0">
     <h3 style="margin-top: 5px">Upcoming</h3>
     <app-activity-panel *ngFor="let activity of activitiesUpcoming" [activity]="activity" [user]="user"></app-activity-panel>
   </div>
 
-  <div *ngIf="activitiesInProgress.length !== 0">
+  <div *ngIf="activitiesInProgress?.length > 0">
     <h3 style="margin-top: 5px">In Progress</h3>
     <app-activity-panel *ngFor="let activity of activitiesInProgress" [activity]="activity" [user]="user"></app-activity-panel>
   </div>
 
-  <div *ngIf="activitiesFinished.length !== 0">
+  <div *ngIf="activitiesFinished?.length > 0">
     <h3 style="margin-top: 5px">Finished</h3>
     <app-activity-panel *ngFor="let activity of activitiesFinished" [activity]="activity" [user]="user"></app-activity-panel>
   </div>

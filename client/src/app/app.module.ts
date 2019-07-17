@@ -34,6 +34,7 @@ import { ActivityListComponent } from './activity-list/activity-list.component';
 import { ActivityPanelComponent } from './main/summery/activity-pannel/activity-panel.component';
 import { SecondsToTimePipe } from './pipes/seconds-to-time.pipe';
 import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
+import { RankToPanelTypePipe } from './pipes/rank-to-panel-type.pipe';
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
     ActivityListComponent,
     ActivityPanelComponent,
     SecondsToTimePipe,
-    SecondsToCountdownPipe
+    SecondsToCountdownPipe,
+    RankToPanelTypePipe
   ],
   imports: [
     BrowserModule,

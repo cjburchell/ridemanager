@@ -103,18 +103,9 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 	return activities, nil
 }
 
-func (s service) getParticipantActivities(athleteId models.AthleteId) ([]string, error) {
-	return nil, nil
-}
-
 func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Activity, error) {
-	activityIds, err := s.getParticipantActivities(athleteId)
-	if err != nil {
-		return nil, err
-	}
-
 	var activities []models.Activity
-	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -123,14 +114,9 @@ func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Acti
 }
 
 func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error) {
-	activityIds, err := s.getParticipantActivities(athleteId)
-	if err != nil {
-		return nil, err
-	}
-
 	var activities []models.Activity
 
-	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "state": state}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}, "state": state}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -140,13 +126,8 @@ func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state m
 
 func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]models.Activity, error) {
 
-	activityIds, err := s.getParticipantActivities(athleteId)
-	if err != nil {
-		return nil, err
-	}
-
 	var activities []models.Activity
-	err = s.db.C(activityCollection).Find(bson.M{"activity_id": bson.M{"$in": activityIds}, "privacy": models.Privacy.Private}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}, "privacy": models.Privacy.Private}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

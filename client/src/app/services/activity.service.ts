@@ -79,9 +79,9 @@ export interface IParticipant {
   name: string;
   sex: Gender;
   time: number;
-  rank: string;
-  out_of: string;
-  stages: string;
+  rank: number;
+  out_of: number;
+  stages: number;
 }
 export interface IResult {
   segment_id: string;

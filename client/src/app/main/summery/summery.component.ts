@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {IActivity} from '../../services/activity.service';
+import {ActivityService, IActivity} from '../../services/activity.service';
 import {IUser} from '../../services/user.service';
 
 @Component({
@@ -13,9 +13,16 @@ export class SummeryComponent implements OnInit {
   activitiesUpcoming: IActivity[];
   activitiesInProgress: IActivity[];
   activitiesFinished: IActivity[];
-  constructor() { }
+
+  constructor(private activityService: ActivityService) {
+  }
 
   ngOnInit() {
+    this.activityService.getJoined().subscribe((activities: IActivity[]) => {
+      this.activitiesUpcoming = activities.filter(item => item.state === 'upcoming');
+      this.activitiesInProgress = activities.filter(item => item.state === 'in_progress');
+      this.activitiesFinished = activities.filter(item => item.state === 'finished');
+    });
   }
 
 }
