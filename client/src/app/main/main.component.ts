@@ -10,7 +10,6 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  token: string;
   pageId = 'summery';
   user: IUser;
 
@@ -18,10 +17,6 @@ export class MainComponent implements OnInit {
               private userService: UserService,
               private router: Router,
               private activatedRoute: ActivatedRoute) {
-    this.token = tokenService.getToken();
-    userService.getMe().subscribe((user: IUser) => {
-      this.user = user;
-    });
   }
 
   ngOnInit() {
@@ -37,6 +32,10 @@ export class MainComponent implements OnInit {
     } else {
       this.router.navigate([`/login`]);
     }
+
+    this.userService.getMe().subscribe((user: IUser) => {
+      this.user = user;
+    });
 
     this.activatedRoute.params.subscribe(params => {
       this.pageId = params.pageId;

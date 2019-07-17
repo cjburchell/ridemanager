@@ -12,7 +12,7 @@
         <app-manage *ngIf="pageId === 'manage'"></app-manage>
         <app-join *ngIf="pageId === 'join'"></app-join>
         <app-create *ngIf="pageId === 'create'" [user] = "user"></app-create>
-        <app-summery *ngIf="pageId === 'summery'"></app-summery>
+        <app-summery *ngIf="pageId === 'summery'" [user] = "user"></app-summery>
       </div>
     </div>
   </div>

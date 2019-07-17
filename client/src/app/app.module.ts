@@ -1,3 +1,4 @@
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -30,6 +31,9 @@ import { AddCategoryComponent } from './main/create/add-category/add-category.co
 import { SelectStageComponent } from './main/create/select-stage/select-stage.component';
 import { SelectRouteComponent } from './main/create/select-route/select-route.component';
 import { ActivityListComponent } from './activity-list/activity-list.component';
+import { ActivityPanelComponent } from './main/summery/activity-pannel/activity-panel.component';
+import { SecondsToTimePipe } from './pipes/seconds-to-time.pipe';
+import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
 
 
 @NgModule({
@@ -57,7 +61,10 @@ import { ActivityListComponent } from './activity-list/activity-list.component';
     AddCategoryComponent,
     SelectStageComponent,
     SelectRouteComponent,
-    ActivityListComponent
+    ActivityListComponent,
+    ActivityPanelComponent,
+    SecondsToTimePipe,
+    SecondsToCountdownPipe
   ],
   imports: [
     BrowserModule,

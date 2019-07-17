@@ -1,0 +1,47 @@
+<div [class] = "participant.rank | rankToPannelType">
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+      <h4>
+        <img [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/>
+        <a [href]="'/activity/details/' + activity.activity_id ">{{activity.name}}</a></h4>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+      <div *ngIf="activity.state === 'upcoming'">
+        <h4 style="text-align: right; margin-bottom: 0">{{ activity.starts_in | secondsToCountdown}}</h4>
+        <h4 style="text-align: right; margin-top: 0"><small>{{ activity.start_time | date: 'short'}}</small></h4>
+      </div>
+      <div *ngIf="activity.state === 'in_progress'">
+        <h4 style="text-align: right">{{ activity.time_left | secondsToCountdown}}</h4>
+      </div>
+      <div *ngIf="activity.state === 'finished'">
+        <h4 style="text-align: right">{{ activity.start_time | date: 'shortDate'}}</h4>
+      </div>
+    </div>
+  </div>
+  <h4 class="rank">
+    <span *ngIf="activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon')">
+        <span *ngIf="activity.route">
+          {{activity.route.distance/1000 | number : '0.0-2'}}km
+        </span>
+      <span *ngIf="!activity.route">
+        {{activity.total_distance/1000 | number : '0.0-2'}}km
+      </span>
+
+      <span *ngIf="activity.stages?.length > 0">
+        <small>{{activity.stages.length}} Timed Stages</small>
+      </span>
+    </span>
+
+    <span *ngIf="!(activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon'))">
+      <span *ngIf="activity.stages.length === participant.results.length">
+        <i *ngIf="participant?.rank<=3" class="fa fa-trophy"></i>Rank: {{participant.rank}}/{{participant.out_of}}
+      </span>
+
+      <span *ngIf="activity.stages.length !== participant.results.length">
+         Stages: {{participant.results.length}}/{{activity.stages.length}}>
+      </span>
+
+      <small>Total Time: {{participant.time | secondsToTime }}</small>
+    </span>
+  </h4>
+</div>

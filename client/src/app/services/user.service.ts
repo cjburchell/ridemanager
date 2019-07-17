@@ -18,6 +18,13 @@ export interface IUser {
   profile_medium: string;
 }
 
+export interface IAchievements{
+  firstCount: number;
+  secondCount: number;
+  thirdCount: number;
+  finishedCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,5 +41,15 @@ export class UserService {
     };
 
     return this.http.get<IUser>(`api/v1/user/me`, httpOptions);
+  }
+
+  getAchievements(): Observable<IAchievements> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IAchievements>(`api/v1/user/me/achievements`, httpOptions);
   }
 }

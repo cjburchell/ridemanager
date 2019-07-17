@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {IAchievements, UserService} from '../../../services/user.service';
 
 @Component({
   selector: 'app-result-summary',
@@ -6,10 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./result-summary.component.scss']
 })
 export class ResultSummaryComponent implements OnInit {
+  achievements: IAchievements;
 
-  constructor() { }
+  constructor(private userService: UserService) {
+  }
 
   ngOnInit() {
+    this.userService.getAchievements().subscribe(achievements => this.achievements = achievements);
   }
 
 }

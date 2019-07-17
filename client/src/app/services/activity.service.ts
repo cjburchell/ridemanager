@@ -78,7 +78,7 @@ export interface IParticipant {
   results: IResult[];
   name: string;
   sex: Gender;
-  time: string;
+  time: number;
   rank: string;
   out_of: string;
   stages: string;
