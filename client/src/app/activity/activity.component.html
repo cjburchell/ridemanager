@@ -2,7 +2,7 @@
 
   <app-header *ngIf="isLoggedIn" [user]="user"></app-header>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="activity">
     <div class="row">
       <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
         <div class="card">
@@ -33,18 +33,18 @@
                 <app-login-button></app-login-button>
               </div>
             </div>
-            <div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
+            <!--<div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
               <a class="fb-xfbml-parse-ignore" target="_blank" [href]=" 'https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.ridemanager.net%2Factivity%2F' + activity.activity_id +'&amp;src=sdkpreparse'">Share</a>
             </div>
             <div style="margin-top: 10px; margin-left: 10px">
               <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-            </div>
+            </div>-->
           </div>
         </div>
         <app-help></app-help>
       </div>
 
-      <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
+     <!--  <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
         <div class="row">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <h2 style="margin-bottom: 0px; margin-top: 0px"><%= activity.name %> <img ng-src="{{activity.activityType | activityTypeToIcon}}" height="40" width="40" data-toggle="tooltip" title="{{activity.activityType | activityTypeToString}}"/><% if(activity.privaicy !== 'public') {%><i class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i><%}%></h2>
@@ -251,7 +251,7 @@
                     </div>
                 </div>
             </div>
-            <%}%>
+            <%}%>-->
       </div>
     </div>
 
@@ -264,7 +264,7 @@
   </div>
 
   <div class="modal fade" id="joinDialog" role="dialog">
-    <app-join-dialog></app-join-dialog>
+    <app-join-dialog [activity]="activity"></app-join-dialog>
   </div>
 
 </div>
