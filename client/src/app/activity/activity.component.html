@@ -1,0 +1,270 @@
+<div>
+
+  <app-header *ngIf="isLoggedIn" [user]="user"></app-header>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
+        <div class="card">
+          <div class="card-header card actions-menu" style="text-align: center"><b>Actions</b></div>
+          <div class="card-body list-group" style="padding: 0">
+            <div *ngIf="isLoggedIn">
+              <div *ngIf="activity.state !== 'finished' && activity.privacy == 'public' && activity.max_participants > activity.participants.length">
+                  <div *ngIf="!isParticipant" > <!--Todo: Check to see if we are in the activity-->
+                      <a *ngIf="activity.categories.length !== 1" class="list-group-item" data-toggle="modal" data-target="#joinDialog" (click)="showCategorySelection()">Join Activity</a>
+                      <a *ngIf="activity.categories.length === 1" class="list-group-item" (click)="join()">Join Activity</a>
+                  </div>
+                  <a *ngIf="isParticipant" class="list-group-item" (click)="leave()">Leave Activity</a>
+              </div>
+
+              <div *ngIf="activity.state !== 'upcoming' && activity.owner.id != user.id">
+                  <a *ngIf="isParticipant" class="list-group-item" (click)="updateMyResults()">Update My Results</a>
+              </div>
+
+              <div *ngIf="activity.owner.id == user.id">
+                <a class="list-group-item" data-toggle="modal" data-target="#addFriendDialog" (click)="showAddFriend()">Add Friend</a>
+                <a *ngIf="activity.state === 'upcoming'" href="#" class="list-group-item" (click)="edit()">Edit</a>
+                <a *ngIf="activity.state !== 'upcoming'" href="#" class="list-group-item" (click)="updateActivityResults()">Update Results</a>
+                <a class="list-group-item" (click)="deleteActivity()">Delete</a>
+              </div>
+
+            <div *ngIf="!isLoggedIn">
+              <div style="margin-top: 10px; margin-left: 10px">
+                <app-login-button></app-login-button>
+              </div>
+            </div>
+            <div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
+              <a class="fb-xfbml-parse-ignore" target="_blank" [href]=" 'https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.ridemanager.net%2Factivity%2F' + activity.activity_id +'&amp;src=sdkpreparse'">Share</a>
+            </div>
+            <div style="margin-top: 10px; margin-left: 10px">
+              <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+            </div>
+          </div>
+        </div>
+        <app-help></app-help>
+      </div>
+
+      <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <h2 style="margin-bottom: 0px; margin-top: 0px"><%= activity.name %> <img ng-src="{{activity.activityType | activityTypeToIcon}}" height="40" width="40" data-toggle="tooltip" title="{{activity.activityType | activityTypeToString}}"/><% if(activity.privaicy !== 'public') {%><i class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i><%}%></h2>
+            <h5 style="margin-top: 0px"><small>Created by <a href="https://www.strava.com/athletes/<%= activity.ownerId%>" target="_blank"><%= activity.ownerName %></a></small></h5>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right">
+            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'upcoming'">Starts in: {{ activity.startsIn | secondsToCountdown}}</h4>
+            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'in_progress'">Time left: {{ activity.timeLeft | secondsToCountdown}}</h4>
+            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'finished'">Finished</h4>
+            <h4 style="margin-top: 0px; margin-bottom: 0px;"><small>{{ activity.startTime | date: 'short'}} to <% if(Math.round((new Date(activity.endTime)-new Date(activity.startTime))/(1000*60*60*24)) !== 0){%>{{ activity.endTime | date: 'short'}}<%}else{%>{{ activity.endTime | date: 'shortTime'}}<%}%></small></h4>
+          </div>
+        </div>
+        <p><%= activity.description %></p>
+
+        <div class="well details-well">
+
+          <h4><%if(activity.state === 'upcoming'){%>Registered<%} else {%>Results<%}%></h4>
+
+          <%if(participants.length != 0){%>
+
+                <div style="text-align: center">
+                    <% if(activity.categories.length > 1){%>
+          <div class="btn-group">
+            <label class="btn btn-primary" ng-model="catagoryFilter" uib-btn-radio="">All</label>
+            <% for(var i=0; i<activity.categories.length; i++) { var category = activity.categories[i];%>
+                        <label class="btn btn-primary" ng-model="catagoryFilter" uib-btn-radio="'<%= category.id %>'"><%= category.name %></label>
+                        <% } %>
+          </div>
+          <% } %>
+
+                    <div ng-if="showSexFilter" class="btn-group">
+                        <label class="btn btn-primary" ng-model="sexFilter" uib-btn-radio="">All</label>
+                        <label class="btn btn-primary" ng-model="sexFilter" uib-btn-radio="'M'">Men</label>
+                        <label class="btn btn-primary" ng-model="sexFilter" uib-btn-radio="'F'">Women</label>
+                    </div>
+                </div>
+
+            <table class="table table-striped">
+                <%if(activity.state === 'upcoming'){%>
+          <thead>
+          <tr>
+            <th>Name</th>
+            <% if(activity.categories.length > 1){%>
+                        <th ng-if="!catagoryFilter">Category</th>
+                    <% } %>
+            <th ng-if="!sexFilter && showSexFilter">Sex</th>
+
+            <% if(user && user.role ==='dev'){%>
+                    <th></th>
+                    <%}%>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="participant in participants | filter:{categoryId:catagoryFilter, sex:sexFilter}">
+            <td style="vertical-align:center"><img class="img-circle" ng-src="{{participant.athleteImage}}" width="24" height="24"/> <a ng-href="https://www.strava.com/athletes/{{participant.athleteId}}">{{participant.name}}</a></td>
+            <% if(activity.categories.length > 1){%>
+                    <td ng-if="!catagoryFilter">{{participant.catagoryName}}</td>
+                    <% } %>
+            <td ng-if="!sexFilter && showSexFilter" style="vertical-align:center">{{participant.sex}}</td>
+
+            <% if(user && user.role ==='dev'){%>
+                        <td><a ng-click="removeParticipant(participant)"> <span class="glyphicon glyphicon-remove-circle"></span></a></td>
+                    <%}%>
+          </tr>
+          </tbody>
+          <%} else {%>
+          <thead>
+          <tr>
+            <%if(activity.activityType === 'race' || activity.activityType === 'triathlon'){%>
+                        <th>Rank</th>
+                        <%}%>
+            <th>Name</th>
+            <% if(activity.categories.length > 1){%>
+                        <th ng-if="!catagoryFilter">Category</th>
+                        <% } %>
+            <th ng-if="!sexFilter && showSexFilter">Sex</th>
+            <th ng-if="activity.stages.lenght !== 1" ng-repeat="stage in activity.stages | orderBy : 'number' ">Stage {{stage.number}}</th>
+            <%if(activity.activityType === 'race' || activity.activityType === 'triathlon'){%>
+                            <th>Total Time</th>
+                        <%}%>
+
+            <% if(user && user.role ==='dev'){%>
+                        <th></th>
+                        <%}%>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="participant in participants | orderBy : 'rank' | filter:{categoryId:catagoryFilter, sex:sexFilter}">
+            <%if(activity.activityType === 'race' || activity.activityType === 'triathlon'){%>
+                            <td style="vertical-align:center"><i ng-if="participant.rank===1" class="fa fa-trophy" style="color: gold"></i><i ng-if="participant.rank===2"class="fa fa-trophy" style="color: silver"></i><i ng-if="participant.rank===3" class="fa fa-trophy" style="color: #8C7853"></i> {{participant.rank}}</td>
+                        <%}%>
+            <td style="vertical-align:center"><img class="img-circle" ng-src="{{participant.athleteImage}}" width="24" height="24"/><a ng-href="https://www.strava.com/athletes/{{participant.athleteId}}" target="_blank">{{participant.name}}</a></td>
+            <% if(activity.categories.length > 1){%>
+                        <td>{{participant.catagoryName}}</td>
+                        <% } %>
+            <td ng-if="!sexFilter && showSexFilter" style="vertical-align:center">{{participant.sex}}</td>
+            <td style="vertical-align:center" ng-repeat="result in participant.results | orderBy : 'stageNumber'"><a ng-href="https://www.strava.com/activities/{{result.activityId}}" target="_blank">{{ result.time | secondsToTime }}</a><i ng-if="result.rank!==undefined "> ({{result.rank}})</i></td>
+            <%if(activity.activityType === 'race' || activity.activityType === 'triathlon'){%>
+                            <td ng-if="participant.time && activity.stages.lenght !== 1 && participant.rank!=1" style="vertical-align:center">+{{participant.offsetTime | secondsToTime}} ({{participant.time | secondsToTime}})</td>
+                            <td ng-if="participant.time && activity.stages.lenght !== 1 && participant.rank===1" style="vertical-align:center">{{participant.time | secondsToTime}}</td>
+                            <td ng-if="!participant.time && activity.stages.lenght !== 1" style="vertical-align:center">DNF</td>
+                        <%}%>
+
+            <% if(user && user.role ==='dev'){%>
+                        <td><a ng-click="removeParticipant(participant)"> <span class="glyphicon glyphicon-remove-circle"></span></a></td>
+                        <%}%>
+          </tr>
+          </tbody>
+          <%}%>
+            </table>
+                <%} else {%>
+                <p style="color: red">
+                    There are no participants entered in the activity.
+                    <%if(isLoggedIn){%>
+          Press join to enter the activity.
+          <%}%>
+                </p>
+                <%}%>
+        </div>
+
+        <%if(activity.stages.length === 0){%>
+                <div ng-if="activity.routeId" class="well details-well">
+                    <h4>Route</h4>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                             <a ng-href="https://www.strava.com/routes/{{activity.routeId}}" target="_blank">{{activity.routeName}}</a>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="text-align: right">
+        {{activity.routeDistance/1000 | number : 2}}km
+                        </div>
+                    </div>
+                </div>
+                <div id='map' style="top:0; bottom:0; width:100%; height:500px"></div>
+            <%} else { %>
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div id='map' style="top:0; bottom:0; width:100%; height:500px"></div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div ng-if="activity.routeId" class="well details-well">
+                        <h4>Route</h4>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <a ng-href="https://www.strava.com/routes/{{activity.routeId}}" target="_blank">{{activity.routeName}}</a>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="text-align: right">
+        {{activity.routeDistance/1000 | number : 2}}km
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="activity.stages.length !== 0" class="well details-well">
+                        <h4>Timed Stages</h4>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Activity</th>
+                                <th>Dist.</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="stage in activity.stages | orderBy : 'number'">
+                                <td style="vertical-align:center">{{stage.number}}</td>
+                                <td style="vertical-align:center"><img ng-src="{{stage.activity_type | typeToIcon}}" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
+                                <td style="vertical-align:center"><a ng-href="https://www.strava.com/segments/{{stage.segmentId}}" target="_blank">{{stage.name}}</a></td>
+                                <td style="vertical-align:center">{{stage.distance/1000 | number : 2}}km</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <p><label>Total Distance</label> {{activity.totalDistance/1000 | number : 2}}km</p>
+                    </div>
+                </div>
+            </div>
+            <%}%>
+
+        <canvas ng-if="elevationData.length !== 0" style="max-height: 200px; margin-top: 20px" id="elevation" class="chart chart-line" chart-data="elevationData" chart-options="elevationChartOptions"></canvas>
+
+        <%if(isLoggedIn || comments.length !== 0){%>
+            <div class="panel-group" style="margin-top: 20px">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>
+                            <a data-toggle="collapse" href="#collapse1">Comments</a> <span ng-if="comments.length !== 0" class="badge">{{comments.length}}</span>
+                        </h4>
+                    </div>
+                    <div id="collapse1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <%if(isLoggedIn){%>
+        <div style="margin-bottom: 10px">
+          <img class="img-circle" src="<%= athlete.profile_medium%>" width="32" height="32"/>  <input style="margin-left: 5px; width: 66%; display: initial" type="text" class="form-control" id="newComment" ng-model="newComment" maxlength="300"> <button type="button" class="btn btn-default" ng-click="addComment()">Post</button>
+        </div>
+        <%}%>
+                            <table>
+                                <tr ng-repeat="comment in comments | orderBy : 'time' : true">
+                                    <td><img class="img-circle" ng-src="{{comment.athleteImage}}" width="24" height="24" style="margin-left: 20px; margin-right: 5px; margin-bottom: 10px;"/></td>
+                                    <td><a ng-href="https://www.strava.com/athletes/{{comment.athleteId}}" target="_blank">{{comment.name}}</a> {{comment.text}}
+        <h5 style="margin-top: 0px; margin-bottom: 10px;"><small>{{comment.time | secondsToDiff}}</small></h5></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%}%>
+      </div>
+    </div>
+
+  </div>
+
+  <app-footer></app-footer>
+
+  <div class="modal fade" id="addFriendDialog" role="dialog">
+    <app-add-friend-dialog></app-add-friend-dialog>
+  </div>
+
+  <div class="modal fade" id="joinDialog" role="dialog">
+    <app-join-dialog></app-join-dialog>
+  </div>
+
+</div>

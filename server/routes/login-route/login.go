@@ -42,29 +42,29 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 	if user == nil {
 		user = models.NewUser(auth.Athlete.Id)
 		user.StravaToken = auth.AccessToken
-		user.FirstName = auth.Athlete.FirstName
-		user.LastName = auth.Athlete.LastName
-		user.ProfileMediumImage = auth.Athlete.ProfileMedium
-		user.ProfileImage = auth.Athlete.Profile
-		user.Gender = auth.Athlete.Gender
+		user.Athlete.FirstName = auth.Athlete.FirstName
+		user.Athlete.LastName = auth.Athlete.LastName
+		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
+		user.Athlete.ProfileImage = auth.Athlete.Profile
+		user.Athlete.Gender = auth.Athlete.Gender
 		err = dataService.AddUser(user)
 		if err != nil {
 			log.Error(err)
 		}
 	} else {
 		user.StravaToken = auth.AccessToken
-		user.FirstName = auth.Athlete.FirstName
-		user.LastName = auth.Athlete.LastName
-		user.ProfileMediumImage = auth.Athlete.ProfileMedium
-		user.ProfileImage = auth.Athlete.Profile
-		user.Gender = auth.Athlete.Gender
+		user.Athlete.FirstName = auth.Athlete.FirstName
+		user.Athlete.LastName = auth.Athlete.LastName
+		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
+		user.Athlete.ProfileImage = auth.Athlete.Profile
+		user.Athlete.Gender = auth.Athlete.Gender
 		err = dataService.UpdateUser(*user)
 		if err != nil {
 			log.Error(err)
 		}
 	}
 
-	tokenString, err := token.Build(user.Id)
+	tokenString, err := token.Build(user.Athlete.Id)
 	if err != nil {
 		log.Error(err)
 	}
@@ -108,7 +108,7 @@ func getLoginStatus(w http.ResponseWriter, r *http.Request, dataService data.ISe
 		return
 	}
 
-	log.Debugf("name %s %s,  userId: %s", user.FirstName, user.LastName, user.Id)
+	log.Debugf("name %s %s,  userId: %s", user.Athlete.FirstName, user.Athlete.LastName, user.Athlete.Id)
 
 	reply, _ := json.Marshal(true)
 	w.WriteHeader(http.StatusOK)

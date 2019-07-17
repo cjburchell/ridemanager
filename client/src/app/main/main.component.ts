@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {TokenService} from '../services/token.service';
 import {Router, ActivatedRoute} from '@angular/router';
-import {IUser, UserService} from '../services/user.service';
+import {IAthlete, UserService} from '../services/user.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
@@ -11,7 +11,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 })
 export class MainComponent implements OnInit {
   pageId = 'summery';
-  user: IUser;
+  user: IAthlete;
 
   constructor(private tokenService: TokenService,
               private userService: UserService,
@@ -33,7 +33,7 @@ export class MainComponent implements OnInit {
       this.router.navigate([`/login`]);
     }
 
-    this.userService.getMe().subscribe((user: IUser) => {
+    this.userService.getMe().subscribe((user: IAthlete) => {
       this.user = user;
     });
 

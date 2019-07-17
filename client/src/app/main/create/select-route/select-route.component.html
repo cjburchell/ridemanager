@@ -23,7 +23,7 @@
       </thead>
       <tbody>
       <tr *ngFor="let route of  routes" (click)="selectRoute(route)">
-        <td style="vertical-align:center"><i *ngIf="route == selectedRoute" class="far fa-check-circle"></i></td>
+        <td style="vertical-align:center"><i *ngIf="route == selectedRoute" class="fa fa-check-circle"></i></td>
         <td style="vertical-align:center"><img [src]="route.type | routeTypeToIcon" height="20" width="20"/></td>
         <td style="vertical-align:center"><a [href]="'https://www.strava.com/routes/' + route.id" target="_blank">{{route.name}}</a></td>
         <td style="vertical-align:center">{{route.distance/1000 | number : '1.2-2'}}km</td>

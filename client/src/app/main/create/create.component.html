@@ -120,15 +120,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let stage of Activity.stages">
+            <tr *ngFor="let stage of sortedStages">
               <td style="vertical-align:center">{{stage.number}}</td>
               <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" [title]="stage.activity_type"/></td>
               <td style="vertical-align:center"><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
               <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>
               <td class="btn-group">
-                <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><span class="glyphicon glyphicon-arrow-up"></span></button>
-                <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><span class="glyphicon glyphicon-arrow-down"></span></button>
-                <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><i class="fa fa-arrow-up"></i></button>
+                <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><i class="fa fa-arrow-down"></i></button>
+                <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><i class="fa fa-times-circle"></i></button>
               </td>
             </tr>
             </tbody>

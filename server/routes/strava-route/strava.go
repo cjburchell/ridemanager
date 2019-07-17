@@ -43,6 +43,11 @@ func handleGetSegment(writer http.ResponseWriter, request *http.Request, service
 		return
 	}
 
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	vars := mux.Vars(request)
 	segmentId, err := strconv.ParseInt(vars["SegmentId"], 10, 64)
 	if err != nil{
@@ -80,6 +85,11 @@ func handleGetRoute(writer http.ResponseWriter, request *http.Request, service d
 	if err != nil{
 		writer.WriteHeader(http.StatusUnauthorized)
 		log.Error(err)
+		return
+	}
+
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -124,9 +134,14 @@ func handleGetRoutes(writer http.ResponseWriter, request *http.Request, service 
 		return
 	}
 
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	stravaService := strava.NewService(user.StravaToken)
 
-	routes, err := stravaService.GetRoutes(user.StravaAthleteId)
+	routes, err := stravaService.GetRoutes(user.Athlete.StravaAthleteId)
 	if err != nil{
 		writer.WriteHeader(http.StatusBadRequest)
 		log.Error(err)
@@ -148,6 +163,11 @@ func handleGetStarredSegments(writer http.ResponseWriter, request *http.Request,
 	if err != nil{
 		writer.WriteHeader(http.StatusUnauthorized)
 		log.Error(err)
+		return
+	}
+
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

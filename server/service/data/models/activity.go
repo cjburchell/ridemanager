@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/cjburchell/go.strava"
 	"time"
 )
 
@@ -28,10 +29,10 @@ var ActivityStates = struct {
 }{"upcoming", "in_progress", "finished"}
 
 type Route struct {
-	RouteId  int    `json:"id" bson:"id"`
-	Name     string `json:"name" bson:"name"`
-	Distance int    `json:"distance" bson:"distance"`
-	Map      Map    `json:"map" bson:"map"`
+	RouteId  int     `json:"id" bson:"id"`
+	Name     string  `json:"name" bson:"name"`
+	Distance float64 `json:"distance" bson:"distance"`
+	Map      Map     `json:"map" bson:"map"`
 }
 
 type Map struct {
@@ -40,17 +41,27 @@ type Map struct {
 	SummaryPolyline string `json:"summary_polyline" bson:"summary_polyline"`
 }
 
+type Athlete struct {
+	Id                 AthleteId     `json:"id" bson:"id"`
+	StravaAthleteId    int64         `json:"strava_athlete_id" bson:"strava_athlete_id"`
+	FirstName          string        `json:"first_name" bson:"first_name"`
+	LastName           string        `json:"last_name" bson:"last_name"`
+	ProfileImage       string        `json:"profile" bson:"profile"`
+	ProfileMediumImage string        `json:"profile_medium" bson:"profile_medium"`
+	Gender             strava.Gender `json:"sex" bson:"sex"`
+}
+
 type ActivityId string
 
 type Activity struct {
 	ActivityId      ActivityId      `json:"activity_id" bson:"activity_id"`
 	ActivityType    ActivityType    `json:"activity_type" bson:"activity_type"`
-	OwnerId         AthleteId       `json:"owner_id" bson:"owner_id"`
+	Owner           Athlete         `json:"owner" bson:"owner"`
 	Name            string          `json:"name" bson:"name"`
 	Description     string          `json:"description" bson:"description"`
 	StartTime       time.Time       `json:"start_time" bson:"start_time"`
 	EndTime         time.Time       `json:"end_time" bson:"end_time"`
-	TotalDistance   int             `json:"total_distance" bson:"total_distance"`
+	TotalDistance   float64         `json:"total_distance" bson:"total_distance"`
 	Duration        float64         `json:"duration" bson:"duration"`
 	TimeLeft        float64         `json:"time_left" bson:"time_left"`
 	StartsIn        float64         `json:"starts_in" bson:"starts_in"`

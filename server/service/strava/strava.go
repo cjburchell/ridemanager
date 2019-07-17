@@ -52,7 +52,7 @@ func (s service) GetSegment(segmentId int64) (*strava.SegmentDetailed, error) {
 	return segments.Get(segmentId).Do()
 }
 
-func (s service) Friends(athleteId int64, page int) ([]*strava.AthleteSummary, error) {
+func (s service) GetFriends(athleteId int64, page int) ([]*strava.AthleteSummary, error) {
 	athlete := strava.NewAthletesService(s.client)
 	return athlete.ListFriends(athleteId).Page(page).Do()
 }

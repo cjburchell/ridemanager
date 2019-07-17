@@ -30,11 +30,16 @@ import { RouteTypeToIconPipe } from './pipes/route-type-to-icon.pipe';
 import { AddCategoryComponent } from './main/create/add-category/add-category.component';
 import { SelectStageComponent } from './main/create/select-stage/select-stage.component';
 import { SelectRouteComponent } from './main/create/select-route/select-route.component';
-import { ActivityListComponent } from './activity-list/activity-list.component';
+import { ActivityListComponent } from './main/activity-list/activity-list.component';
 import { ActivityPanelComponent } from './main/summery/activity-pannel/activity-panel.component';
 import { SecondsToTimePipe } from './pipes/seconds-to-time.pipe';
 import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
 import { RankToPanelTypePipe } from './pipes/rank-to-panel-type.pipe';
+import { ActivityComponent } from './activity/activity.component';
+import { AthleteComponent } from './main/athlete/athlete.component';
+import { AddFriendDialogComponent } from './activity/add-friend-dialog/add-friend-dialog.component';
+import { JoinDialogComponent } from './activity/join-dialog/join-dialog.component';
+import { LoginButtonComponent } from './login/login-button/login-button.component';
 
 
 @NgModule({
@@ -66,7 +71,12 @@ import { RankToPanelTypePipe } from './pipes/rank-to-panel-type.pipe';
     ActivityPanelComponent,
     SecondsToTimePipe,
     SecondsToCountdownPipe,
-    RankToPanelTypePipe
+    RankToPanelTypePipe,
+    ActivityComponent,
+    AthleteComponent,
+    AddFriendDialogComponent,
+    JoinDialogComponent,
+    LoginButtonComponent
   ],
   imports: [
     BrowserModule,

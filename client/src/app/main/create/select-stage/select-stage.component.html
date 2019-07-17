@@ -23,7 +23,7 @@
       </thead>
       <tbody>
       <tr *ngFor="let stage of stages" (click)="selectStage(stage)">
-        <td style="vertical-align:center"><i *ngIf="stage === selectedStage" class="far fa-check-circle"></i></td>
+        <td style="vertical-align:center"><i *ngIf="stage === selectedStage" class="fa fa-check-circle"></i></td>
         <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
         <td style="vertical-align:center"><a [href]=" 'https://www.strava.com/segments/' + stage.id" target="_blank">{{stage.name}}</a></td>
         <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>

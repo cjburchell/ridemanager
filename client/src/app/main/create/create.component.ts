@@ -3,7 +3,7 @@ import {
   ActivityService,
   IActivity, ICategory, IStage
 } from '../../services/activity.service';
-import {IUser} from '../../services/user.service';
+import {IAthlete} from '../../services/user.service';
 import {Router} from '@angular/router';
 
 import {IRouteSummary, ISegmentSummary, StravaService} from '../../services/strava.service';
@@ -18,13 +18,18 @@ import {SelectRouteComponent} from './select-route/select-route.component';
 export class CreateComponent implements OnChanges {
 
   Activity: IActivity;
-  @Input() user: IUser;
-  @ViewChild('selectStage',  {static: false}) selectStage: SelectStageComponent;
-  @ViewChild('selectRoute',  {static: false}) selectRoute: SelectRouteComponent;
+  sortedStages: IStage[];
+  @Input() user: IAthlete;
+  @ViewChild('selectStage', {static: false}) selectStage: SelectStageComponent;
+  @ViewChild('selectRoute', {static: false}) selectRoute: SelectRouteComponent;
 
   constructor(private activityService: ActivityService,
               private router: Router,
               private stravaService: StravaService) {
+  }
+
+  private updateSortedStages() {
+    this.sortedStages = this.Activity.stages.sort((item1, item2) => item1.number - item2.number);
   }
 
   ngOnChanges() {
@@ -32,7 +37,7 @@ export class CreateComponent implements OnChanges {
       this.Activity = {
         activity_id: undefined,
         activity_type: 'group_ride',
-        owner_id: this.user.id,
+        owner: this.user,
         name: undefined,
         description: undefined,
         start_time: new Date(),
@@ -51,6 +56,7 @@ export class CreateComponent implements OnChanges {
       };
 
       this.Activity.end_time.setDate(this.Activity.end_time.getDate() + 7);
+      this.updateSortedStages();
     }
   }
 
@@ -60,7 +66,11 @@ export class CreateComponent implements OnChanges {
 
   create() {
     // TODO: add validation
-    this.activityService.createActivity(this.Activity);
+    this.activityService.createActivity(this.Activity).subscribe(result => {
+      if (result !== undefined && result !== null) {
+        this.router.navigate([`/main`]);
+      }
+    }, error1 => console.log(error1));
   }
 
   deleteCategory(category: ICategory) {
@@ -94,6 +104,14 @@ export class CreateComponent implements OnChanges {
     if (index > -1) {
       this.Activity.stages.splice(index, 1);
       this.updateDistance();
+
+      let stageNumber = 1;
+      this.Activity.stages.sort((item1, item2) => item1.number - item2.number).forEach(item => {
+        item.number = stageNumber;
+        stageNumber++;
+      });
+
+      this.updateSortedStages();
     }
   }
 
@@ -105,6 +123,7 @@ export class CreateComponent implements OnChanges {
     if (otherStage) {
       otherStage.number = stage.number;
       stage.number--;
+      this.updateSortedStages();
     }
   }
 
@@ -116,22 +135,24 @@ export class CreateComponent implements OnChanges {
     if (otherStage) {
       otherStage.number = stage.number;
       stage.number++;
+      this.updateSortedStages();
     }
   }
 
   addStage(segment: ISegmentSummary) {
-    this.stravaService.getSegment(segment.id).subscribe( (fullSegment: ISegmentSummary) => {
-        this.Activity.stages.push({
-          segment_id: fullSegment.id,
-          distance: fullSegment.distance,
-          activity_type: fullSegment.activity_type,
-          name: fullSegment.name,
-          number: this.Activity.stages.length,
-          map: fullSegment.map,
-          start_latlng: fullSegment.start_latlng,
-          end_latlng: fullSegment.end_latlng
-        });
-        this.updateDistance();
+    this.stravaService.getSegment(segment.id).subscribe((fullSegment: ISegmentSummary) => {
+      this.Activity.stages.push({
+        segment_id: fullSegment.id,
+        distance: fullSegment.distance,
+        activity_type: fullSegment.activity_type,
+        name: fullSegment.name,
+        number: this.Activity.stages.length + 1,
+        map: fullSegment.map,
+        start_latlng: fullSegment.start_latlng,
+        end_latlng: fullSegment.end_latlng
+      });
+      this.updateDistance();
+      this.updateSortedStages();
     });
   }
 

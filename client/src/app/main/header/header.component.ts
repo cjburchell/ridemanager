@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {IUser, UserService} from '../../services/user.service';
+import {IAthlete, UserService} from '../../services/user.service';
 import {TokenService} from '../../services/token.service';
 import {Router} from '@angular/router';
 
@@ -10,7 +10,7 @@ import {Router} from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() public user: IUser;
+  @Input() public user: IAthlete;
 
   constructor(private tokenService: TokenService,
               private router: Router) {

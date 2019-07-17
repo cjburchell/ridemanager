@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Gender} from './user.service';
+import {IAthlete} from './user.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TokenService} from './token.service';
 import {Observable} from 'rxjs';
@@ -47,7 +47,7 @@ export type SegmentType =
 export interface IActivity {
   activity_id: string;
   activity_type: ActivityType;
-  owner_id: string;
+  owner: IAthlete;
   name: string;
   description: string;
   start_time: Date;
@@ -73,11 +73,9 @@ export interface IRoute {
 }
 
 export interface IParticipant {
-  athlete_id: string;
+  athlete: IAthlete;
   category_id: string;
   results: IResult[];
-  name: string;
-  sex: Gender;
   time: number;
   rank: number;
   out_of: number;
@@ -109,7 +107,8 @@ export interface IStage {
 })
 export class ActivityService {
 
-  constructor(private http: HttpClient, private token: TokenService) { }
+  constructor(private http: HttpClient, private token: TokenService) {
+  }
 
   createActivity(activity: IActivity): Observable<string> {
     const httpOptions = {
@@ -151,7 +150,7 @@ export class ActivityService {
     return this.http.get<IActivity>(`api/v1/activity/${activityId}`, httpOptions);
   }
 
-  getActivties(): Observable<IActivity[]> {
+  getActivities(): Observable<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
@@ -171,7 +170,7 @@ export class ActivityService {
     return this.http.get<IActivity[]>(`api/v1/activity/joined`, httpOptions);
   }
 
-  getMyActivities(): Observable<IActivity[]>{
+  getMyActivities(): Observable<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()

@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {IActivity, IParticipant} from '../../../services/activity.service';
-import {IUser} from '../../../services/user.service';
+import {IAthlete} from '../../../services/user.service';
 
 @Component({
   selector: 'app-activity-panel',
@@ -9,7 +9,7 @@ import {IUser} from '../../../services/user.service';
 })
 export class ActivityPanelComponent implements OnChanges {
 
-  @Input() user: IUser;
+  @Input() user: IAthlete;
   @Input() activity: IActivity;
   participant: IParticipant;
 
@@ -17,7 +17,7 @@ export class ActivityPanelComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.user !== undefined && this.activity !== undefined) {
-      this.participant = this.activity.participants.find( participant => participant.athlete_id === this.user.id);
+      this.participant = this.activity.participants.find( participant => participant.athlete.id === this.user.id);
     }
   }
 }

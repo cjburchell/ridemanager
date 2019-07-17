@@ -1,5 +1,5 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
-import {IActivity} from '../services/activity.service';
+import {Component, Input, OnChanges} from '@angular/core';
+import {IActivity} from '../../services/activity.service';
 
 @Component({
   selector: 'app-activity-list',

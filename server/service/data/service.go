@@ -46,7 +46,7 @@ func (s service) GetStravaUser(athleteId int64) (*models.User, error) {
 
 func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
 	var user models.User
-	err := s.db.C(usersCollection).Find(bson.M{"id": athleteId}).One(&user)
+	err := s.db.C(usersCollection).Find(bson.M{"athlete.id": athleteId}).One(&user)
 
 	if err == mgo.ErrNotFound {
 		return nil, nil
@@ -60,9 +60,9 @@ func (s service) GetUser(athleteId models.AthleteId) (*models.User, error) {
 }
 
 func (s service) AddUser(user *models.User) error {
-	if user.Id == "" {
+	if user.Athlete.Id == "" {
 		u1 := uuid.NewV4()
-		user.Id = models.AthleteId(u1.String())
+		user.Athlete.Id = models.AthleteId(u1.String())
 	}
 
 	err := s.db.C(usersCollection).Insert(user)
@@ -73,7 +73,7 @@ func (s service) AddUser(user *models.User) error {
 }
 
 func (s service) UpdateUser(user models.User) error {
-	err := s.db.C(usersCollection).Update(bson.M{"id": user.Id}, user)
+	err := s.db.C(usersCollection).Update(bson.M{"athlete.id": user.Athlete.Id}, user)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -81,7 +81,7 @@ func (s service) UpdateUser(user models.User) error {
 }
 
 func (s service) DeleteUser(athleteId string) error {
-	err := s.db.C(usersCollection).Remove(bson.M{"id": athleteId})
+	err := s.db.C(usersCollection).Remove(bson.M{"athlete.id": athleteId})
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -90,7 +90,7 @@ func (s service) DeleteUser(athleteId string) error {
 
 func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity, error) {
 	var activities []models.Activity
-	err := s.db.C(activityCollection).Find(bson.M{"owner_id": ownerId}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"owner.id": ownerId}).All(&activities)
 
 	if err == mgo.ErrNotFound {
 		return nil, nil
@@ -105,7 +105,7 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 
 func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Activity, error) {
 	var activities []models.Activity
-	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -116,7 +116,7 @@ func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Acti
 func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error) {
 	var activities []models.Activity
 
-	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}, "state": state}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}, "state": state}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -124,10 +124,28 @@ func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state m
 	return activities, nil
 }
 
+func (s service) GetAthleteActivitiesByStateCount(athleteId models.AthleteId, state models.ActivityState) (int, error) {
+	count, err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}, "state": state}).Count()
+	if err != nil {
+		return 0, errors.WithStack(err)
+	}
+
+	return count, nil
+}
+
+func (s service) GetAthleteActivitiesPlaceCount(athleteId models.AthleteId, place int) (int, error) {
+	count, err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId, "rank": place}}, "state": models.ActivityStates.Finished}).Count()
+	if err != nil {
+		return 0, errors.WithStack(err)
+	}
+
+	return count, nil
+}
+
 func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]models.Activity, error) {
 
 	var activities []models.Activity
-	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete_id": athleteId}}, "privacy": models.Privacy.Private}).All(&activities)
+	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}, "privacy": models.Privacy.Private}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -181,17 +199,17 @@ func (s service) GetActivitiesByState(state models.ActivityState) ([]models.Acti
 	return activities, nil
 }
 
-func (s service) AddActivity(activity *models.Activity) error {
+func (s service) AddActivity(activity *models.Activity) (models.ActivityId, error) {
 	if activity.ActivityId == "" {
-		u1 := uuid.Must(uuid.NewV4(), errors.New("unable to create uuid"))
+		u1 := uuid.NewV4()
 		activity.ActivityId = models.ActivityId(u1.String())
 	}
 
 	err := s.db.C(activityCollection).Insert(activity)
 	if err != nil {
-		return errors.WithStack(err)
+		return models.ActivityId(""), errors.WithStack(err)
 	}
-	return nil
+	return activity.ActivityId, nil
 }
 
 func (s service) UpdateActivity(activity models.Activity) error {

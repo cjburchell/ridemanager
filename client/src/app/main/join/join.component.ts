@@ -12,7 +12,7 @@ export class JoinComponent implements OnInit {
   constructor(private activityService: ActivityService) { }
 
   ngOnInit() {
-    this.activityService.getActivties().subscribe(activities => this.activities = activities);
+    this.activityService.getActivities().subscribe(activities => this.activities = activities);
   }
 
 }

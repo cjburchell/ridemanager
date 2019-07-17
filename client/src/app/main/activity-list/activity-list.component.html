@@ -30,9 +30,9 @@
     </thead>
     <tbody>
     <tr *ngFor="let activity of activities">
-      <td><a [href]="'/activity/details/' + activity.activity_id">{{activity.name}}</a></td>
+      <td><a [href]="'/activity/' + activity.activity_id">{{activity.name}}</a></td>
       <td><img [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/></td>
-      <td>{{activity.owner_id}}</td>
+      <td><app-athlete [athlete]="activity.owner"></app-athlete></td>
       <td>{{activity.stages.length}}</td>
       <td>{{activity.total_distance/1000 | number : '0.0-2'}} km</td>
       <td>{{ activity.start_time | date: 'short'}}</td>

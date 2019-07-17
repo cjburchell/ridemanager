@@ -30,12 +30,12 @@ func Setup(r *mux.Router, service data.IService) {
 			handleGetJoinedActivities(writer, request, service)
 		})).Methods("GET")
 
-	dataRoute.HandleFunc("/{ActivityId}", token.ValidateMiddleware(
+	dataRoute.HandleFunc("/{ActivityId}",
 		func(writer http.ResponseWriter, request *http.Request) {
 			handleGetActivity(writer, request, service)
-		})).Methods("GET")
+		}).Methods("GET")
 
-	dataRoute.HandleFunc("/", token.ValidateMiddleware(
+	dataRoute.HandleFunc("", token.ValidateMiddleware(
 		func(writer http.ResponseWriter, request *http.Request) {
 			handleCreateActivity(writer, request, service)
 		})).Methods("POST")
@@ -82,7 +82,7 @@ func validateWritableAccessMiddleware(next http.HandlerFunc, service data.IServi
 			return
 		}
 
-		if activity.OwnerId != user.Id{
+		if activity.Owner.Id != user.Athlete.Id{
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -135,14 +135,21 @@ func handleCreateActivity(writer http.ResponseWriter, request *http.Request, ser
 		return
 	}
 
-	err = service.AddActivity(&activity)
+	id, err := service.AddActivity(&activity)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	reply, _ := json.Marshal(id)
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
+
+	_, err = writer.Write(reply)
+	if err != nil {
+		log.Error(err)
+	}
 }
 
 func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, service data.IService) {
@@ -153,7 +160,12 @@ func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, servic
 		return
 	}
 
-	activities, err := service.GetOwnedActivities(user.Id)
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	activities, err := service.GetOwnedActivities(user.Athlete.Id)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -178,7 +190,12 @@ func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, se
 		return
 	}
 
-	activities, err := service.GetAthleteActivities(user.Id)
+	if user == nil{
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	activities, err := service.GetAthleteActivities(user.Athlete.Id)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
