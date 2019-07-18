@@ -9,29 +9,28 @@
           <div class="card-header card actions-menu" style="text-align: center"><b>Actions</b></div>
           <div class="card-body list-group" style="padding: 0">
             <div *ngIf="isLoggedIn">
-              <div *ngIf="activity.state !== 'finished' && activity.privacy == 'public' && activity.max_participants > activity.participants.length">
-                  <div *ngIf="!isParticipant" > <!--Todo: Check to see if we are in the activity-->
-                      <a *ngIf="activity.categories.length !== 1" class="list-group-item" data-toggle="modal" data-target="#joinDialog" (click)="showCategorySelection()">Join Activity</a>
-                      <a *ngIf="activity.categories.length === 1" class="list-group-item" (click)="join()">Join Activity</a>
-                  </div>
-                  <a *ngIf="isParticipant" class="list-group-item" (click)="leave()">Leave Activity</a>
+
+              <div *ngIf="isParticipant">
+                <a *ngIf="isParticipant && activity.state !== 'upcoming' &&" class="list-group-item list-group-item-action" (click)="updateMyResults()">Update My Results</a>
+                <a *ngIf="isParticipant" class="list-group-item list-group-item-action" (click)="leave()">Leave Activity</a>
               </div>
 
-              <div *ngIf="activity.state !== 'upcoming' && activity.owner.id != user.id">
-                  <a *ngIf="isParticipant" class="list-group-item" (click)="updateMyResults()">Update My Results</a>
+              <div *ngIf="!isParticipant">
+                <a *ngIf="(activity.state !== 'finished' &&
+                          (activity.owner.id !== user.id ? activity.privacy == 'public' : true)  &&
+                          activity.max_participants > activity.participants.length)"
+                   class="list-group-item list-group-item-action" data-toggle="modal" data-target="#joinDialog" (click)="showCategorySelection()">Join Activity</a>
               </div>
 
               <div *ngIf="activity.owner.id == user.id">
-                <a class="list-group-item" data-toggle="modal" data-target="#addFriendDialog" (click)="showAddFriend()">Add Friend</a>
-                <a *ngIf="activity.state === 'upcoming'" href="#" class="list-group-item" (click)="edit()">Edit</a>
-                <a *ngIf="activity.state !== 'upcoming'" href="#" class="list-group-item" (click)="updateActivityResults()">Update Results</a>
-                <a class="list-group-item" (click)="deleteActivity()">Delete</a>
-              </div>
-
-            <div *ngIf="!isLoggedIn">
-              <div style="margin-top: 10px; margin-left: 10px">
+                <a class="list-group-item list-group-item-action" data-toggle="modal" data-target="#addFriendDialog" (click)="showAddFriend()">Add Friend</a>
+                <a *ngIf="activity.state === 'upcoming'" class="list-group-item list-group-item-action" (click)="edit()">Edit</a>
+                <a *ngIf="activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateActivityResults()">Update Results</a>
+                <a class="list-group-item list-group-item-action" (click)="deleteActivity()">Delete</a>
+               </div>
+            </div>
+            <div *ngIf="!isLoggedIn" class="list-group-item list-group-item-action" style="margin-top: 10px; margin-left: 10px">
                 <app-login-button></app-login-button>
-              </div>
             </div>
             <!--<div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
               <a class="fb-xfbml-parse-ignore" target="_blank" [href]=" 'https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.ridemanager.net%2Factivity%2F' + activity.activity_id +'&amp;src=sdkpreparse'">Share</a>
@@ -39,7 +38,6 @@
             <div style="margin-top: 10px; margin-left: 10px">
               <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
             </div>-->
-          </div>
         </div>
         <app-help></app-help>
       </div>
