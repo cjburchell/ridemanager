@@ -36,10 +36,12 @@ import { SecondsToTimePipe } from './pipes/seconds-to-time.pipe';
 import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
 import { RankToPanelTypePipe } from './pipes/rank-to-panel-type.pipe';
 import { ActivityComponent } from './activity/activity.component';
-import { AthleteComponent } from './main/athlete/athlete.component';
+import { AthleteComponent } from './common/athlete/athlete.component';
 import { AddFriendDialogComponent } from './activity/add-friend-dialog/add-friend-dialog.component';
 import { JoinDialogComponent } from './activity/join-dialog/join-dialog.component';
 import { LoginButtonComponent } from './login/login-button/login-button.component';
+import { SearchComponent } from './common/search/search.component';
+import { FilterPipe } from './pipes/filter.pipe';
 
 
 @NgModule({
@@ -76,7 +78,9 @@ import { LoginButtonComponent } from './login/login-button/login-button.componen
     AthleteComponent,
     AddFriendDialogComponent,
     JoinDialogComponent,
-    LoginButtonComponent
+    LoginButtonComponent,
+    SearchComponent,
+    FilterPipe
   ],
   imports: [
     BrowserModule,

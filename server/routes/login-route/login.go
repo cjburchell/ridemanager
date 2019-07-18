@@ -42,8 +42,7 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 	if user == nil {
 		user = models.NewUser(auth.Athlete.Id)
 		user.StravaToken = auth.AccessToken
-		user.Athlete.FirstName = auth.Athlete.FirstName
-		user.Athlete.LastName = auth.Athlete.LastName
+		user.Athlete.Name = auth.Athlete.FirstName + " " + auth.Athlete.LastName
 		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
 		user.Athlete.ProfileImage = auth.Athlete.Profile
 		user.Athlete.Gender = auth.Athlete.Gender
@@ -53,8 +52,7 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 		}
 	} else {
 		user.StravaToken = auth.AccessToken
-		user.Athlete.FirstName = auth.Athlete.FirstName
-		user.Athlete.LastName = auth.Athlete.LastName
+		user.Athlete.Name = auth.Athlete.FirstName + " " + auth.Athlete.LastName
 		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
 		user.Athlete.ProfileImage = auth.Athlete.Profile
 		user.Athlete.Gender = auth.Athlete.Gender
@@ -108,7 +106,7 @@ func getLoginStatus(w http.ResponseWriter, r *http.Request, dataService data.ISe
 		return
 	}
 
-	log.Debugf("name %s %s,  userId: %s", user.Athlete.FirstName, user.Athlete.LastName, user.Athlete.Id)
+	log.Debugf("name %s,  userId: %s", user.Athlete.Name, user.Athlete.Id)
 
 	reply, _ := json.Marshal(true)
 	w.WriteHeader(http.StatusOK)

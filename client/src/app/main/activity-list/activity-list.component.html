@@ -1,8 +1,5 @@
 <div>
-  <div class="inner-addon right-addon" style="width: 50%;margin-bottom: 20px">
-    <i class="fas fa-search"></i>
-    <input type="text" class="form-control" [(ngModel)]="searchText">
-  </div>
+  <app-search [(searchText)]="searchText"></app-search>
 
   <div *ngIf="isUpcoming && isInProgress ||
                 isUpcoming && isFinished ||
@@ -29,7 +26,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let activity of activities">
+    <tr *ngFor="let activity of activities | filter : searchText: 'name'">
       <td><a [href]="'/activity/' + activity.activity_id">{{activity.name}}</a></td>
       <td><img [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/></td>
       <td><app-athlete [athlete]="activity.owner"></app-athlete></td>

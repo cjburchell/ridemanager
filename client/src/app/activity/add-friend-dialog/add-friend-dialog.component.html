@@ -6,17 +6,14 @@
       <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
     <div class="modal-body" >
-      <div class="inner-addon right-addon" style="width: 50%;margin-bottom: 20px">
-        <span class="fa fa-search"></span>
-        <input type="text" class="form-control" [(ngModel)]="friendSearchText">
-      </div>
+      <app-search [(searchText)]="friendSearchText"></app-search>
       <div *ngIf="friends === undefined">
         <h5 style="height: 400px; text-align: center; vertical-align: middle"><i class="fa fa-refresh fa-spin" style="font-size:24px"></i> Loading...</h5>
       </div>
       <div style="height: 400px; overflow: scroll" *ngIf="friends !== undefined">
         <table class="table table-stri table-hover">
           <tbody>
-            <tr *ngFor="let friend of friends" (click)="selectFriend(friend)">
+            <tr *ngFor="let friend of friends | filter : friendSearchText: 'name'" (click)="selectFriend(friend)">
               <td style="vertical-align:center"><i *ngIf="friend === selectedFriend" class="fa fa-check-circle"></i></td>
               <td style="vertical-align:center"><app-athlete [athlete]="friend"></app-athlete></td>
             </tr>

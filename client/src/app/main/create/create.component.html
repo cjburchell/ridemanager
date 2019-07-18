@@ -158,41 +158,14 @@
   <button class="btn btn-outline-secondary back-button" (click)="back()">Cancel</button>
 
   <div  class="modal fade" id="addCategoryDialog" role="dialog">
-    <div class="modal-dialog">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Add Category</h4>
-          <button type="button" class="close" data-dismiss="modal">x</button>
-        </div>
-        <div class="modal-body">
-          <app-add-category (addCategory)="addCategory($event)"></app-add-category>
-        </div>
-      </div>
-    </div>
+    <app-add-category (addCategory)="addCategory($event)"></app-add-category>
   </div>
 
   <div class="modal fade" id="addStageDialog" role="dialog">
-    <div class="modal-dialog">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Add Stage</h4>
-          <button type="button" class="close" data-dismiss="modal">x</button>
-        </div>
-        <div class="modal-body" >
-          <app-select-stage #selectStage (stageSelected)="addStage($event)"></app-select-stage>
-        </div>
-      </div>
-    </div>
+    <app-select-stage #selectStage (stageSelected)="addStage($event)"></app-select-stage>
   </div>
 
   <div class="modal fade" id="addRouteDialog" role="dialog">
-    <div class="modal-dialog">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <app-select-route #selectRoute (routeSelected)="setRoute($event.route, $event.addStages)"></app-select-route>
-      </div>
-    </div>
+    <app-select-route #selectRoute (routeSelected)="setRoute($event.route, $event.addStages)"></app-select-route>
   </div>
 </div>

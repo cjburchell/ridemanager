@@ -44,8 +44,7 @@ type Map struct {
 type Athlete struct {
 	Id                 AthleteId     `json:"id" bson:"id"`
 	StravaAthleteId    int64         `json:"strava_athlete_id" bson:"strava_athlete_id"`
-	FirstName          string        `json:"first_name" bson:"first_name"`
-	LastName           string        `json:"last_name" bson:"last_name"`
+	Name               string        `json:"name" bson:"name"`
 	ProfileImage       string        `json:"profile" bson:"profile"`
 	ProfileMediumImage string        `json:"profile_medium" bson:"profile_medium"`
 	Gender             strava.Gender `json:"sex" bson:"sex"`

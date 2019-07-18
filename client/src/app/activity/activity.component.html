@@ -11,8 +11,8 @@
             <div *ngIf="isLoggedIn">
 
               <div *ngIf="isParticipant">
-                <a *ngIf="isParticipant && activity.state !== 'upcoming' &&" class="list-group-item list-group-item-action" (click)="updateMyResults()">Update My Results</a>
-                <a *ngIf="isParticipant" class="list-group-item list-group-item-action" (click)="leave()">Leave Activity</a>
+                <a *ngIf="activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateMyResults()">Update My Results</a>
+                <a class="list-group-item list-group-item-action" (click)="leave()">Leave Activity</a>
               </div>
 
               <div *ngIf="!isParticipant">
@@ -39,25 +39,30 @@
               <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
             </div>-->
         </div>
+        </div>
         <app-help></app-help>
       </div>
 
-     <!--  <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
-        <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-            <h2 style="margin-bottom: 0px; margin-top: 0px"><%= activity.name %> <img ng-src="{{activity.activityType | activityTypeToIcon}}" height="40" width="40" data-toggle="tooltip" title="{{activity.activityType | activityTypeToString}}"/><% if(activity.privaicy !== 'public') {%><i class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i><%}%></h2>
-            <h5 style="margin-top: 0px"><small>Created by <a href="https://www.strava.com/athletes/<%= activity.ownerId%>" target="_blank"><%= activity.ownerName %></a></small></h5>
-          </div>
+        <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+              <h2 style="margin-bottom: 0px; margin-top: 0px">{{activity.name}}<img [src]="activity.activity_type | activityTypeToImage" height="40" width="40" data-toggle="tooltip"/><i *ngIf="activity.privacy !== 'public'" class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i></h2>
+              <h5 style="margin-top: 0px"><small>Created by <app-athlete [athlete]="activity.owner"></app-athlete></small></h5>
+            </div>
 
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right">
-            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'upcoming'">Starts in: {{ activity.startsIn | secondsToCountdown}}</h4>
-            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'in_progress'">Time left: {{ activity.timeLeft | secondsToCountdown}}</h4>
-            <h4 style="margin-bottom: 0px; margin-top: 0px" ng-if="activity.state === 'finished'">Finished</h4>
-            <h4 style="margin-top: 0px; margin-bottom: 0px;"><small>{{ activity.startTime | date: 'short'}} to <% if(Math.round((new Date(activity.endTime)-new Date(activity.startTime))/(1000*60*60*24)) !== 0){%>{{ activity.endTime | date: 'short'}}<%}else{%>{{ activity.endTime | date: 'shortTime'}}<%}%></small></h4>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right">
+              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'upcoming'">Starts in: {{ activity.starts_in | secondsToCountdown}}</h4>
+              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'in_progress'">Time left: {{ activity.time_left | secondsToCountdown}}</h4>
+              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'finished'">Finished</h4>
+              <h4 style="margin-top: 0px; margin-bottom: 0px;"><small>{{ activity.start_time | date: 'short'}} to {{ activity.end_time | date: 'short'}}</small></h4>
+            </div>
           </div>
+          <p>{{activity.description}}</p>
         </div>
-        <p><%= activity.description %></p>
+    </div>
+  </div>
 
+     <!--
         <div class="well details-well">
 
           <h4><%if(activity.state === 'upcoming'){%>Registered<%} else {%>Results<%}%></h4>
@@ -250,10 +255,6 @@
                 </div>
             </div>
             <%}%>-->
-      </div>
-    </div>
-
-  </div>
 
   <app-footer></app-footer>
 

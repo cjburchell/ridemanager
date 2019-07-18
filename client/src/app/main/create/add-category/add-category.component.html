@@ -1,8 +1,22 @@
-<div class="add-category">
-  <div class="form-group">
-    <label for="name">Name:</label>
-    <input type="text" class="form-control" id="name" [ngModel]="newCategory?.name" (ngModelChange)="newCategory.name = $event">
+<div class="modal-dialog add-category">
+  <!-- Modal content-->
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title">Add Category</h4>
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" class="form-control" id="name" [ngModel]="newCategory?.name" (ngModelChange)="newCategory.name = $event">
+        </div>
+    </div>
+
+    <div class="modal-footer">
+      <button [disabled]="newCategory?.name === ''" type="button" class="btn btn-primary" data-dismiss="modal" (click)="addCategory.emit(newCategory)">Add</button>
+    </div>
   </div>
-  <button [disabled]="newCategory?.name === ''" type="button" class="btn btn-primary" data-dismiss="modal" (click)="addCategory.emit(newCategory)">Add</button>
 </div>
+
+
 

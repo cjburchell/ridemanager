@@ -8,8 +8,7 @@ export type Gender = 'M' | 'F' | '';
 export interface IAthlete {
   id: string;
   strava_athlete_id: number;
-  first_name: string;
-  last_name: string;
+  name: string;
   sex: Gender;
   profile: string;
   profile_medium: string;
