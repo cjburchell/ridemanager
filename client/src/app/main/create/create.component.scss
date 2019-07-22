@@ -16,4 +16,29 @@
   .create-button{
     margin-top: 20px;
   }
+  .card-body{
+    padding: 0;
+  }
+
+  .card {
+    margin-bottom: 5px;
+  }
+
+  .card-footer{
+    .btn{
+      margin-right: 5px;
+    }
+  }
+
+  .error-message{
+    color: red;
+  }
+
+  .route-name{
+    margin: 5px;
+  }
+
+  td{
+    vertical-align: center;
+  }
 }

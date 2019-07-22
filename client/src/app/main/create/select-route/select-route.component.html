@@ -6,15 +6,13 @@
     </div>
     <div class="modal-body">
       <app-search [(searchText)]="routeSearchText"></app-search>
-      <div *ngIf="routes?.length === 0 && loadingRouts">
-        <h5 style="height: 400px; text-align: center; vertical-align: middle"><i class="fa fa-refresh fa-spin" style="font-size:24px"></i> Loading...</h5>
-      </div>
+      <app-loading *ngIf="routes?.length === 0 && loadingRouts"></app-loading>
 
       <div *ngIf="routes?.length === 0 && !loadingRouts">
-        <h5 style="height: 400px; text-align: center; vertical-align: middle">You do not have any routes go to <a href="https://www.strava.com/routes/new">Strava</a> and create a route.</h5>
+        <h5>You do not have any routes go to <a href="https://www.strava.com/routes/new">Strava</a> and create a route.</h5>
       </div>
 
-      <div style="height: 400px; overflow: scroll" *ngIf="routes?.length !== 0">
+      <div class="route-table" *ngIf="routes?.length !== 0">
         <table class="table table-striped table-hover">
           <thead>
           <tr>
@@ -26,10 +24,10 @@
           </thead>
           <tbody>
           <tr *ngFor="let route of  routes | filter : routeSearchText: 'name'" (click)="selectRoute(route)">
-            <td style="vertical-align:center"><i *ngIf="route == selectedRoute" class="fa fa-check-circle"></i></td>
-            <td style="vertical-align:center"><img [src]="route.type | routeTypeToIcon" height="20" width="20"/></td>
-            <td style="vertical-align:center"><a [href]="'https://www.strava.com/routes/' + route.id" target="_blank">{{route.name}}</a></td>
-            <td style="vertical-align:center">{{route.distance/1000 | number : '1.2-2'}}km</td>
+            <td><i *ngIf="route == selectedRoute" class="fa fa-check-circle"></i></td>
+            <td><img [src]="route.type | routeTypeToIcon" height="20" width="20"/></td>
+            <td><a [href]="'https://www.strava.com/routes/' + route.id" target="_blank">{{route.name}}</a></td>
+            <td>{{route.distance/1000 | number : '1.2-2'}}km</td>
           </tr>
           </tbody>
         </table>
@@ -39,7 +37,7 @@
         <div class="checkbox">
           <label class="checkbox"><input type="checkbox" [(ngModel)]="autoAddStages">Add Stages</label>
         </div>
-        <button type="button" class="btn btn-default" (click)="getRoutes()">Refresh</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="getRoutes()">Refresh</button>
         <button type="button" [disabled]="selectedRoute === undefined"  class="btn btn-primary" data-dismiss="modal" (click)="routeSelected.emit({route: selectedRoute, addStages: autoAddStages})">Add</button>
       </div>
     </div>

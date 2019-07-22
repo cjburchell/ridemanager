@@ -8,15 +8,13 @@
     </div>
     <div class="modal-body" >
       <app-search [(searchText)]="stageSearchText"></app-search>
-      <div *ngIf="stages?.length === 0 && loadingStages">
-        <h5 style="height: 400px; text-align: center; vertical-align: middle"><i class="fa fa-refresh fa-spin" style="font-size:24px"></i> Loading...</h5>
-      </div>
+      <app-loading *ngIf="stages?.length === 0 && loadingStages"></app-loading>
 
       <div *ngIf="stages?.length === 0 && !loadingStages">
-        <h5 style="height: 400px; text-align: center; vertical-align: middle">You do not have any stared segments go to <a href="https://www.strava.com/segments/search">Strava</a> and star some segments.</h5>
+        <h5>You do not have any stared segments go to <a href="https://www.strava.com/segments/search">Strava</a> and star some segments.</h5>
       </div>
 
-      <div style="height: 400px; overflow: scroll" *ngIf="stages?.length !== 0">
+      <div class="stage-table" *ngIf="stages?.length !== 0">
         <table class="table table-striped table-hover">
           <thead>
           <tr>
@@ -28,17 +26,17 @@
           </thead>
           <tbody>
           <tr *ngFor="let stage of stages| filter: stageSearchText: 'name'" (click)="selectStage(stage)">
-            <td style="vertical-align:center"><i *ngIf="stage === selectedStage" class="fa fa-check-circle"></i></td>
-            <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
-            <td style="vertical-align:center"><a [href]=" 'https://www.strava.com/segments/' + stage.id" target="_blank">{{stage.name}}</a></td>
-            <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>
+            <td><i *ngIf="stage === selectedStage" class="fa fa-check-circle"></i></td>
+            <td><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
+            <td><a [href]=" 'https://www.strava.com/segments/' + stage.id" target="_blank">{{stage.name}}</a></td>
+            <td>{{stage.distance/1000 | number : '1.2-2'}}km</td>
           </tr>
           </tbody>
         </table>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" (click)="getStages()">Refresh</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="getStages()">Refresh</button>
       <button type="button" [disabled]="selectedStage === undefined"  class="btn btn-primary" data-dismiss="modal" (click)="stageSelected.emit(selectedStage)">Add</button>
     </div>
   </div>

@@ -15,23 +15,11 @@ export class MainComponent implements OnInit {
 
   constructor(private tokenService: TokenService,
               private userService: UserService,
-              private router: Router,
               private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
-    if (this.tokenService.getToken() !== null) {
-      this.tokenService.validateToken().subscribe((isLoggedIn: boolean) => {
-        if (!isLoggedIn) {
-          this.router.navigate([`/login`]);
-        }
-      }, (err: HttpErrorResponse) => {
-        console.log(err);
-        this.router.navigate([`/login`]);
-      });
-    } else {
-      this.router.navigate([`/login`]);
-    }
+    this.tokenService.checkLogin();
 
     this.userService.getMe().subscribe((user: IAthlete) => {
       this.user = user;

@@ -33,7 +33,9 @@
             <label for="startTime">Start Time:</label>
             <div class="input-group">
                 <input id="startTime" [owlDateTime]="dt" placeholder="Date Time" [(ngModel)]="Activity.start_time">
-                <span [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
+                <div class="input-group-append">
+                  <span class="input-group-text" [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
+                </div>
                 <owl-date-time #dt></owl-date-time>
             </div>
         </div>
@@ -43,7 +45,9 @@
             <label for="endTime">End Time:</label>
             <div class="input-group">
               <input id="endTime" [owlDateTime]="dtEnd" placeholder="Date Time" [(ngModel)]="Activity.end_time">
-              <span [owlDateTimeTrigger]="dtEnd"><i class="fa fa-calendar"></i></span>
+              <div class="input-group-append">
+                <span class="input-group-text" [owlDateTimeTrigger]="dtEnd"><i class="fa fa-calendar"></i></span>
+              </div>
               <owl-date-time #dtEnd></owl-date-time>
             </div>
             </div>
@@ -69,84 +73,96 @@
         </div>
       </div>
 
-    <div class="card">
-        <label>Categories:</label>
-        <div *ngIf="Activity?.categories.length !== 0">
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <th>Name</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let category of Activity?.categories">
-              <td style="vertical-align:center">{{category.name}}</td>
-              <td><button type="button" class="close" (click)="deleteCategory(category)">x</button></td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <div *ngIf="Activity?.categories.length === 0">
-          <p style="color: red">No categories, You must have at least one catagory</p>
-        </div>
-        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#addCategoryDialog" (click)="showAddCategory()">Add Category</button>
+      <div class="card">
+          <div class="card-header">Categories</div>
+          <div class="card-body">
+            <div *ngIf="Activity?.categories.length !== 0">
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th>Name</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let category of Activity?.categories">
+                  <td>{{category.name}}</td>
+                  <td><button type="button" class="close" (click)="deleteCategory(category)">x</button></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="Activity?.categories.length === 0">
+              <p class="error-message">No categories, You must have at least one catagory</p>
+            </div>
+          </div>
+          <div class="card-footer">
+           <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#addCategoryDialog" (click)="showAddCategory()">Add Category</button>
+         </div>
       </div>
     </div>
 
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
      <div class="card">
-        <label *ngIf="Activity.route">Route:</label>
-        <p *ngIf="Activity.route"><a [href]="'https://www.strava.com/routes/' + Activity.route?.id " target="_blank">{{Activity.route?.name}}</a> {{Activity.route?.distance/1000 | number : '1.2-2'}}km</p>
-        <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon'">
-          <div *ngIf="Activity.stages.length === 0 && !Activity.route ">
-            <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
-          </div>
+       <div class="card-body">
+         <div class="route-name">
+           <span *ngIf="Activity.route">Route: </span>
+           <span *ngIf="Activity.route"><a [href]="'https://www.strava.com/routes/' + Activity.route?.id " target="_blank">{{Activity.route?.name}}</a> {{Activity.route?.distance/1000 | number : '1.2-2'}}km</span>
+           <span *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon' && Activity.stages.length === 0 && !Activity.route">
+               <span class="error-message">You must have at least one stage or a route set, please add a stage or set the route for this activity</span>
+           </span>
+         </div>
+       </div>
+        <div class="card-footer">
+          <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="showRoutes()">Set Route</button>
+          <button *ngIf="Activity.route" class="btn btn-outline-secondary" (click)="clearRoute()">Clear Route</button>
         </div>
-        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="showRoutes()">Set Route</button>
-        <button *ngIf="Activity.route" class="btn btn-outline-secondary" (click)="clearRoute()">Clear Route</button>
       </div>
      <div class="card">
-        <div *ngIf="Activity.stages.length != 0">
-          <label>Timed Stages:</label>
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <th>#</th>
-              <th>Type</th>
-              <th>Activity</th>
-              <th>Dist.</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let stage of sortedStages">
-              <td style="vertical-align:center">{{stage.number}}</td>
-              <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" [title]="stage.activity_type"/></td>
-              <td style="vertical-align:center"><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
-              <td style="vertical-align:center">{{stage.distance/1000 | number : '1.2-2'}}km</td>
-              <td class="btn-group">
-                <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><i class="fa fa-arrow-up"></i></button>
-                <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><i class="fa fa-arrow-down"></i></button>
-                <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><i class="fa fa-times-circle"></i></button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+       <div class="card-header">
+         Timed Stages
+       </div>
+       <div class="card-body">
+          <div *ngIf="Activity.stages.length != 0">
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Activity</th>
+                <th>Dist.</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let stage of sortedStages">
+                <td>{{stage.number}}</td>
+                <td><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" [title]="stage.activity_type"/></td>
+                <td><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
+                <td>{{stage.distance/1000 | number : '1.2-2'}}km</td>
+                <td class="btn-group">
+                  <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><i class="fa fa-arrow-up"></i></button>
+                  <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><i class="fa fa-arrow-down"></i></button>
+                  <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><i class="fa fa-times-circle"></i></button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
 
-        <div *ngIf="(Activity.activity_type === 'race' || Activity.activity_type === 'triathlon') && Activity.stages.length === 0">
-            <p style="color: red">You must have at least one stage, please add a stage</p>
-        </div>
+          <div *ngIf="(Activity.activity_type === 'race' || Activity.activity_type === 'triathlon') && Activity.stages.length === 0">
+              <p class="error-message">You must have at least one stage, please add a stage</p>
+          </div>
 
-        <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon' && Activity.stages.length === 0 && !Activity.route">
-            <p style="color: red">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
-        </div>
+          <div *ngIf="Activity.activity_type !== 'race' && Activity.activity_type !== 'triathlon' && Activity.stages.length === 0 && !Activity.route">
+              <p class="error-message">You must have at least one stage or a route set, please add a stage or set the route for this activity</p>
+          </div>
 
-        <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '1.2-2'}}km</p>
-
-        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="showAddStage()">Add Stage</button>
-
+          <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '1.2-2'}}km</p>
+       </div>
+       <div class="card-footer">
+         <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="showAddStage()">Add Stage</button>
+       </div>
       </div>
     </div>
     </div>

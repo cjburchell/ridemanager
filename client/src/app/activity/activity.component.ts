@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ActivityService, IActivity} from '../services/activity.service';
 import {TokenService} from '../services/token.service';
 import {IAthlete, UserService} from '../services/user.service';
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-activity',
@@ -24,18 +25,27 @@ export class ActivityComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoggedIn = this.tokenService.getToken() !== null;
 
-    if (this.isLoggedIn) {
-      this.userService.getMe().subscribe((user: IAthlete) => {
-        this.user = user;
-
-        if (this.activity !== undefined) {
-          this.isParticipant = this.activity.participants.findIndex(item => item.athlete.id === this.user.id) !== -1;
+    this.isLoggedIn = true;
+    if (this.tokenService.getToken() !== null) {
+      this.tokenService.validateToken().subscribe((isLoggedIn: boolean) => {
+        this.isLoggedIn = isLoggedIn;
+        if (this.isLoggedIn) {
+          this.userService.getMe().subscribe((user: IAthlete) => {
+            this.user = user;
+            if (this.activity !== undefined) {
+              this.isParticipant = this.activity.participants.findIndex(item => item.athlete.id === this.user.id) !== -1;
+            }
+          });
         }
+      }, (err: HttpErrorResponse) => {
+        console.log(err);
+        this.isLoggedIn = false;
       });
-
+    } else {
+      this.isLoggedIn = false;
     }
+
     this.activatedRoute.params.subscribe(params => {
       this.activityService.getActivity(params.activityId).subscribe((activity: IActivity) => {
         if (activity === undefined || activity === null) {

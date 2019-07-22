@@ -42,6 +42,7 @@ import { JoinDialogComponent } from './activity/join-dialog/join-dialog.componen
 import { LoginButtonComponent } from './login/login-button/login-button.component';
 import { SearchComponent } from './common/search/search.component';
 import { FilterPipe } from './pipes/filter.pipe';
+import { LoadingComponent } from './common/loading/loading.component';
 
 
 @NgModule({
@@ -80,7 +81,8 @@ import { FilterPipe } from './pipes/filter.pipe';
     JoinDialogComponent,
     LoginButtonComponent,
     SearchComponent,
-    FilterPipe
+    FilterPipe,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,

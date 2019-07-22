@@ -1,9 +1,9 @@
-<div>
+<div class="activity-list">
   <app-search [(searchText)]="searchText"></app-search>
 
-  <div *ngIf="isUpcoming && isInProgress ||
+  <div class="activity-state-filter" *ngIf="isUpcoming && isInProgress ||
                 isUpcoming && isFinished ||
-                isFinished && isInProgress" style="text-align: center">
+                isFinished && isInProgress">
         <div class="btn-group">
             <input type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="">All
             <input *ngIf="isUpcoming" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="upcoming">Upcoming

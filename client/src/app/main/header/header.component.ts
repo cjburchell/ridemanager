@@ -25,14 +25,17 @@ export class HeaderComponent implements OnInit {
   }
 
   showToMain() {
+    this.tokenService.checkLogin();
     this.router.navigate([`/main`]);
   }
 
   showManageActivities() {
+    this.tokenService.checkLogin();
     this.router.navigate([`/main/manage`]);
   }
 
   showUserHistory() {
+    this.tokenService.checkLogin();
     this.router.navigate([`/main/history`]);
   }
 }

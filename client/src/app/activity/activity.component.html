@@ -1,13 +1,13 @@
-<div>
+<div class="activity">
 
   <app-header *ngIf="isLoggedIn" [user]="user"></app-header>
 
   <div class="container-fluid" *ngIf="activity">
     <div class="row">
       <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
-        <div class="card">
-          <div class="card-header card actions-menu" style="text-align: center"><b>Actions</b></div>
-          <div class="card-body list-group" style="padding: 0">
+        <div class="card menu">
+          <div class="card-header card actions-menu"><b>Actions</b></div>
+          <div class="card-body list-group">
             <div *ngIf="isLoggedIn">
 
               <div *ngIf="isParticipant">
@@ -29,7 +29,7 @@
                 <a class="list-group-item list-group-item-action" (click)="deleteActivity()">Delete</a>
                </div>
             </div>
-            <div *ngIf="!isLoggedIn" class="list-group-item list-group-item-action" style="margin-top: 10px; margin-left: 10px">
+            <div *ngIf="!isLoggedIn" class="list-group-item list-group-item-action login">
                 <app-login-button></app-login-button>
             </div>
             <!--<div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
@@ -43,18 +43,21 @@
         <app-help></app-help>
       </div>
 
-        <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
+      <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-              <h2 style="margin-bottom: 0px; margin-top: 0px">{{activity.name}}<img [src]="activity.activity_type | activityTypeToImage" height="40" width="40" data-toggle="tooltip"/><i *ngIf="activity.privacy !== 'public'" class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i></h2>
-              <h5 style="margin-top: 0px"><small>Created by <app-athlete [athlete]="activity.owner"></app-athlete></small></h5>
+              <h2 class = "title">
+                {{activity.name}}<img [src]="activity.activity_type | activityTypeToImage" height="40" width="40" data-toggle="tooltip"/>
+                <i *ngIf="activity.privacy !== 'public'" class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i>
+              </h2>
+              <h5 class="created-by"><small>Created by <app-athlete [athlete]="activity.owner"></app-athlete></small></h5>
             </div>
 
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right">
-              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'upcoming'">Starts in: {{ activity.starts_in | secondsToCountdown}}</h4>
-              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'in_progress'">Time left: {{ activity.time_left | secondsToCountdown}}</h4>
-              <h4 style="margin-bottom: 0px; margin-top: 0px" *ngIf="activity.state === 'finished'">Finished</h4>
-              <h4 style="margin-top: 0px; margin-bottom: 0px;"><small>{{ activity.start_time | date: 'short'}} to {{ activity.end_time | date: 'short'}}</small></h4>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 state">
+              <h4 *ngIf="activity.state === 'upcoming'">Starts in: {{ activity.starts_in | secondsToCountdown}}</h4>
+              <h4 *ngIf="activity.state === 'in_progress'">Time left: {{ activity.time_left | secondsToCountdown}}</h4>
+              <h4 *ngIf="activity.state === 'finished'">Finished</h4>
+              <h4><small>{{ activity.start_time | date: 'short'}} to {{ activity.end_time | date: 'short'}}</small></h4>
             </div>
           </div>
           <p>{{activity.description}}</p>

@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {IRouteSummary, ISegmentSummary, StravaService} from '../../services/strava.service';
 import {SelectStageComponent} from './select-stage/select-stage.component';
 import {SelectRouteComponent} from './select-route/select-route.component';
+import {TokenService} from "../../services/token.service";
 
 @Component({
   selector: 'app-create',
@@ -25,7 +26,8 @@ export class CreateComponent implements OnChanges {
 
   constructor(private activityService: ActivityService,
               private router: Router,
-              private stravaService: StravaService) {
+              private stravaService: StravaService,
+              private tokenService: TokenService) {
   }
 
   private updateSortedStages() {
@@ -61,6 +63,7 @@ export class CreateComponent implements OnChanges {
   }
 
   back() {
+    this.tokenService.checkLogin();
     this.router.navigate([`/main`]);
   }
 
@@ -68,6 +71,7 @@ export class CreateComponent implements OnChanges {
     // TODO: add validation
     this.activityService.createActivity(this.Activity).subscribe(result => {
       if (result !== undefined && result !== null) {
+        this.tokenService.checkLogin();
         this.router.navigate([`/main`]);
       }
     }, error1 => console.log(error1));

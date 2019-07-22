@@ -16,17 +16,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    const token = this.tokenService.getToken();
-    if (token !== null) {
-      this.tokenService.validateToken().subscribe((isLoggedIn: boolean) => {
-          if (isLoggedIn) {
-            this.router.navigate([`/main`]);
-          }
-        },
-        (err: HttpErrorResponse) => {
-          console.log(err);
-          this.router.navigate([`/login`]);
-        });
-    }
+    this.tokenService.checkLogin();
   }
 }

@@ -1,4 +1,4 @@
-<div class="modal-dialog">
+<div class="modal-dialog add-friend">
   <!-- Modal content-->
   <div class="modal-content">
     <div class="modal-header">
@@ -7,15 +7,13 @@
     </div>
     <div class="modal-body" >
       <app-search [(searchText)]="friendSearchText"></app-search>
-      <div *ngIf="friends === undefined">
-        <h5 style="height: 400px; text-align: center; vertical-align: middle"><i class="fa fa-refresh fa-spin" style="font-size:24px"></i> Loading...</h5>
-      </div>
-      <div style="height: 400px; overflow: scroll" *ngIf="friends !== undefined">
-        <table class="table table-stri table-hover">
+      <app-loading *ngIf="friends === undefined"></app-loading>
+      <div class="friend-table" *ngIf="friends !== undefined">
+        <table class="table table-striped table-hover">
           <tbody>
             <tr *ngFor="let friend of friends | filter : friendSearchText: 'name'" (click)="selectFriend(friend)">
-              <td style="vertical-align:center"><i *ngIf="friend === selectedFriend" class="fa fa-check-circle"></i></td>
-              <td style="vertical-align:center"><app-athlete [athlete]="friend"></app-athlete></td>
+              <td><i *ngIf="friend === selectedFriend" class="fa fa-check-circle"></i></td>
+              <td><app-athlete [athlete]="friend"></app-athlete></td>
             </tr>
           </tbody>
         </table>

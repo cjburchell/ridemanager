@@ -1,0 +1,35 @@
+.activity{
+  .menu{
+    .actions-menu{
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .card-body{
+      padding: 0;
+    }
+
+    .login{
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+  }
+
+  .title{
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  .created-by{
+    margin-top: 0;
+  }
+
+  .state{
+    text-align: right;
+
+    h4{
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+  }
+}
