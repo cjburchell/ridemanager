@@ -8,9 +8,9 @@
     </div>
     <div class="modal-body" >
       <app-search [(searchText)]="stageSearchText"></app-search>
-      <app-loading *ngIf="stages?.length === 0 && loadingStages"></app-loading>
+      <app-loading *ngIf="stages?.length === 0 && loading"></app-loading>
 
-      <div *ngIf="stages?.length === 0 && !loadingStages">
+      <div *ngIf="stages?.length === 0 && !loading">
         <h5>You do not have any stared segments go to <a href="https://www.strava.com/segments/search">Strava</a> and star some segments.</h5>
       </div>
 

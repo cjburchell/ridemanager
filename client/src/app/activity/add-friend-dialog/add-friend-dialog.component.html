@@ -21,7 +21,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" (click)="getFriends()">Refresh</button>
-      <button type="button" [disabled]="selectedFriend === undefined"  class="btn btn-primary" data-dismiss="modal" (click)="addFriend()">Add</button>
+      <button type="button" [disabled]="selectedFriend === undefined"  class="btn btn-primary" data-dismiss="modal" (click)="addFriend.emit(selectedFriend)">Add</button>
     </div>
   </div>
 </div>

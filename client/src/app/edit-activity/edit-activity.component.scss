@@ -1,0 +1,41 @@
+.edit-activity{
+
+  .activity-type-select{
+    min-width: 100px;
+  }
+
+  .name-input{
+    min-width: 200px;
+  }
+
+  .create-button{
+    margin-top: 20px;
+  }
+  .card-body{
+    padding: 0;
+  }
+
+  .card {
+    margin-bottom: 5px;
+  }
+
+  .card-footer{
+    .btn{
+      margin-right: 5px;
+    }
+  }
+
+  .error-message{
+    color: red;
+    margin-left: 5px;
+  }
+
+  .route-name{
+    margin: 5px;
+  }
+
+  td{
+    vertical-align: center;
+  }
+  
+}

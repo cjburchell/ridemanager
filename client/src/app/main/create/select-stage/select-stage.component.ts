@@ -10,7 +10,7 @@ import {ISegmentSummary, StravaService} from '../../../services/strava.service';
 export class SelectStageComponent implements OnInit {
 
   stageSearchText = '';
-  loadingStages: boolean;
+  loading: boolean;
   stages: ISegmentSummary[];
   selectedStage: ISegmentSummary;
   @Output() stageSelected: EventEmitter<ISegmentSummary> = new EventEmitter();
@@ -34,12 +34,23 @@ export class SelectStageComponent implements OnInit {
   }
 
   getStages() {
-    this.loadingStages = true;
-    this.stravaService.getStaredSegments().subscribe((segments: ISegmentSummary[]) => {
-      this.stages = segments.filter(item => !item.private);
-      this.loadingStages = false;
-      this.ref.detectChanges();
-    });
+    this.loading = true;
+    const perPage = 100;
+    this.stages = [];
+    const loop = (page: number) => {
+      this.stravaService.getStaredSegments(page, perPage).subscribe((segments: ISegmentSummary[]) => {
+        this.stages.concat(segments.filter(item => !item.private));
+        if (segments.length !== perPage) {
+          this.loading = false;
+          this.ref.detectChanges();
+        } else {
+          loop(page + 1);
+        }
+
+      });
+    };
+
+    loop(0);
   }
 
 }

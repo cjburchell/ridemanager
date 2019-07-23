@@ -4,11 +4,13 @@ import {LoginComponent} from './login/login.component';
 import {MainComponent} from './main/main.component';
 import {TokenComponent} from './token/token.component';
 import {ActivityComponent} from './activity/activity.component';
+import {EditComponent} from './edit/edit.component';
 
 const routes: Routes = [
   {path: 'main', component: MainComponent },
   {path: 'main/:pageId', component: MainComponent },
   {path: 'activity/:activityId', component: ActivityComponent },
+  {path: 'edit/:activityId', component: EditComponent },
   {path: 'login', component: LoginComponent },
   {path: 'token', component: TokenComponent },
   {path: '', pathMatch: 'full', redirectTo: 'login'}

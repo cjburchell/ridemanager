@@ -1,24 +1,15 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {IActivity} from '../../services/activity.service';
-import {IAthlete} from '../../services/user.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ICategory} from '../../services/activity.service';
 
 @Component({
   selector: 'app-join-dialog',
   templateUrl: './join-dialog.component.html',
   styleUrls: ['./join-dialog.component.scss']
 })
-export class JoinDialogComponent implements OnInit {
+export class JoinDialogComponent {
 
-  @Input() activity: IActivity;
-  @Input() user: IAthlete;
-  selectedCategoryId: number;
+  @Input() categories: ICategory[];
+  selectedCategory: ICategory;
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-  join() {
-  }
+  @Output() join: EventEmitter<ICategory> = new EventEmitter();
 }

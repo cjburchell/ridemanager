@@ -42,6 +42,10 @@ func Setup(r *mux.Router) {
 		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})
 
+	r.HandleFunc("/edit/{activityId}", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+	})
+
 	r.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
 	})

@@ -19,7 +19,7 @@
                 <a *ngIf="(activity.state !== 'finished' &&
                           (activity.owner.id !== user.id ? activity.privacy == 'public' : true)  &&
                           activity.max_participants > activity.participants.length)"
-                   class="list-group-item list-group-item-action" data-toggle="modal" data-target="#joinDialog" (click)="showCategorySelection()">Join Activity</a>
+                   class="list-group-item list-group-item-action" data-toggle="modal" data-target="#joinDialog">Join Activity</a>
               </div>
 
               <div *ngIf="activity.owner.id == user.id">
@@ -262,11 +262,11 @@
   <app-footer></app-footer>
 
   <div class="modal fade" id="addFriendDialog" role="dialog">
-    <app-add-friend-dialog></app-add-friend-dialog>
+    <app-add-friend-dialog (addFriend)="addFriend($event)" #selectFriends></app-add-friend-dialog>
   </div>
 
   <div class="modal fade" id="joinDialog" role="dialog">
-    <app-join-dialog [activity]="activity"></app-join-dialog>
+    <app-join-dialog [categories]="activity.categories" (join)="join($event)"></app-join-dialog>
   </div>
 
 </div>

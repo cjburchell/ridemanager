@@ -6,9 +6,9 @@
     </div>
     <div class="modal-body">
       <app-search [(searchText)]="routeSearchText"></app-search>
-      <app-loading *ngIf="routes?.length === 0 && loadingRouts"></app-loading>
+      <app-loading *ngIf="routes?.length === 0 && loading"></app-loading>
 
-      <div *ngIf="routes?.length === 0 && !loadingRouts">
+      <div *ngIf="routes?.length === 0 && !loading">
         <h5>You do not have any routes go to <a href="https://www.strava.com/routes/new">Strava</a> and create a route.</h5>
       </div>
 

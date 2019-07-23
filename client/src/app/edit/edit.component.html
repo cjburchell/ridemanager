@@ -1,0 +1,19 @@
+<div class="edit" *ngIf="Activity">
+  <app-header [user]="user"></app-header>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
+        <app-main-menu></app-main-menu>
+      </div>
+
+      <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12">
+        <h2>Create Activity</h2>
+        <app-edit-activity [Activity]="Activity" [user]="user"></app-edit-activity>
+        <button class="btn btn-primary create-button" (click)="save()">Save</button>
+        <button class="btn btn-outline-secondary back-button" (click)="back()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+</div>

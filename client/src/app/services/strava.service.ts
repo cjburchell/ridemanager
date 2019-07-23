@@ -3,6 +3,7 @@ import {Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TokenService} from './token.service';
 import {SegmentType} from './activity.service';
+import {IAthlete} from './user.service';
 
 
 export interface ISegmentSummary {
@@ -48,24 +49,24 @@ export class StravaService {
 
   constructor(private http: HttpClient, private token: TokenService) { }
 
-  getStaredSegments(): Observable<ISegmentSummary[]> {
+  getStaredSegments(page: number, perPage: number): Observable<ISegmentSummary[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<ISegmentSummary[]>(`api/v1/strava/segments/starred`, httpOptions);
+    return this.http.get<ISegmentSummary[]>(`api/v1/strava/segments/starred?page=${page}&perPage=${perPage}`, httpOptions);
   }
 
-  getRoutes(): Observable<IRouteSummary[]> {
+  getRoutes(page: number, perPage: number): Observable<IRouteSummary[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IRouteSummary[]>(`api/v1/strava/routes`, httpOptions);
+    return this.http.get<IRouteSummary[]>(`api/v1/strava/routes?page=${page}&perPage=${perPage}`, httpOptions);
   }
 
   getRoute(routeId: number): Observable<IRouteSummary> {
@@ -75,7 +76,7 @@ export class StravaService {
       })
     };
 
-    return this.http.get<IRouteSummary>(`api/v1/strava/routes/` + routeId, httpOptions);
+    return this.http.get<IRouteSummary>(`api/v1/strava/routes/${routeId}`, httpOptions);
   }
 
   getSegment(segmentId: number): Observable<ISegmentSummary> {
@@ -85,6 +86,16 @@ export class StravaService {
       })
     };
 
-    return this.http.get<ISegmentSummary>(`api/v1/strava/segments/` + segmentId, httpOptions);
+    return this.http.get<ISegmentSummary>(`api/v1/strava/segments/${segmentId}`, httpOptions);
+  }
+
+  getFriends(page: number, perPage: number): Observable<IAthlete[]> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.get<IAthlete[]>(`api/v1/strava/friends?page=${page}&perPage=${perPage}`, httpOptions);
   }
 }

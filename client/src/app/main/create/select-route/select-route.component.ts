@@ -14,7 +14,7 @@ export interface IRouteSet {
 export class SelectRouteComponent implements OnInit {
 
   routeSearchText = '';
-  loadingRouts: boolean;
+  loading: boolean;
   autoAddStages: boolean;
   routes: IRouteSummary[];
   selectedRoute: IRouteSummary;
@@ -31,18 +31,30 @@ export class SelectRouteComponent implements OnInit {
 
   show() {
     this.routeSearchText = '';
+    this.autoAddStages = true;
     this.selectedRoute = undefined;
     this.routes = undefined;
     this.getRoutes();
   }
 
   getRoutes() {
-    this.loadingRouts = true;
-    this.stravaService.getRoutes().subscribe((routes: IRouteSummary[]) => {
-      this.routes = routes;
-      this.loadingRouts = false;
-      this.ref.detectChanges();
-    });
+    this.loading = true;
+    const perPage = 100;
+    this.routes = [];
+    const loop = (page: number) => {
+      this.stravaService.getRoutes(page, perPage).subscribe((routes: IRouteSummary[]) => {
+        this.routes.concat(routes);
+        if (routes.length !== perPage) {
+          this.loading = false;
+          this.ref.detectChanges();
+        } else {
+          loop(page + 1);
+        }
+
+      });
+    };
+
+    loop(0);
   }
 
   selectRoute(route: IRouteSummary) {

@@ -42,20 +42,14 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 	if user == nil {
 		user = models.NewUser(auth.Athlete.Id)
 		user.StravaToken = auth.AccessToken
-		user.Athlete.Name = auth.Athlete.FirstName + " " + auth.Athlete.LastName
-		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
-		user.Athlete.ProfileImage = auth.Athlete.Profile
-		user.Athlete.Gender = auth.Athlete.Gender
+		user.Athlete.Update(auth.Athlete.AthleteSummary)
 		err = dataService.AddUser(user)
 		if err != nil {
 			log.Error(err)
 		}
 	} else {
 		user.StravaToken = auth.AccessToken
-		user.Athlete.Name = auth.Athlete.FirstName + " " + auth.Athlete.LastName
-		user.Athlete.ProfileMediumImage = auth.Athlete.ProfileMedium
-		user.Athlete.ProfileImage = auth.Athlete.Profile
-		user.Athlete.Gender = auth.Athlete.Gender
+		user.Athlete.Update(auth.Athlete.AthleteSummary)
 		err = dataService.UpdateUser(*user)
 		if err != nil {
 			log.Error(err)

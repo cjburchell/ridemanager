@@ -50,6 +50,14 @@ type Athlete struct {
 	Gender             strava.Gender `json:"sex" bson:"sex"`
 }
 
+func (a *Athlete)Update(athlete strava.AthleteSummary)  {
+	a.StravaAthleteId = athlete.Id
+	a.Name = athlete.FirstName + " " + athlete.LastName
+	a.ProfileMediumImage = athlete.ProfileMedium
+	a.ProfileImage = athlete.Profile
+	a.Gender = athlete.Gender
+}
+
 type ActivityId string
 
 type Activity struct {

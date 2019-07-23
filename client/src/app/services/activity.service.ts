@@ -179,4 +179,44 @@ export class ActivityService {
 
     return this.http.get<IActivity[]>(`api/v1/activity/my`, httpOptions);
   }
+
+  addParticipant(activity: IActivity, participant: IParticipant): Observable<boolean> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/participant`, participant, httpOptions);
+  }
+
+  leaveActivity(activity: IActivity, athleteId: string): Observable<boolean> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.delete<boolean>(`api/v1/activity/${activity.activity_id}/participant/${athleteId}`, httpOptions);
+  }
+
+  updateUserResults(activity: IActivity, athleteId: string): Observable<boolean> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update/${athleteId}`, null, httpOptions);
+  }
+
+  updateResults(activity: IActivity): Observable<boolean> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.token.getToken()
+      })
+    };
+
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update`, null, httpOptions);
+  }
 }

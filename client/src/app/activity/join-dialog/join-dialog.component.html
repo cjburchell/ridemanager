@@ -9,14 +9,14 @@
       <div class="form-group">
         <label for="category">Category:</label>
         <div class='input-group' id='privacy'>
-          <select class="form-control" id="category" [(ngModel)]="selectedCategoryId">
-            <option *ngFor="let category of activity.categories" [value]="category.category_id">{{category.name}}</option>
+          <select class="form-control" id="category" [(ngModel)]="selectedCategory">
+            <option *ngFor="let category of categories" [value]="category">{{category.name}}</option>
           </select>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="join()">OK</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="join.emit(selectedCategory)">OK</button>
     </div>
   </div>
 </div>

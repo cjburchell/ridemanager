@@ -43,6 +43,9 @@ import { LoginButtonComponent } from './login/login-button/login-button.componen
 import { SearchComponent } from './common/search/search.component';
 import { FilterPipe } from './pipes/filter.pipe';
 import { LoadingComponent } from './common/loading/loading.component';
+import { EditComponentComponent } from './edit-component/edit-component.component';
+import { EditComponent } from './edit/edit.component';
+import { EditActivityComponent } from './edit-activity/edit-activity.component';
 
 
 @NgModule({
@@ -82,7 +85,10 @@ import { LoadingComponent } from './common/loading/loading.component';
     LoginButtonComponent,
     SearchComponent,
     FilterPipe,
-    LoadingComponent
+    LoadingComponent,
+    EditComponentComponent,
+    EditComponent,
+    EditActivityComponent
   ],
   imports: [
     BrowserModule,

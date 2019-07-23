@@ -7,19 +7,20 @@ import (
 )
 
 type IService interface {
-	GetStaredSegments() ([]*strava.SegmentSummary, error)
-	GetRoutes(athleteId int64) ([]*strava.Route, error)
+	GetStaredSegments(page int, perPage int) ([]*strava.SegmentSummary, error)
+	GetRoutes(athleteId int64, page int, perPage int) ([]*strava.Route, error)
 	GetRoute(routeId int64) (*strava.Route, error)
 	GetSegment(segmentId int64) (*strava.SegmentDetailed, error)
+    GetFriends(athleteId int64, page int, perPage int) ([]*strava.AthleteSummary, error)
 }
 
 type service struct {
 	client *strava.Client
 }
 
-func (s service) GetRoutes(athleteId int64) ([]*strava.Route, error) {
+func (s service) GetRoutes(athleteId int64, page int, perPage int) ([]*strava.Route, error) {
 	athletes := strava.NewAthletesService(s.client)
-	return athletes.Routes(athleteId).Do()
+	return athletes.Routes(athleteId).PerPage(perPage).Page(page).Do()
 }
 
 func (s service) GetRoute(routeId int64) (*strava.Route, error) {
@@ -37,9 +38,9 @@ func (s service) GetSegmentStream(segmentId int64, streamTypes []strava.StreamTy
 	return routes.Get(segmentId, streamTypes).Do()
 }
 
-func (s service) GetStaredSegments() ([]*strava.SegmentSummary, error) {
+func (s service) GetStaredSegments(page int, perPage int) ([]*strava.SegmentSummary, error) {
 	segments := strava.NewSegmentsService(s.client)
-	return segments.Starred().PerPage(100).Do()
+	return segments.Starred().PerPage(perPage).Page(page).Do()
 }
 
 func (s service) SegmentsListEfforts(segmentId int64, athleteId int64, startTime time.Time, endTime time.Time) ([]*strava.SegmentEffortSummary, error) {
@@ -52,9 +53,9 @@ func (s service) GetSegment(segmentId int64) (*strava.SegmentDetailed, error) {
 	return segments.Get(segmentId).Do()
 }
 
-func (s service) GetFriends(athleteId int64, page int) ([]*strava.AthleteSummary, error) {
+func (s service) GetFriends(athleteId int64, page int, perPage int) ([]*strava.AthleteSummary, error) {
 	athlete := strava.NewAthletesService(s.client)
-	return athlete.ListFriends(athleteId).Page(page).Do()
+	return athlete.ListFriends(athleteId).PerPage(perPage).Page(page).Do()
 }
 
 func NewService(accessToken string) IService {
