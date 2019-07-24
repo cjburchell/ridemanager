@@ -80,10 +80,12 @@ export interface IParticipant {
   rank: number;
   out_of: number;
   stages: number;
+  offset_time: number;
 }
 export interface IResult {
+  rank: number;
   segment_id: string;
-  time: Date;
+  time: number;
 }
 
 export interface ICategory {

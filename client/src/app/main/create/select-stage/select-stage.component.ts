@@ -39,7 +39,7 @@ export class SelectStageComponent implements OnInit {
     this.stages = [];
     const loop = (page: number) => {
       this.stravaService.getStaredSegments(page, perPage).subscribe((segments: ISegmentSummary[]) => {
-        this.stages.concat(segments.filter(item => !item.private));
+        this.stages = this.stages.concat(segments.filter(item => !item.private));
         if (segments.length !== perPage) {
           this.loading = false;
           this.ref.detectChanges();

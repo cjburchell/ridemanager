@@ -37,15 +37,14 @@ import { SecondsToCountdownPipe } from './pipes/seconds-to-countdown.pipe';
 import { RankToPanelTypePipe } from './pipes/rank-to-panel-type.pipe';
 import { ActivityComponent } from './activity/activity.component';
 import { AthleteComponent } from './common/athlete/athlete.component';
-import { AddFriendDialogComponent } from './activity/add-friend-dialog/add-friend-dialog.component';
 import { JoinDialogComponent } from './activity/join-dialog/join-dialog.component';
 import { LoginButtonComponent } from './login/login-button/login-button.component';
 import { SearchComponent } from './common/search/search.component';
 import { FilterPipe } from './pipes/filter.pipe';
 import { LoadingComponent } from './common/loading/loading.component';
-import { EditComponentComponent } from './edit-component/edit-component.component';
 import { EditComponent } from './edit/edit.component';
 import { EditActivityComponent } from './edit-activity/edit-activity.component';
+import { ChartsModule } from 'ng2-charts';
 
 
 @NgModule({
@@ -80,13 +79,11 @@ import { EditActivityComponent } from './edit-activity/edit-activity.component';
     RankToPanelTypePipe,
     ActivityComponent,
     AthleteComponent,
-    AddFriendDialogComponent,
     JoinDialogComponent,
     LoginButtonComponent,
     SearchComponent,
     FilterPipe,
     LoadingComponent,
-    EditComponentComponent,
     EditComponent,
     EditActivityComponent
   ],
@@ -97,7 +94,8 @@ import { EditActivityComponent } from './edit-activity/edit-activity.component';
     FormsModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

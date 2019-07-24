@@ -88,14 +88,4 @@ export class StravaService {
 
     return this.http.get<ISegmentSummary>(`api/v1/strava/segments/${segmentId}`, httpOptions);
   }
-
-  getFriends(page: number, perPage: number): Observable<IAthlete[]> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: 'Bearer ' + this.token.getToken()
-      })
-    };
-
-    return this.http.get<IAthlete[]>(`api/v1/strava/friends?page=${page}&perPage=${perPage}`, httpOptions);
-  }
 }

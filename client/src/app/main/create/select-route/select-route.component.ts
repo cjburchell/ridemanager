@@ -43,7 +43,7 @@ export class SelectRouteComponent implements OnInit {
     this.routes = [];
     const loop = (page: number) => {
       this.stravaService.getRoutes(page, perPage).subscribe((routes: IRouteSummary[]) => {
-        this.routes.concat(routes);
+        this.routes = this.routes.concat(routes);
         if (routes.length !== perPage) {
           this.loading = false;
           this.ref.detectChanges();

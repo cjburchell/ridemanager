@@ -2,9 +2,8 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ActivityService, IActivity, ICategory, IParticipant} from '../services/activity.service';
 import {TokenService} from '../services/token.service';
-import {IAthlete, UserService} from '../services/user.service';
+import {Gender, IAthlete, UserService} from '../services/user.service';
 import {HttpErrorResponse} from '@angular/common/http';
-import {AddFriendDialogComponent} from './add-friend-dialog/add-friend-dialog.component';
 
 @Component({
   selector: 'app-activity',
@@ -16,8 +15,8 @@ export class ActivityComponent implements OnInit {
   public isLoggedIn: boolean;
   public user: IAthlete;
   private isParticipant: boolean;
-
-  @ViewChild('selectFriends', {static: false}) selectFriends: AddFriendDialogComponent;
+  categoryFilter: string;
+  sexFilter: Gender;
 
 
   constructor(private activatedRoute: ActivatedRoute,
@@ -79,6 +78,7 @@ export class ActivityComponent implements OnInit {
       rank: undefined,
       out_of: undefined,
       stages: undefined,
+      offset_time: undefined
     };
 
     this.activityService.addParticipant(this.activity, participant).subscribe(
@@ -119,11 +119,28 @@ export class ActivityComponent implements OnInit {
     this.router.navigate([`/main`]);
   }
 
-  addFriend(friend: IAthlete) {
-    this.addParticipant(friend, this.activity.categories[0]);
+  showSexFilter(): boolean {
+    let foundMale = false;
+    let foundFemale = false;
+
+    this.activity.participants.forEach(item => {
+      if (item.athlete.sex === 'M') {
+        foundMale = true;
+      } else {
+        foundFemale = true;
+      }
+    });
+
+    return foundFemale && foundMale;
   }
 
-  showAddFriend() {
-    this.selectFriends.show();
+  getCategoryName(categoryId: string) {
+    return this.activity.categories.find(item => item.category_id === categoryId).name;
+  }
+
+  removeParticipant(participant: IParticipant) {
+    this.activityService.leaveActivity(this.activity, participant.athlete.id).subscribe(() => {
+      this.getActivity(this.activity.activity_id);
+    });
   }
 }
