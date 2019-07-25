@@ -1,28 +1,40 @@
+.activity-panel{
+  .activity-well{
+    padding: 3px 10px;
+    min-height: 90px;
+    h4 {
+      margin: 0;
+    }
+  }
 
-.panel-first>.rank>.fa {
-  color: gold;
-}
+  .panel-first {
+    .rank {
+      .fa {
+        color: gold;
+      }
+    }
+  }
 
-.panel-second>.rank>.fa {
-  color: silver;
-}
+  .panel-second {
+    .rank {
+      .fa {
+        color: silver;
+      }
+    }
+  }
 
-.panel-third>.rank>.fa {
-  color: #8C7853;
-}
+  .panel-third {
+    .rank {
+      .fa {
+        color: #8C7853;
+      }
+    }
+  }
 
-.activity-well {
-  padding: 3px 10px;
-  min-height: 90px;
-}
-
-.activity-well>h4 {
-  margin: 0;
-}
-
-.well{
-  border-radius: 0;
-  border-width: 0.5px;
-  -webkit-box-shadow: none;
-  box-shadow: none;
+  .card{
+    border-radius: 0;
+    border-width: 0.5px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
 }

@@ -45,6 +45,7 @@ import { LoadingComponent } from './common/loading/loading.component';
 import { EditComponent } from './edit/edit.component';
 import { EditActivityComponent } from './edit-activity/edit-activity.component';
 import { ChartsModule } from 'ng2-charts';
+import { DateTimeComponent } from './common/date-time/date-time.component';
 
 
 @NgModule({
@@ -85,7 +86,8 @@ import { ChartsModule } from 'ng2-charts';
     FilterPipe,
     LoadingComponent,
     EditComponent,
-    EditActivityComponent
+    EditActivityComponent,
+    DateTimeComponent
   ],
   imports: [
     BrowserModule,

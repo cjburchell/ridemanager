@@ -13,11 +13,11 @@ export class SearchComponent {
     return this.searchValue;
   }
 
-  @Output()
-  searchTextChange = new EventEmitter<string>();
-
   set searchText(val) {
     this.searchValue = val;
     this.searchTextChange.emit(val);
   }
+
+  @Output()
+  searchTextChange = new EventEmitter<string>();
 }

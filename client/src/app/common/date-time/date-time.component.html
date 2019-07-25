@@ -1,0 +1,7 @@
+<div class="input-group time">
+  <input [owlDateTime]="dt" placeholder="Date Time" [(ngModel)]="time">
+  <div class="input-group-append">
+    <span class="input-group-text" [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
+  </div>
+  <owl-date-time #dt></owl-date-time>
+</div>

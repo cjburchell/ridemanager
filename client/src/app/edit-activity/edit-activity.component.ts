@@ -4,6 +4,7 @@ import {IAthlete} from '../services/user.service';
 import {SelectStageComponent} from '../main/create/select-stage/select-stage.component';
 import {SelectRouteComponent} from '../main/create/select-route/select-route.component';
 import {IRouteSummary, ISegmentSummary, StravaService} from '../services/strava.service';
+import {AddCategoryComponent} from '../main/create/add-category/add-category.component';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class EditActivityComponent implements OnChanges {
   @Input() user: IAthlete;
   @ViewChild('selectStage', {static: false}) selectStage: SelectStageComponent;
   @ViewChild('selectRoute', {static: false}) selectRoute: SelectRouteComponent;
+  @ViewChild('addCategoryItem', {static: false}) addCategoryItem: AddCategoryComponent;
 
   constructor(private stravaService: StravaService) { }
 
@@ -38,23 +40,12 @@ export class EditActivityComponent implements OnChanges {
     }
   }
 
-  showAddCategory() {
-  }
-
   addCategory(newCategory: ICategory) {
     this.Activity.categories.push(newCategory);
   }
 
-  showRoutes() {
-    this.selectRoute.show();
-  }
-
   clearRoute() {
     this.Activity.route = undefined;
-  }
-
-  showAddStage() {
-    this.selectStage.show();
   }
 
   deleteStage(stage: IStage) {

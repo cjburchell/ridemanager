@@ -7,7 +7,7 @@ import {ISegmentSummary, StravaService} from '../../../services/strava.service';
   templateUrl: './select-stage.component.html',
   styleUrls: ['./select-stage.component.scss']
 })
-export class SelectStageComponent implements OnInit {
+export class SelectStageComponent {
 
   stageSearchText = '';
   loading: boolean;
@@ -17,10 +17,6 @@ export class SelectStageComponent implements OnInit {
 
   constructor(private stravaService: StravaService,
               private ref: ChangeDetectorRef) { }
-
-  ngOnInit() {
-   this.show();
-  }
 
   public show() {
     this.stageSearchText = '';
@@ -52,5 +48,4 @@ export class SelectStageComponent implements OnInit {
 
     loop(0);
   }
-
 }

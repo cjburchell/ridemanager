@@ -7,14 +7,13 @@ import * as uuid from 'uuid';
   templateUrl: './add-category.component.html',
   styleUrls: ['./add-category.component.scss']
 })
-export class AddCategoryComponent implements OnInit {
+export class AddCategoryComponent {
 
   newCategory: ICategory;
   @Output() addCategory: EventEmitter<ICategory> = new EventEmitter();
 
   constructor() { }
-
-  ngOnInit() {
+  show() {
     this.newCategory = {
       category_id: uuid.v4().toString(),
       name: undefined,

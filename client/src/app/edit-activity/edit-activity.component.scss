@@ -14,12 +14,21 @@
   .card-body{
     padding: 0;
   }
+  .card-header{
+    background-color: transparent;
+    border-bottom: 0;
+    font-weight: bold;
+  }
 
   .card {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   .card-footer{
+    border-top: 0;
+    background-color: transparent;
+    padding-top: 0;
+
     .btn{
       margin-right: 5px;
     }

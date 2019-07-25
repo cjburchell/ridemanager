@@ -155,7 +155,7 @@ func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]mode
 
 func (s service) GetActivityParticipantsCount(activityId models.ActivityId) (int, error) {
 	var activity models.Activity
-	err := s.db.C(usersCollection).Find(bson.M{"activity_id": activityId}).One(&activity)
+	err := s.db.C(activityCollection).Find(bson.M{"activity_id": activityId}).One(&activity)
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
@@ -213,7 +213,7 @@ func (s service) AddActivity(activity *models.Activity) (models.ActivityId, erro
 }
 
 func (s service) UpdateActivity(activity models.Activity) error {
-	err := s.db.C(usersCollection).Update(bson.M{"activity_id": activity.ActivityId}, activity)
+	err := s.db.C(activityCollection).Update(bson.M{"activity_id": activity.ActivityId}, activity)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -221,7 +221,7 @@ func (s service) UpdateActivity(activity models.Activity) error {
 }
 
 func (s service) DeleteActivity(activityId models.ActivityId) error {
-	err := s.db.C(usersCollection).Remove(bson.M{"activity_id": activityId})
+	err := s.db.C(activityCollection).Remove(bson.M{"activity_id": activityId})
 	if err != nil {
 		return errors.WithStack(err)
 	}

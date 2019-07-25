@@ -30,25 +30,13 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="startTime">Start Time:</label>
-            <div class="input-group">
-              <input id="startTime" [owlDateTime]="dt" placeholder="Date Time" [(ngModel)]="Activity.start_time">
-              <div class="input-group-append">
-                <span class="input-group-text" [owlDateTimeTrigger]="dt"><i class="fa fa-calendar"></i></span>
-              </div>
-              <owl-date-time #dt></owl-date-time>
-            </div>
+            <app-date-time id="startTime" [(time)]="Activity.start_time" ></app-date-time>
           </div>
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-group">
             <label for="endTime">End Time:</label>
-            <div class="input-group">
-              <input id="endTime" [owlDateTime]="dtEnd" placeholder="Date Time" [(ngModel)]="Activity.end_time">
-              <div class="input-group-append">
-                <span class="input-group-text" [owlDateTimeTrigger]="dtEnd"><i class="fa fa-calendar"></i></span>
-              </div>
-              <owl-date-time #dtEnd></owl-date-time>
-            </div>
+            <app-date-time id="endTime" [(time)]="Activity.end_time" ></app-date-time>
           </div>
         </div>
       </div>
@@ -96,7 +84,7 @@
           </div>
         </div>
         <div class="card-footer">
-          <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#addCategoryDialog" (click)="showAddCategory()">Add Category</button>
+          <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#addCategoryDialog" (click)="addCategoryItem.show()">Add Category</button>
         </div>
       </div>
     </div>
@@ -112,7 +100,7 @@
           </div>
         </div>
         <div class="card-footer">
-          <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="showRoutes()">Set Route</button>
+          <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addRouteDialog" (click)="selectRoute.show()">Set Route</button>
           <button *ngIf="Activity.route" class="btn btn-outline-secondary" (click)="clearRoute()">Clear Route</button>
         </div>
       </div>
@@ -159,14 +147,14 @@
           <p *ngIf="Activity.stages.length !== 0"><label>Total Distance</label> {{Activity.total_distance/1000 | number : '1.2-2'}}km</p>
         </div>
         <div class="card-footer">
-          <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="showAddStage()">Add Stage</button>
+          <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#addStageDialog" (click)="selectStage.show()">Add Stage</button>
         </div>
       </div>
     </div>
   </div>
 
   <div  class="modal fade" id="addCategoryDialog" role="dialog">
-    <app-add-category (addCategory)="addCategory($event)"></app-add-category>
+    <app-add-category #addCategoryItem (addCategory)="addCategory($event)"></app-add-category>
   </div>
 
   <div class="modal fade" id="addStageDialog" role="dialog">

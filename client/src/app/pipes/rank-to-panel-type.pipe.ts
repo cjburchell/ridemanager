@@ -7,21 +7,21 @@ export class RankToPanelTypePipe implements PipeTransform {
 
   transform(rank: number): string {
     if (!rank) {
-      return 'well activity-well';
+      return 'card activity-well';
     }
     if (rank === 1) {
-      return 'well activity-well panel-first';
+      return 'card activity-well panel-first';
     }
 
     if (rank === 2) {
-      return 'well activity-well panel-second';
+      return 'card activity-well panel-second';
     }
 
     if (rank === 3) {
-      return 'well activity-well panel-third';
+      return 'card activity-well panel-third';
     }
 
-    return 'well activity-well';
+    return 'card activity-well';
   }
 
 }

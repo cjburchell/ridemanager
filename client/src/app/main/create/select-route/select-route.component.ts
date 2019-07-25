@@ -11,7 +11,7 @@ export interface IRouteSet {
   templateUrl: './select-route.component.html',
   styleUrls: ['./select-route.component.scss']
 })
-export class SelectRouteComponent implements OnInit {
+export class SelectRouteComponent {
 
   routeSearchText = '';
   loading: boolean;
@@ -23,10 +23,6 @@ export class SelectRouteComponent implements OnInit {
 
   constructor(private stravaService: StravaService,
               private ref: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
-    this.show();
   }
 
   show() {

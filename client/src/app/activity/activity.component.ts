@@ -4,6 +4,7 @@ import {ActivityService, IActivity, ICategory, IParticipant} from '../services/a
 import {TokenService} from '../services/token.service';
 import {Gender, IAthlete, UserService} from '../services/user.service';
 import {HttpErrorResponse} from '@angular/common/http';
+import {JoinDialogComponent} from './join-dialog/join-dialog.component';
 
 @Component({
   selector: 'app-activity',
@@ -17,6 +18,8 @@ export class ActivityComponent implements OnInit {
   private isParticipant: boolean;
   categoryFilter: string;
   sexFilter: Gender;
+
+  @ViewChild('joinDialog', {static: false}) joinDialog: JoinDialogComponent;
 
 
   constructor(private activatedRoute: ActivatedRoute,

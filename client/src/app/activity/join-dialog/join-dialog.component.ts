@@ -12,4 +12,8 @@ export class JoinDialogComponent {
   selectedCategory: ICategory;
 
   @Output() join: EventEmitter<ICategory> = new EventEmitter();
+
+  show() {
+    this.selectedCategory = this.categories[0];
+  }
 }
