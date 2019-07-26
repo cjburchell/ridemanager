@@ -46,6 +46,7 @@ import { EditComponent } from './edit/edit.component';
 import { EditActivityComponent } from './edit-activity/edit-activity.component';
 import { ChartsModule } from 'ng2-charts';
 import { DateTimeComponent } from './common/date-time/date-time.component';
+import { ActivityMenuComponent } from './activity/activity-menu/activity-menu.component';
 
 
 @NgModule({
@@ -87,7 +88,8 @@ import { DateTimeComponent } from './common/date-time/date-time.component';
     LoadingComponent,
     EditComponent,
     EditActivityComponent,
-    DateTimeComponent
+    DateTimeComponent,
+    ActivityMenuComponent
   ],
   imports: [
     BrowserModule,

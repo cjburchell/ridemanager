@@ -4,7 +4,7 @@ import {ActivityService, IActivity, ICategory, IParticipant} from '../services/a
 import {TokenService} from '../services/token.service';
 import {Gender, IAthlete, UserService} from '../services/user.service';
 import {HttpErrorResponse} from '@angular/common/http';
-import {JoinDialogComponent} from './join-dialog/join-dialog.component';
+
 
 @Component({
   selector: 'app-activity',
@@ -18,9 +18,6 @@ export class ActivityComponent implements OnInit {
   private isParticipant: boolean;
   categoryFilter: string;
   sexFilter: Gender;
-
-  @ViewChild('joinDialog', {static: false}) joinDialog: JoinDialogComponent;
-
 
   constructor(private activatedRoute: ActivatedRoute,
               private activityService: ActivityService,
@@ -70,56 +67,6 @@ export class ActivityComponent implements OnInit {
         }
       }
     });
-  }
-
-  private addParticipant(athlete: IAthlete, catagory: ICategory) {
-    const participant: IParticipant = {
-      athlete,
-      category_id: catagory.category_id,
-      results: undefined,
-      time: undefined,
-      rank: undefined,
-      out_of: undefined,
-      stages: undefined,
-      offset_time: undefined
-    };
-
-    this.activityService.addParticipant(this.activity, participant).subscribe(
-      () => {
-        this.getActivity(this.activity.activity_id);
-      }
-    );
-  }
-
-  join(category: ICategory) {
-    this.addParticipant(this.user, category);
-  }
-
-  leave() {
-    this.activityService.leaveActivity(this.activity, this.user.id).subscribe(() => {
-      this.getActivity(this.activity.activity_id);
-    });
-  }
-
-  updateMyResults() {
-    this.activityService.updateUserResults(this.activity, this.user.id).subscribe(() => {
-      this.getActivity(this.activity.activity_id);
-    });
-  }
-
-  updateActivityResults() {
-    this.activityService.updateResults(this.activity).subscribe(() => {
-      this.getActivity(this.activity.activity_id);
-    });
-  }
-
-  edit() {
-    this.router.navigate([`/edit/${this.activity.activity_id}`]);
-  }
-
-  deleteActivity() {
-    this.activityService.deleteActivity(this.activity);
-    this.router.navigate([`/main`]);
   }
 
   showSexFilter(): boolean {

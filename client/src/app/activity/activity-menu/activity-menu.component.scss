@@ -1,0 +1,21 @@
+.activity-menu{
+  margin-top: 20px;
+  .actions-menu{
+    text-align: center;
+  }
+
+  .card-body{
+    padding: 0;
+  }
+
+  .login{
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  .list-group-item-action{
+    border-bottom: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+}
