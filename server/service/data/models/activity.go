@@ -69,9 +69,9 @@ type Activity struct {
 	StartTime       time.Time       `json:"start_time" bson:"start_time"`
 	EndTime         time.Time       `json:"end_time" bson:"end_time"`
 	TotalDistance   float64         `json:"total_distance" bson:"total_distance"`
-	Duration        float64         `json:"duration" bson:"duration"`
-	TimeLeft        float64         `json:"time_left" bson:"time_left"`
-	StartsIn        float64         `json:"starts_in" bson:"starts_in"`
+	Duration        float64           `json:"duration" bson:"duration"`
+	TimeLeft        float64           `json:"time_left" bson:"time_left"`
+	StartsIn        float64           `json:"starts_in" bson:"starts_in"`
 	Route           *Route          `json:"route" bson:"route"`
 	Privacy         ActivityPrivacy `json:"privacy" bson:"privacy"`
 	Categories      []Category      `json:"categories" bson:"categories"`
@@ -81,14 +81,14 @@ type Activity struct {
 	MaxParticipants int             `json:"max_participants" bson:"max_participants"`
 }
 
-func (activity *Activity) UpdateActivityState() {
+func (activity *Activity) updateActivityState() {
 	activity.TotalDistance = 0
 	for _, item := range activity.Stages {
 		activity.TotalDistance += item.Distance
 	}
 
 	activity.StartsIn = activity.StartTime.Sub(time.Now()).Seconds()
-	activity.Duration = activity.EndTime.Sub(activity.EndTime).Seconds()
+	activity.Duration = activity.EndTime.Sub(activity.StartTime).Seconds()
 	activity.TimeLeft = activity.EndTime.Sub(time.Now()).Seconds()
 	if activity.TimeLeft <= 0 {
 		activity.State = ActivityStates.Finished
@@ -97,4 +97,28 @@ func (activity *Activity) UpdateActivityState() {
 	} else {
 		activity.State = ActivityStates.Upcoming
 	}
+}
+
+func (activity *Activity)UpdateState() bool {
+	oldState := activity.State
+	activity.updateActivityState()
+
+	if activity.State == ActivityStates.Upcoming {
+		return oldState != activity.State
+	}
+
+	return oldState != activity.State
+}
+
+func (activity *Activity) UpdateResults() bool  {
+	stateChanged := activity.UpdateState()
+	if activity.State == ActivityStates.Upcoming {
+		return stateChanged
+	}
+
+	for p := range activity.Participants {
+		activity.Participants[p].UpdateParticipantsResults(activity)
+	}
+
+	return true
 }

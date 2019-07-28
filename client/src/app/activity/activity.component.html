@@ -120,13 +120,13 @@
             </div>
           </div>
 
-<!--          <div id='map' style="top:0; bottom:0; width:100%; height:500px"></div>-->
+
         </div>
 
         <div *ngIf="activity.stages.length !== 0">
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-<!--              <div id='map' style="top:0; bottom:0; width:100%; height:500px"></div>-->
+              <app-activity-map [activity]="activity"></app-activity-map>
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -169,8 +169,7 @@
             </div>
           </div>
         </div>
-
-<!--        <canvas *ngIf="elevationData.length !== 0" style="max-height: 200px; margin-top: 20px" id="elevation" class="chart chart-line" chart-data="elevationData" chart-options="elevationChartOptions"></canvas>-->
+        <app-activity-elevation [activity]="activity"></app-activity-elevation>
       </div>
     </div>
   </div>

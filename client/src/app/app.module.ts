@@ -47,6 +47,8 @@ import { EditActivityComponent } from './edit-activity/edit-activity.component';
 import { ChartsModule } from 'ng2-charts';
 import { DateTimeComponent } from './common/date-time/date-time.component';
 import { ActivityMenuComponent } from './activity/activity-menu/activity-menu.component';
+import { ActivityMapComponent } from './activity/activity-map/activity-map.component';
+import { ActivityElevationComponent } from './activity/activity-elevation/activity-elevation.component';
 
 
 @NgModule({
@@ -89,7 +91,9 @@ import { ActivityMenuComponent } from './activity/activity-menu/activity-menu.co
     EditComponent,
     EditActivityComponent,
     DateTimeComponent,
-    ActivityMenuComponent
+    ActivityMenuComponent,
+    ActivityMapComponent,
+    ActivityElevationComponent
   ],
   imports: [
     BrowserModule,

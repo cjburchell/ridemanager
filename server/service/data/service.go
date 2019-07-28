@@ -88,8 +88,8 @@ func (s service) DeleteUser(athleteId string) error {
 	return nil
 }
 
-func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity, error) {
-	var activities []models.Activity
+func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]*models.Activity, error) {
+	var activities []*models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"owner.id": ownerId}).All(&activities)
 
 	if err == mgo.ErrNotFound {
@@ -103,8 +103,8 @@ func (s service) GetOwnedActivities(ownerId models.AthleteId) ([]models.Activity
 	return activities, nil
 }
 
-func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Activity, error) {
-	var activities []models.Activity
+func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]*models.Activity, error) {
+	var activities []*models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -113,8 +113,8 @@ func (s service) GetAthleteActivities(athleteId models.AthleteId) ([]models.Acti
 	return activities, nil
 }
 
-func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]models.Activity, error) {
-	var activities []models.Activity
+func (s service) GetAthleteActivitiesByState(athleteId models.AthleteId, state models.ActivityState) ([]*models.Activity, error) {
+	var activities []*models.Activity
 
 	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}, "state": state}).All(&activities)
 	if err != nil {
@@ -142,9 +142,9 @@ func (s service) GetAthleteActivitiesPlaceCount(athleteId models.AthleteId, plac
 	return count, nil
 }
 
-func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]models.Activity, error) {
+func (s service) GetAthletePrivateActivities(athleteId models.AthleteId) ([]*models.Activity, error) {
 
-	var activities []models.Activity
+	var activities []*models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"participants": bson.M{"$elemMatch": bson.M{"athlete.id": athleteId}}, "privacy": models.Privacy.Private}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -179,8 +179,8 @@ func (s service) GetFinishedActivitiesCount(athleteId models.AthleteId) (int, er
 	panic("implement me")
 }
 
-func (s service) GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) ([]models.Activity, error) {
-	var activities []models.Activity
+func (s service) GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) ([]*models.Activity, error) {
+	var activities []*models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"privacy": activityPrivacy}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -189,8 +189,8 @@ func (s service) GetActivitiesByPrivacy(activityPrivacy models.ActivityPrivacy) 
 	return activities, nil
 }
 
-func (s service) GetActivitiesByState(state models.ActivityState) ([]models.Activity, error) {
-	var activities []models.Activity
+func (s service) GetActivitiesByState(state models.ActivityState) ([]*models.Activity, error) {
+	var activities []*models.Activity
 	err := s.db.C(activityCollection).Find(bson.M{"state": state}).All(&activities)
 	if err != nil {
 		return nil, errors.WithStack(err)

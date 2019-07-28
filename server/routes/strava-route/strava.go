@@ -5,7 +5,7 @@ import (
 	"github.com/cjburchell/go-uatu"
 	"github.com/cjburchell/ridemanager/routes/token"
 	"github.com/cjburchell/ridemanager/service/data"
-	"github.com/cjburchell/ridemanager/service/strava"
+	"github.com/cjburchell/ridemanager/service/stravaService"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"

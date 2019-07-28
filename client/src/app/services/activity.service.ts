@@ -84,7 +84,7 @@ export interface IParticipant {
 }
 export interface IResult {
   rank: number;
-  segment_id: string;
+  segment_id: number;
   time: number;
 }
 

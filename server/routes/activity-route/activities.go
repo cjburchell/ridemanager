@@ -3,6 +3,7 @@ package activity_route
 import (
 	"encoding/json"
 	"github.com/cjburchell/go-uatu"
+	activityservice "github.com/cjburchell/ridemanager/service/activity"
 	"github.com/cjburchell/ridemanager/service/data/models"
 	"github.com/cjburchell/tools-go/slice"
 	"net/http"
@@ -70,9 +71,6 @@ func Setup(r *mux.Router, service data.IService) {
 		func(writer http.ResponseWriter, request *http.Request) {
 			handleDeleteActivity(writer, request, service)
 		}, service))).Methods("DELETE")
-
-
-
 }
 
 func handleUpdateActivityState(writer http.ResponseWriter, request *http.Request, service data.IService) {
@@ -120,6 +118,8 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	} else {
 		activity.Participants = append(activity.Participants, participant)
 	}
+
+	_ = activityservice.UpdateState(activity, nil)
 
 	err = service.UpdateActivity(*activity)
 	if err != nil {
@@ -242,15 +242,17 @@ func handleDeleteActivity(writer http.ResponseWriter, request *http.Request, ser
 
 func handleUpdateActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
 	decoder := json.NewDecoder(request.Body)
-	var activity models.Activity
-	err := decoder.Decode(&activity)
+	var changedActivity models.Activity
+	err := decoder.Decode(&changedActivity)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = service.UpdateActivity(activity)
+	_ = activityservice.UpdateState(&changedActivity, nil)
+
+	err = service.UpdateActivity(changedActivity)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -262,15 +264,17 @@ func handleUpdateActivity(writer http.ResponseWriter, request *http.Request, ser
 
 func handleCreateActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
 	decoder := json.NewDecoder(request.Body)
-	var activity models.Activity
-	err := decoder.Decode(&activity)
+	var newActivity models.Activity
+	err := decoder.Decode(&newActivity)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	id, err := service.AddActivity(&activity)
+	_ = activityservice.UpdateState(&newActivity, nil)
+
+	id, err := service.AddActivity(&newActivity)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -307,6 +311,13 @@ func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, servic
 		return
 	}
 
+	err = activityservice.UpdateAll(activities, service)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	reply, _ := json.Marshal(activities)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -337,6 +348,13 @@ func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, se
 		return
 	}
 
+	err := activityservice.UpdateAll(activities, service)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	reply, _ := json.Marshal(activities)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -349,6 +367,13 @@ func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, se
 
 func handleGetPublicActivities(writer http.ResponseWriter, _ *http.Request, service data.IService) {
 	activities, err := service.GetActivitiesByPrivacy(models.Privacy.Public)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = activityservice.UpdateAll(activities, service)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -370,14 +395,21 @@ func handleGetActivity(writer http.ResponseWriter, request *http.Request, servic
 	vars := mux.Vars(request)
 	activityId := models.ActivityId(vars["ActivityId"])
 
-	activity, err := service.GetActivity(activityId)
+	foundActivity, err := service.GetActivity(activityId)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	reply, _ := json.Marshal(activity)
+	err = activityservice.UpdateState(foundActivity, service)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reply, _ := json.Marshal(foundActivity)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 

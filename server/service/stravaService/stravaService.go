@@ -1,5 +1,4 @@
-package strava
-
+package stravaService
 import (
 	log "github.com/cjburchell/go-uatu"
 	"time"
@@ -12,6 +11,8 @@ type IService interface {
 	GetRoutes(athleteId int64, page int, perPage int) ([]*strava.Route, error)
 	GetRoute(routeId int64) (*strava.Route, error)
 	GetSegment(segmentId int64) (*strava.SegmentDetailed, error)
+
+	SegmentsListEfforts(segmentId int64, athleteId int64, startTime time.Time, endTime time.Time) ([]*strava.SegmentEffortSummary, error)
 }
 
 type service struct {
