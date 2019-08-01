@@ -48,11 +48,11 @@ func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
 
-func (participant *Participant) UpdateParticipantsResults(activity *Activity) error {
+func (participant *Participant) UpdateParticipantsResults(activity *Activity, accessToken string) error {
 	participant.Results = make([]Result, len(activity.Stages))
 
 
-	ss := stravaService.NewService("")
+	ss := stravaService.NewService(accessToken)
 
 	for index, stage := range activity.Stages {
 		participant.Results[index].SegmentId = stage.SegmentId

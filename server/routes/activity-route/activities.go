@@ -73,8 +73,44 @@ func Setup(r *mux.Router, service data.IService) {
 		}, service))).Methods("DELETE")
 }
 
-func handleUpdateActivityState(writer http.ResponseWriter, _ *http.Request, _ data.IService) {
-	writer.WriteHeader(http.StatusNotImplemented)
+func handleUpdateActivityState(writer http.ResponseWriter, request *http.Request, service data.IService) {
+	vars := mux.Vars(request)
+	activityId := models.ActivityId(vars["ActivityId"])
+
+	user, err := token.GetUser(request, service)
+	if err != nil || user == nil {
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	activity, err := service.GetActivity(activityId)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = activity.UpdateResults(user.StravaToken)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = service.UpdateActivity(*activity)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reply, _ := json.Marshal(true)
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+	_, err = writer.Write(reply)
+	if err != nil {
+		log.Error(err)
+	}
 }
 
 func handleAddParticipant(writer http.ResponseWriter, request *http.Request, service data.IService) {
@@ -137,8 +173,51 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	}
 }
 
-func handleUpdateActivityParticipantState(writer http.ResponseWriter, _ *http.Request, _ data.IService) {
-	writer.WriteHeader(http.StatusNotImplemented)
+func handleUpdateActivityParticipantState(writer http.ResponseWriter, request *http.Request, service data.IService) {
+	vars := mux.Vars(request)
+	activityId := models.ActivityId(vars["ActivityId"])
+
+	user, err := token.GetUser(request, service)
+	if err != nil || user == nil {
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	activity, err := service.GetActivity(activityId)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	athleteId := models.AthleteId(vars["AthleteId"])
+	participant := activity.FindParticipant(athleteId)
+	if participant == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = participant.UpdateParticipantsResults(activity, user.StravaToken)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = service.UpdateActivity(*activity)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reply, _ := json.Marshal(true)
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+	_, err = writer.Write(reply)
+	if err != nil {
+		log.Error(err)
+	}
 }
 
 func remove(s []*models.Participant, i int) []*models.Participant {
@@ -294,12 +373,7 @@ func handleCreateActivity(writer http.ResponseWriter, request *http.Request, ser
 func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, service data.IService) {
 
 	user, err := token.GetUser(req, service)
-	if err != nil{
-		writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	if user == nil{
+	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -331,12 +405,7 @@ func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, servic
 func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, service data.IService) {
 
 	user, err := token.GetUser(req, service)
-	if err != nil{
-		writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	if user == nil{
+	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}

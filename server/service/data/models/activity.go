@@ -82,6 +82,16 @@ type Activity struct {
 	MaxParticipants int             `json:"max_participants" bson:"max_participants"`
 }
 
+func (activity Activity)FindParticipant(id AthleteId) *Participant   {
+	for _, participant := range activity.Participants{
+		if participant.Athlete.Id == id{
+			return participant
+		}
+	}
+
+	return nil
+}
+
 func (activity *Activity) updateActivityState() {
 	activity.TotalDistance = 0
 	for _, item := range activity.Stages {
@@ -111,22 +121,22 @@ func (activity *Activity)UpdateState() bool {
 	return oldState != activity.State
 }
 
-func (activity *Activity) UpdateResults() (bool, error)  {
-	stateChanged := activity.UpdateState()
+func (activity *Activity) UpdateResults(accessToken string) error  {
+	activity.UpdateState()
 	if activity.State == ActivityStates.Upcoming {
-		return stateChanged, nil
+		return nil
 	}
 
 	for p := range activity.Participants {
-		err := activity.Participants[p].UpdateParticipantsResults(activity)
+		err := activity.Participants[p].UpdateParticipantsResults(activity, accessToken)
 		if err != nil{
-			return false, err
+			return err
 		}
 	}
 
 	activity.UpdateStandings()
 
-	return true, nil
+	return  nil
 }
 
 type ResultItem struct {

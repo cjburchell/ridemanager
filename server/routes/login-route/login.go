@@ -48,6 +48,10 @@ func oAuthSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *
 			log.Error(err)
 		}
 	} else {
+		if user.StravaToken != auth.AccessToken{
+			log.Printf("Token Changed for %s", user.Athlete.Name)
+		}
+
 		user.StravaToken = auth.AccessToken
 		user.Athlete.Update(auth.Athlete.AthleteSummary)
 		err = dataService.UpdateUser(*user)
