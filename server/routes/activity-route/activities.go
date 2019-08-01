@@ -73,7 +73,7 @@ func Setup(r *mux.Router, service data.IService) {
 		}, service))).Methods("DELETE")
 }
 
-func handleUpdateActivityState(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func handleUpdateActivityState(writer http.ResponseWriter, _ *http.Request, _ data.IService) {
 	writer.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -114,12 +114,12 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	}
 
 	if activity.Participants == nil{
-		activity.Participants = []models.Participant{participant}
+		activity.Participants = []*models.Participant{&participant}
 	} else {
-		activity.Participants = append(activity.Participants, participant)
+		activity.Participants = append(activity.Participants, &participant)
 	}
 
-	_ = activityservice.UpdateState(activity, nil)
+	activity.UpdateState()
 
 	err = service.UpdateActivity(*activity)
 	if err != nil {
@@ -137,11 +137,11 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	}
 }
 
-func handleUpdateActivityParticipantState(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func handleUpdateActivityParticipantState(writer http.ResponseWriter, _ *http.Request, _ data.IService) {
 	writer.WriteHeader(http.StatusNotImplemented)
 }
 
-func remove(s []models.Participant, i int) []models.Participant {
+func remove(s []*models.Participant, i int) []*models.Participant {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
@@ -250,7 +250,7 @@ func handleUpdateActivity(writer http.ResponseWriter, request *http.Request, ser
 		return
 	}
 
-	_ = activityservice.UpdateState(&changedActivity, nil)
+	changedActivity.UpdateState()
 
 	err = service.UpdateActivity(changedActivity)
 	if err != nil {
@@ -272,7 +272,7 @@ func handleCreateActivity(writer http.ResponseWriter, request *http.Request, ser
 		return
 	}
 
-	_ = activityservice.UpdateState(&newActivity, nil)
+	newActivity.UpdateState()
 
 	id, err := service.AddActivity(&newActivity)
 	if err != nil {
@@ -348,7 +348,7 @@ func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, se
 		return
 	}
 
-	err := activityservice.UpdateAll(activities, service)
+	err = activityservice.UpdateAll(activities, service)
 	if err != nil {
 		log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -402,12 +402,15 @@ func handleGetActivity(writer http.ResponseWriter, request *http.Request, servic
 		return
 	}
 
-	err = activityservice.UpdateState(foundActivity, service)
-	if err != nil {
-		log.Error(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+    if foundActivity.UpdateState(){
+		err = service.UpdateActivity(*foundActivity)
+		if err != nil {
+			log.Error(err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
+
 
 	reply, _ := json.Marshal(foundActivity)
 	writer.Header().Set("Content-Type", "application/json")

@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/cjburchell/go.strava"
+	"sort"
 	"time"
 )
 
@@ -76,7 +77,7 @@ type Activity struct {
 	Privacy         ActivityPrivacy `json:"privacy" bson:"privacy"`
 	Categories      []Category      `json:"categories" bson:"categories"`
 	Stages          []Stage         `json:"stages" bson:"stages"`
-	Participants    []Participant   `json:"participants" bson:"participants"`
+	Participants    []*Participant   `json:"participants" bson:"participants"`
 	State           ActivityState   `json:"state" bson:"state"`
 	MaxParticipants int             `json:"max_participants" bson:"max_participants"`
 }
@@ -110,15 +111,104 @@ func (activity *Activity)UpdateState() bool {
 	return oldState != activity.State
 }
 
-func (activity *Activity) UpdateResults() bool  {
+func (activity *Activity) UpdateResults() (bool, error)  {
 	stateChanged := activity.UpdateState()
 	if activity.State == ActivityStates.Upcoming {
-		return stateChanged
+		return stateChanged, nil
 	}
 
 	for p := range activity.Participants {
-		activity.Participants[p].UpdateParticipantsResults(activity)
+		err := activity.Participants[p].UpdateParticipantsResults(activity)
+		if err != nil{
+			return false, err
+		}
 	}
 
-	return true
+	activity.UpdateStandings()
+
+	return true, nil
+}
+
+type ResultItem struct {
+Result *Result
+Participant *Participant
+}
+
+func filterResultItem(ss []ResultItem, test func(ResultItem) bool) (ret []ResultItem) {
+	for _, s := range ss {
+		if test(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}
+
+
+func (activity *Activity) UpdateStandings() {
+	if activity.ActivityType == ActivityTypes.Triathlon || activity.ActivityType == ActivityTypes.Race {
+		return
+	}
+
+	genders := []strava.Gender {strava.Genders.Male, strava.Genders.Female}
+	for _, category := range activity.Categories {
+		for _, gender := range genders{
+			stageParticipants := filterParticipants(activity.Participants, func(participant *Participant) bool {
+				return participant.CategoryId == category.CategoryId && participant.Athlete.Gender == gender
+			})
+
+
+			stageCount := len(activity.Stages)
+			finishedParticipants := filterParticipants(stageParticipants, func(participant *Participant) bool {
+				return participant.StagesComplete == stageCount
+			})
+
+			sort.Slice(finishedParticipants, func(i, j int) bool {
+				return finishedParticipants[i].Time < finishedParticipants[j].Time
+			})
+
+			activity.calculateRank(finishedParticipants, len(stageParticipants))
+
+			topParticipant := finishedParticipants[0]
+			activity.calculateOffset(finishedParticipants, topParticipant)
+
+
+			for stageIndex := range activity.Stages{
+				results:= make([]ResultItem  , len(stageParticipants))
+
+				for index, participant := range stageParticipants{
+					results[index].Participant = participant
+					results[index].Result = &participant.Results[stageIndex]
+				}
+
+				sortedResults:= filterResultItem(results, func(item ResultItem) bool {
+					return item.Result.ActivityId != 0
+				})
+
+				sort.Slice(sortedResults,func(i, j int) bool {
+					return sortedResults[i].Result.Time < sortedResults[j].Result.Time
+				})
+
+				stageRank := 0
+				for _, item := range sortedResults{
+					stageRank++
+					item.Result.Rank = stageRank
+				}
+			}
+		}
+	}
+}
+
+func (activity *Activity) calculateRank(finishedParticipants []*Participant, totalParticipants int) {
+	rank := 0
+	for _, p := range finishedParticipants {
+		rank++
+		p.Rank = rank
+		p.OutOf = totalParticipants
+	}
+}
+
+func (activity *Activity) calculateOffset(finishedParticipants []*Participant, topParticipant *Participant) {
+	for _, p := range finishedParticipants {
+		p.OffsetTime = p.Time - topParticipant.Time
+	}
 }

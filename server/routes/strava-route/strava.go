@@ -56,7 +56,7 @@ func handleGetSegment(writer http.ResponseWriter, request *http.Request, service
 		return
 	}
 
-	stravaService := strava.NewService(user.StravaToken)
+	stravaService := stravaService.NewService(user.StravaToken)
 
 	segment, err := stravaService.GetSegment(segmentId)
 	if err != nil{
@@ -102,7 +102,7 @@ func handleGetRoute(writer http.ResponseWriter, request *http.Request, service d
 		return
 	}
 
-	stravaService := strava.NewService(user.StravaToken)
+	stravaService := stravaService.NewService(user.StravaToken)
 
 	route, err := stravaService.GetRoute(activityId)
 	if err != nil{
@@ -154,7 +154,7 @@ func handleGetRoutes(writer http.ResponseWriter, request *http.Request, service 
 		return
 	}
 
-	stravaService := strava.NewService(user.StravaToken)
+	stravaService := stravaService.NewService(user.StravaToken)
 
 	routes, err := stravaService.GetRoutes(user.Athlete.StravaAthleteId, page, perPage)
 	if err != nil{
@@ -200,7 +200,7 @@ func handleGetStarredSegments(writer http.ResponseWriter, request *http.Request,
 		return
 	}
 
-	stravaService := strava.NewService(user.StravaToken)
+	stravaService := stravaService.NewService(user.StravaToken)
 
 	segments, err := stravaService.GetStaredSegments(page, perPage)
 	if err != nil{
