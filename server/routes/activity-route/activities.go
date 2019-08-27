@@ -42,12 +42,12 @@ func Setup(r *mux.Router, service data.IService) {
 			handleCreateActivity(writer, request, service)
 		})).Methods("POST")
 
-	dataRoute.HandleFunc("{ActivityId}/update", token.ValidateMiddleware(validateWritableAccessMiddleware(
+	dataRoute.HandleFunc("/{ActivityId}/update", token.ValidateMiddleware(validateWritableAccessMiddleware(
 		func(writer http.ResponseWriter, request *http.Request) {
 			handleUpdateActivityState(writer, request, service)
 		}, service))).Methods("POST")
 
-	dataRoute.HandleFunc("{ActivityId}/update/{AthleteId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
+	dataRoute.HandleFunc("/{ActivityId}/update/{AthleteId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
 		func(writer http.ResponseWriter, request *http.Request) {
 			handleUpdateActivityParticipantState(writer, request, service)
 		}, service))).Methods("POST")
@@ -156,6 +156,13 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	}
 
 	activity.UpdateState()
+
+	err = participant.UpdateParticipantsResults(activity, user.StravaToken)
+	if err != nil {
+		log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	err = service.UpdateActivity(*activity)
 	if err != nil {

@@ -15,7 +15,6 @@ export class SecondsToCountdownPipe implements PipeTransform {
     }
 
     let time = value;
-    time = Math.floor(time / 1000);
     time = Math.floor(time / 60);
     const minutes = Math.floor(time % 60);
     time = Math.floor(time / 60);

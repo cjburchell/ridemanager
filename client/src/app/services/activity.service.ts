@@ -85,7 +85,9 @@ export interface IParticipant {
 export interface IResult {
   rank: number;
   segment_id: number;
+  activity_id: number;
   time: number;
+  stage_number: number;
 }
 
 export interface ICategory {

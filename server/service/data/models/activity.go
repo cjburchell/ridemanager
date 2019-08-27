@@ -178,9 +178,10 @@ func (activity *Activity) UpdateStandings() {
 
 			activity.calculateRank(finishedParticipants, len(stageParticipants))
 
-			topParticipant := finishedParticipants[0]
-			activity.calculateOffset(finishedParticipants, topParticipant)
-
+			if len(finishedParticipants) != 0 {
+				topParticipant := finishedParticipants[0]
+				activity.calculateOffset(finishedParticipants, topParticipant)
+			}
 
 			for stageIndex := range activity.Stages{
 				results:= make([]ResultItem  , len(stageParticipants))

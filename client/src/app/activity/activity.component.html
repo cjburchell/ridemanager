@@ -86,7 +86,7 @@
                     <td><app-athlete [athlete]="participant.athlete"></app-athlete></td>
                     <td *ngIf="!categoryFilter && activity.categories.length > 1">{{getCategoryName(participant.category_id)}}</td>
                     <td *ngIf="!sexFilter && showSexFilter()">{{participant.athlete.sex}}</td>
-                    <td *ngFor="let stage of participant.results"><a [href]=" 'https://www.strava.com/activities/' + stage.segment_id " target="_blank">{{ stage.time | secondsToTime }}</a><span *ngIf="stage.rank!==undefined "> ({{stage.rank}})</span></td>
+                    <td *ngFor="let stage of participant.results"><a [href]=" 'https://www.strava.com/activities/' + stage.activity_id " target="_blank">{{ stage.time | secondsToTime }}</a><span *ngIf="stage.rank!==undefined "> ({{stage.rank}})</span></td>
                     <td *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">
                       <div *ngIf="participant.time && activity.stages.length !== 1 && participant.rank!=1">+{{participant.offset_time | secondsToTime}} ({{participant.time | secondsToTime}})</div>
                       <div *ngIf="participant.time && activity.stages.length !== 1 && participant.rank===1">{{participant.time | secondsToTime}}</div>
@@ -130,7 +130,7 @@
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-              <div *ngIf="activity.route.id" class="card">
+              <div *ngIf="activity.route" class="card">
                 <div class="card-body">
                   <h4>Route</h4>
                   <div class="row">

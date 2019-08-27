@@ -88,7 +88,7 @@ func (participant *Participant) UpdateParticipantsResults(activity *Activity, ac
 		}
 
 		participant.Results[index].Time = float64(bestEffort.ElapsedTime)
-		participant.Results[index].ActivityId = bestEffort.Id
+		participant.Results[index].ActivityId = bestEffort.Activity.Id
 	}
 
 	if activity.ActivityType == ActivityTypes.Triathlon || activity.ActivityType == ActivityTypes.Race{

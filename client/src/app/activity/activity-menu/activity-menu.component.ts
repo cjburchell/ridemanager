@@ -18,7 +18,7 @@ export class ActivityMenuComponent {
 
   @Output() activityUpdate = new EventEmitter();
 
-  @ViewChild('joinDialog', {static: false}) joinDialog: JoinDialogComponent;
+  @ViewChild('selectCategory', {static: false}) selectCategory: JoinDialogComponent;
 
   constructor(private activityService: ActivityService,
               private router: Router) { }
@@ -46,8 +46,9 @@ export class ActivityMenuComponent {
   }
 
   deleteActivity() {
-    this.activityService.deleteActivity(this.activity);
-    this.router.navigate([`/main`]);
+    this.activityService.deleteActivity(this.activity).subscribe(() => {
+      this.router.navigate([`/main`]);
+    });
   }
 
   join(category: ICategory) {
