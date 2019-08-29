@@ -152,6 +152,13 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	if activity.Participants == nil{
 		activity.Participants = []*models.Participant{&participant}
 	} else {
+		for _,p := range activity.Participants {
+			if p.Athlete.Id == participant.Athlete.Id {
+				writeSuccess(writer)
+				return
+			}
+		}
+
 		activity.Participants = append(activity.Participants, &participant)
 	}
 
@@ -171,10 +178,14 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 		return
 	}
 
+	writeSuccess(writer)
+}
+
+func writeSuccess(writer http.ResponseWriter) {
 	reply, _ := json.Marshal(true)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
-	_, err = writer.Write(reply)
+	_, err := writer.Write(reply)
 	if err != nil {
 		log.Error(err)
 	}
