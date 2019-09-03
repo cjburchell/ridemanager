@@ -171,6 +171,8 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 		return
 	}
 
+	activity.UpdateStandings()
+
 	err = service.UpdateActivity(*activity)
 	if err != nil {
 		log.Error(err)
@@ -221,6 +223,8 @@ func handleUpdateActivityParticipantState(writer http.ResponseWriter, request *h
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	activity.UpdateStandings()
 
 	err = service.UpdateActivity(*activity)
 	if err != nil {
