@@ -6,6 +6,7 @@ import {
 import {IAthlete} from '../../services/user.service';
 import {Router} from '@angular/router';
 import {TokenService} from '../../services/token.service';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-create',
@@ -39,7 +40,10 @@ export class CreateComponent implements OnChanges {
         starts_in: undefined,
         route: undefined,
         privacy: 'private',
-        categories: [],
+        categories:[{
+          category_id: uuid.v4().toString(),
+          name: 'Open',
+        }],
         stages: [],
         participants: [],
         state: 'upcoming',
