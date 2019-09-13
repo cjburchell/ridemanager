@@ -40,7 +40,7 @@ export class CreateComponent implements OnChanges {
         starts_in: undefined,
         route: undefined,
         privacy: 'private',
-        categories:[{
+        categories: [{
           category_id: uuid.v4().toString(),
           name: 'Open',
         }],
