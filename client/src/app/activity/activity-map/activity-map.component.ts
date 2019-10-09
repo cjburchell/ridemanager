@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import {LngLatLike, LngLatBoundsLike} from 'mapbox-gl';
 import {Polyline} from '../../services/polyline';
 import * as geojson from 'geojson';
+import {StageTypeToImagePipe} from '../../pipes/stage-type-to-image.pipe';
 
 @Component({
   selector: 'app-activity-map',
@@ -143,65 +144,70 @@ export class ActivityMapComponent implements OnInit, OnChanges {
       if (this.activity.stages) {
         for (const stage of this.activity.stages) {
 
-          const icon = stage.activity_type === 'Ride' ? 'bicycle' : 'star';
+          const icon = new StageTypeToImagePipe().transform(stage.activity_type);
+          const tempMap = this.map;
+          this.map.loadImage(icon, (error, image) => {
+            if (error) { throw error; }
+            tempMap.addImage('icon', image);
 
-          const layer: mapboxgl.Layer = {
-            id: 'stage' + stage.number,
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: {
-                type: 'FeatureCollection',
-                features: [{
-                  type: 'Feature',
-                  geometry: {
-                    type: 'LineString',
-                    coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(stage.map.polyline)),
-                  },
-                  properties: {},
-                },
-                  {
+            const layer: mapboxgl.Layer = {
+              id: 'stage' + stage.number,
+              type: 'line',
+              source: {
+                type: 'geojson',
+                data: {
+                  type: 'FeatureCollection',
+                  features: [{
                     type: 'Feature',
                     geometry: {
-                      type: 'Point',
-                      coordinates: [stage.start_latlng[1], stage.start_latlng[0]],
+                      type: 'LineString',
+                      coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(stage.map.polyline)),
                     },
-                    properties: {
-                      title: 'Start Stage ' + stage.number,
-                      description: stage.name,
-                      'marker-size': 'small',
-                      'marker-color': '#00AA00',
-                      icon,
-                      url: 'https://www.strava.com/segments/' + stage.segment_id
-                    },
+                    properties: {},
                   },
-                  {
-                    type: 'Feature',
-                    geometry: {
-                      type: 'Point',
-                      coordinates: [stage.end_latlng[1], stage.end_latlng[0]],
+                    {
+                      type: 'Feature',
+                      geometry: {
+                        type: 'Point',
+                        coordinates: [stage.start_latlng[1], stage.start_latlng[0]],
+                      },
+                      properties: {
+                        title: 'Start Stage ' + stage.number,
+                        description: stage.name,
+                        'marker-size': 'small',
+                        'marker-color': '#00AA00',
+                        url: 'https://www.strava.com/segments/' + stage.segment_id
+                      },
                     },
-                    properties: {
-                      title: 'Start Stage ' + stage.number,
-                      description: stage.name,
-                      'marker-size': 'small',
-                      'marker-color': '#FF0000',
-                      icon,
-                      url: 'https://www.strava.com/segments/' + stage.segment_id
-                    },
-                  }]
+                    {
+                      type: 'Feature',
+                      geometry: {
+                        type: 'Point',
+                        coordinates: [stage.end_latlng[1], stage.end_latlng[0]],
+                      },
+                      properties: {
+                        title: 'Start Stage ' + stage.number,
+                        description: stage.name,
+                        'marker-size': 'small',
+                        'marker-color': '#FF0000',
+                        url: 'https://www.strava.com/segments/' + stage.segment_id
+                      },
+                    }]
+                }
+              },
+              layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'icon-image': 'icon',
+                'icon-size': 0.25
+              },
+              paint: {
+                'line-color': '#F00',
+                'line-width': 3,
               }
-            },
-            layout: {
-              'line-cap': 'round',
-              'line-join': 'round',
-            },
-            paint: {
-              'line-color': '#F00',
-              'line-width': 3,
-            }
-          };
-          this.map.addLayer(layer);
+            };
+            tempMap.addLayer(layer);
+          });
         }
       }
     });
