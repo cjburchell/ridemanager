@@ -37,9 +37,14 @@ func main() {
 		log.Warn(err, "Unable to Connect to logger")
 	}
 
+	err = settings.Verify()
+	if err != nil{
+		log.Fatal(err, "Unable to verify settings")
+	}
+
 	dataService, err := data.NewService(settings.MongoUrl)
 	if err != nil {
-		log.Warn(err, "Unable to Connect to mongo")
+		log.Fatal(err, "Unable to Connect to mongo")
 	}
 
 	setupStrava()

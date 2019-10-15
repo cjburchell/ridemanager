@@ -1,11 +1,10 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {IActivity} from '../../services/activity.service';
 import * as mapboxgl from 'mapbox-gl';
-import { environment } from '../../../environments/environment';
 import {LngLatLike, LngLatBoundsLike} from 'mapbox-gl';
 import {Polyline} from '../../services/polyline';
 import * as geojson from 'geojson';
-import {StageTypeToImagePipe} from '../../pipes/stage-type-to-image.pipe';
+import {SettingsService} from '../../services/settings.service';
 
 @Component({
   selector: 'app-activity-map',
@@ -14,12 +13,10 @@ import {StageTypeToImagePipe} from '../../pipes/stage-type-to-image.pipe';
 })
 export class ActivityMapComponent implements OnInit, OnChanges {
 
-  constructor() {
-  }
-
   map: mapboxgl.Map;
   style = 'mapbox://styles/mapbox/outdoors-v11';
   @Input() activity: IActivity;
+  private token: string;
 
   private static swapLatLong(points: number[][]): number[][] {
     for (const point of points) {
@@ -30,22 +27,29 @@ export class ActivityMapComponent implements OnInit, OnChanges {
     return points;
   }
 
-  ngOnInit() {
-    // @ts-ignore
-    mapboxgl.accessToken = environment.mapbox.accessToken;
-    this.map = new mapboxgl.Map({
-      container: 'map',
-      style: this.style,
-      zoom: 13,
-      center: [0, 0]
+  constructor(private settingsService: SettingsService) {
+  }
+
+  async ngOnInit() {
+    this.settingsService.getSetting('mapboxAccessToken').subscribe(token => {
+      this.token = token;
+      // @ts-ignore
+      mapboxgl.accessToken = token;
+
+      this.map = new mapboxgl.Map({
+        container: 'map',
+        style: this.style,
+        zoom: 13,
+        center: [0, 0]
+      });
+
+      // Add map controls
+      this.map.addControl(new mapboxgl.NavigationControl());
+
+      if (this.activity) {
+        this.UpdateActivity();
+      }
     });
-
-    // Add map controls
-    this.map.addControl(new mapboxgl.NavigationControl());
-
-    if (this.activity) {
-      this.UpdateActivity();
-    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -118,15 +122,12 @@ export class ActivityMapComponent implements OnInit, OnChanges {
           source: {
             type: 'geojson',
             data: {
-              type: 'FeatureCollection',
-              features: [{
-                type: 'Feature',
-                geometry: {
-                  type: 'LineString',
-                  coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(this.activity.route.map.polyline)),
-                },
-                properties: {},
-              }]
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(this.activity.route.map.polyline)),
+              },
+              properties: {},
             }
           },
           layout: {
@@ -142,30 +143,48 @@ export class ActivityMapComponent implements OnInit, OnChanges {
       }
 
       if (this.activity.stages) {
-        for (const stage of this.activity.stages) {
 
-          const icon = new StageTypeToImagePipe().transform(stage.activity_type);
-          const tempMap = this.map;
-          this.map.loadImage(icon, (error, image) => {
-            if (error) { throw error; }
-            tempMap.addImage('icon', image);
-
-            const layer: mapboxgl.Layer = {
+        const tempMap = this.map;
+        const icon = '/assets/images/bike.png';
+        this.map.loadImage(icon, (error, image) => {
+          if (error) {
+            throw error;
+          }
+          tempMap.addImage('icon', image);
+          for (const stage of this.activity.stages) {
+            const trackLayer: mapboxgl.Layer = {
               id: 'stage' + stage.number,
               type: 'line',
               source: {
                 type: 'geojson',
                 data: {
-                  type: 'FeatureCollection',
-                  features: [{
                     type: 'Feature',
                     geometry: {
                       type: 'LineString',
                       coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(stage.map.polyline)),
                     },
                     properties: {},
-                  },
-                    {
+                  }
+              },
+              layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+              },
+              paint: {
+                'line-color': '#F00',
+                'line-width': 3,
+              }
+            };
+            tempMap.addLayer(trackLayer);
+
+            const pointslayer: mapboxgl.Layer = {
+              id: 'stage_points' + stage.number,
+              type: 'line',
+              source: {
+                type: 'geojson',
+                data: {
+                  type: 'FeatureCollection',
+                  features: [{
                       type: 'Feature',
                       geometry: {
                         type: 'Point',
@@ -173,13 +192,11 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                       },
                       properties: {
                         title: 'Start Stage ' + stage.number,
+                        icon: 'monument',
                         description: stage.name,
-                        'marker-size': 'small',
-                        'marker-color': '#00AA00',
                         url: 'https://www.strava.com/segments/' + stage.segment_id
                       },
-                    },
-                    {
+                    }, {
                       type: 'Feature',
                       geometry: {
                         type: 'Point',
@@ -188,27 +205,18 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                       properties: {
                         title: 'Start Stage ' + stage.number,
                         description: stage.name,
-                        'marker-size': 'small',
-                        'marker-color': '#FF0000',
                         url: 'https://www.strava.com/segments/' + stage.segment_id
                       },
-                    }]
+                    }
+                  ]
                 }
               },
               layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-                'icon-image': 'icon',
-                'icon-size': 0.25
-              },
-              paint: {
-                'line-color': '#F00',
-                'line-width': 3,
               }
             };
-            tempMap.addLayer(layer);
-          });
-        }
+            tempMap.addLayer(pointslayer);
+          }
+        });
       }
     });
   }

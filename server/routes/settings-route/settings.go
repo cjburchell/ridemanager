@@ -28,6 +28,8 @@ func handleGetSettings(w http.ResponseWriter, r *http.Request) {
 		result = fmt.Sprintf("%d", strava.ClientId)
 	case "stravaRedirect":
 		result = settings.StravaRedirectURI
+	case "mapboxAccessToken":
+		result = settings.MapboxToken
 	}
 
 	if result == "" {
