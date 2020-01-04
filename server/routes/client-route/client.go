@@ -1,7 +1,6 @@
-package client_route
+package clientroute
 
 import (
-	"github.com/cjburchell/ridemanager/settings"
 	"mime"
 	"net/http"
 
@@ -9,46 +8,45 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Setup(r *mux.Router) {
-
+func Setup(r *mux.Router, clientLocation string, logger log.ILog) {
 
 	err := mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	err = mime.AddExtensionType(".html", "text/html; charset=utf-8")
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/main/{mode}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/activity/{activityId}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/edit/{activityId}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
 	r.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, settings.ClientLocation+"/index.html")
+		http.ServeFile(w, r, clientLocation+"/index.html")
 	})
 
-	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(settings.ClientLocation))))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(clientLocation))))
 }

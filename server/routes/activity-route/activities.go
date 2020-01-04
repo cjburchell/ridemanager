@@ -1,105 +1,102 @@
-package activity_route
+package activityroute
 
 import (
 	"encoding/json"
+	"net/http"
+
+	"github.com/cjburchell/ridemanager/service/stravaService"
+
+	"github.com/cjburchell/ridemanager/service/update"
+
 	"github.com/cjburchell/go-uatu"
-	activityservice "github.com/cjburchell/ridemanager/service/activity"
+	activityService "github.com/cjburchell/ridemanager/service/activity"
 	"github.com/cjburchell/ridemanager/service/data/models"
 	"github.com/cjburchell/tools-go/slice"
-	"net/http"
 
 	"github.com/cjburchell/ridemanager/routes/token"
 	"github.com/cjburchell/ridemanager/service/data"
 	"github.com/gorilla/mux"
 )
 
-func Setup(r *mux.Router, service data.IService) {
+type handle struct {
+	dataService   data.IService
+	authenticator stravaService.Authenticator
+	log           log.ILog
+}
+
+// Setup the activity route
+func Setup(r *mux.Router, service data.IService, tokenValidator token.Validator, authenticator stravaService.Authenticator, logger log.ILog) {
 
 	dataRoute := r.PathPrefix("/api/v1/activity").Subrouter()
 
-	dataRoute.HandleFunc("/my", token.ValidateMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetMyActivities(writer, request, service)
-		})).Methods("GET")
+	handle := handle{service, authenticator, logger}
+	validateWritable := validateWritable{service, logger}
 
-	dataRoute.HandleFunc("/public", token.ValidateMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetPublicActivities(writer, request, service)
-		})).Methods("GET")
-
-	dataRoute.HandleFunc("/joined", token.ValidateMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetJoinedActivities(writer, request, service)
-		})).Methods("GET")
-
-	dataRoute.HandleFunc("/{ActivityId}",
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetActivity(writer, request, service)
-		}).Methods("GET")
-
-	dataRoute.HandleFunc("", token.ValidateMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleCreateActivity(writer, request, service)
-		})).Methods("POST")
-
-	dataRoute.HandleFunc("/{ActivityId}/update", token.ValidateMiddleware(validateWritableAccessMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleUpdateActivityState(writer, request, service)
-		}, service))).Methods("POST")
-
-	dataRoute.HandleFunc("/{ActivityId}/update/{AthleteId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleUpdateActivityParticipantState(writer, request, service)
-		}, service))).Methods("POST")
-
-	dataRoute.HandleFunc("/{ActivityId}/participant", token.ValidateMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleAddParticipant(writer, request, service)
-		})).Methods("POST")
-
-	dataRoute.HandleFunc("/{ActivityId}/participant/{AthleteId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleRemoveParticipant(writer, request, service)
-		}, service))).Methods("DELETE")
-
-	dataRoute.HandleFunc("/{ActivityId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleUpdateActivity(writer, request, service)
-		}, service))).Methods("PATCH")
-
-	dataRoute.HandleFunc("/{ActivityId}", token.ValidateMiddleware(validateWritableAccessMiddleware(
-		func(writer http.ResponseWriter, request *http.Request) {
-			handleDeleteActivity(writer, request, service)
-		}, service))).Methods("DELETE")
+	dataRoute.HandleFunc("/my", tokenValidator.ValidateMiddleware(handle.getMyActivities)).Methods("GET")
+	dataRoute.HandleFunc("/public", tokenValidator.ValidateMiddleware(handle.getPublicActivities)).Methods("GET")
+	dataRoute.HandleFunc("/joined", tokenValidator.ValidateMiddleware(handle.getJoinedActivities)).Methods("GET")
+	dataRoute.HandleFunc("/{ActivityId}", handle.getActivity).Methods("GET")
+	dataRoute.HandleFunc("", tokenValidator.ValidateMiddleware(handle.createActivity)).Methods("POST")
+	dataRoute.HandleFunc("/{ActivityId}/update", tokenValidator.ValidateMiddleware(validateWritable.Middleware(handle.updateActivityState))).Methods("POST")
+	dataRoute.HandleFunc("/{ActivityId}/update/{AthleteId}", tokenValidator.ValidateMiddleware(validateWritable.Middleware(handle.updateActivityParticipantState))).Methods("POST")
+	dataRoute.HandleFunc("/{ActivityId}/participant", tokenValidator.ValidateMiddleware(handle.addParticipant)).Methods("POST")
+	dataRoute.HandleFunc("/{ActivityId}/participant/{AthleteId}", tokenValidator.ValidateMiddleware(validateWritable.Middleware(handle.removeParticipant))).Methods("DELETE")
+	dataRoute.HandleFunc("/{ActivityId}", tokenValidator.ValidateMiddleware(validateWritable.Middleware(handle.updateActivity))).Methods("PATCH")
+	dataRoute.HandleFunc("/{ActivityId}", tokenValidator.ValidateMiddleware(validateWritable.Middleware(handle.deleteActivity))).Methods("DELETE")
 }
 
-func handleUpdateActivityState(writer http.ResponseWriter, request *http.Request, service data.IService) {
-	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+func (h handle) updateResults(activity *models.Activity) error {
+	activity.UpdateState()
+	if activity.State == models.ActivityStates.Upcoming {
+		return nil
+	}
 
-	user, err := token.GetUser(request, service)
+	for p := range activity.Participants {
+
+		participant := activity.Participants[p]
+		user, err := h.dataService.GetUser(participant.Athlete.Id)
+		if err != nil {
+			return err
+		}
+
+		err = update.ParticipantsResults(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
+		if err != nil {
+			return err
+		}
+	}
+
+	update.Standings(activity)
+
+	return nil
+}
+
+func (h handle) updateActivityState(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	activityID := models.ActivityId(vars["ActivityId"])
+
+	user, err := token.GetUser(request, h.dataService)
 	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	activity, err := service.GetActivity(activityId)
+	activity, err := h.dataService.GetActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = activity.UpdateResults(user.StravaToken)
+	err = h.updateResults(activity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = service.UpdateActivity(*activity)
+	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -109,28 +106,28 @@ func handleUpdateActivityState(writer http.ResponseWriter, request *http.Request
 	writer.WriteHeader(http.StatusOK)
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func handleAddParticipant(writer http.ResponseWriter, request *http.Request, service data.IService) {
-	user, err := token.GetUser(request, service)
-	if err != nil{
+func (h handle) addParticipant(writer http.ResponseWriter, request *http.Request) {
+	user, err := token.GetUser(request, h.dataService)
+	if err != nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	if user == nil{
+	if user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+	activityID := models.ActivityId(vars["ActivityId"])
 
-	activity, err := service.GetActivity(activityId)
+	activity, err := h.dataService.GetActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -139,22 +136,22 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 	var participant models.Participant
 	err = decoder.Decode(&participant)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if user.Role != models.AdminRole && user.Athlete.Id != activity.Owner.Id && user.Athlete.Id != participant.Athlete.Id {
+	if user.Athlete.Id != participant.Athlete.Id {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	if activity.Participants == nil{
+	if activity.Participants == nil {
 		activity.Participants = []*models.Participant{&participant}
 	} else {
-		for _,p := range activity.Participants {
+		for _, p := range activity.Participants {
 			if p.Athlete.Id == participant.Athlete.Id {
-				writeSuccess(writer)
+				h.writeSuccess(writer)
 				return
 			}
 		}
@@ -164,71 +161,71 @@ func handleAddParticipant(writer http.ResponseWriter, request *http.Request, ser
 
 	activity.UpdateState()
 
-	err = participant.UpdateParticipantsResults(activity, user.StravaToken)
+	err = update.ParticipantsResults(&participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	activity.UpdateStandings()
+	update.Standings(activity)
 
-	err = service.UpdateActivity(*activity)
+	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	writeSuccess(writer)
+	h.writeSuccess(writer)
 }
 
-func writeSuccess(writer http.ResponseWriter) {
+func (h handle) writeSuccess(writer http.ResponseWriter) {
 	reply, _ := json.Marshal(true)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	_, err := writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func handleUpdateActivityParticipantState(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) updateActivityParticipantState(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+	activityID := models.ActivityId(vars["ActivityId"])
 
-	user, err := token.GetUser(request, service)
+	user, err := token.GetUser(request, h.dataService)
 	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	activity, err := service.GetActivity(activityId)
+	activity, err := h.dataService.GetActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	athleteId := models.AthleteId(vars["AthleteId"])
-	participant := activity.FindParticipant(athleteId)
+	athleteID := models.AthleteId(vars["AthleteId"])
+	participant := activity.FindParticipant(athleteID)
 	if participant == nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	err = participant.UpdateParticipantsResults(activity, user.StravaToken)
+	err = update.ParticipantsResults(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	activity.UpdateStandings()
+	update.Standings(activity)
 
-	err = service.UpdateActivity(*activity)
+	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -238,7 +235,7 @@ func handleUpdateActivityParticipantState(writer http.ResponseWriter, request *h
 	writer.WriteHeader(http.StatusOK)
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
@@ -247,31 +244,31 @@ func remove(s []*models.Participant, i int) []*models.Participant {
 	return s[:len(s)-1]
 }
 
-func handleRemoveParticipant(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) removeParticipant(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+	activityID := models.ActivityId(vars["ActivityId"])
 
-	activity, err := service.GetActivity(activityId)
+	activity, err := h.dataService.GetActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	athleteId := models.AthleteId(vars["AthleteId"])
+	athleteID := models.AthleteId(vars["AthleteId"])
 	index := slice.Index(len(activity.Participants), func(i int) bool {
-		return activity.Participants[i].Athlete.Id == athleteId
+		return activity.Participants[i].Athlete.Id == athleteID
 	})
-	if index == -1{
+	if index == -1 {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	activity.Participants = remove(activity.Participants, index)
 
-	err = service.UpdateActivity(*activity)
+	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -281,59 +278,17 @@ func handleRemoveParticipant(writer http.ResponseWriter, request *http.Request, 
 	writer.WriteHeader(http.StatusOK)
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func validateWritableAccessMiddleware(next http.HandlerFunc, service data.IService) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		 user, err := token.GetUser(req, service)
-		 if err != nil{
-			 w.WriteHeader(http.StatusUnauthorized)
-			 return
-		 }
-
-		if user == nil{
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		// check user role
-		if user.Role == models.AdminRole{
-			next(w, req)
-			return
-		}
-
-		 // check activity owner
-		vars := mux.Vars(req)
-		activityId := models.ActivityId(vars["ActivityId"])
-
-		activity, err := service.GetActivity(activityId)
-		if err != nil {
-			log.Error(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if activity.Owner.Id != user.Athlete.Id{
-			activityId := models.AthleteId(vars["AthleteId"])
-			if activityId != user.Athlete.Id{
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		}
-
-		next(w, req)
-	})
-}
-
-func handleDeleteActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) deleteActivity(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+	activityID := models.ActivityId(vars["ActivityId"])
 
-	err := service.DeleteActivity(activityId)
+	err := h.dataService.DeleteActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -341,21 +296,21 @@ func handleDeleteActivity(writer http.ResponseWriter, request *http.Request, ser
 	writer.WriteHeader(http.StatusOK)
 }
 
-func handleUpdateActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) updateActivity(writer http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
 	var changedActivity models.Activity
 	err := decoder.Decode(&changedActivity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	changedActivity.UpdateState()
 
-	err = service.UpdateActivity(changedActivity)
+	err = h.dataService.UpdateActivity(changedActivity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -363,21 +318,21 @@ func handleUpdateActivity(writer http.ResponseWriter, request *http.Request, ser
 	writer.WriteHeader(http.StatusOK)
 }
 
-func handleCreateActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) createActivity(writer http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
 	var newActivity models.Activity
 	err := decoder.Decode(&newActivity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	newActivity.UpdateState()
 
-	id, err := service.AddActivity(&newActivity)
+	id, err := h.dataService.AddActivity(&newActivity)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -388,28 +343,28 @@ func handleCreateActivity(writer http.ResponseWriter, request *http.Request, ser
 
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, service data.IService) {
+func (h handle) getMyActivities(writer http.ResponseWriter, req *http.Request) {
 
-	user, err := token.GetUser(req, service)
+	user, err := token.GetUser(req, h.dataService)
 	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	activities, err := service.GetOwnedActivities(user.Athlete.Id)
+	activities, err := h.dataService.GetOwnedActivities(user.Athlete.Id)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = activityservice.UpdateAll(activities, service)
+	err = activityService.UpdateAll(activities, h.dataService)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -420,53 +375,28 @@ func handleGetMyActivities(writer http.ResponseWriter, req *http.Request, servic
 
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func handleGetJoinedActivities(writer http.ResponseWriter, req *http.Request, service data.IService) {
+func (h handle) getJoinedActivities(writer http.ResponseWriter, req *http.Request) {
 
-	user, err := token.GetUser(req, service)
+	user, err := token.GetUser(req, h.dataService)
 	if err != nil || user == nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	activities, err := service.GetAthleteActivities(user.Athlete.Id)
+	activities, err := h.dataService.GetAthleteActivities(user.Athlete.Id)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = activityservice.UpdateAll(activities, service)
+	err = activityService.UpdateAll(activities, h.dataService)
 	if err != nil {
-		log.Error(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	reply, _ := json.Marshal(activities)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-
-	_, err = writer.Write(reply)
-	if err != nil {
-		log.Error(err)
-	}
-}
-
-func handleGetPublicActivities(writer http.ResponseWriter, _ *http.Request, service data.IService) {
-	activities, err := service.GetActivitiesByPrivacy(models.Privacy.Public)
-	if err != nil {
-		log.Error(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	err = activityservice.UpdateAll(activities, service)
-	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -477,31 +407,55 @@ func handleGetPublicActivities(writer http.ResponseWriter, _ *http.Request, serv
 
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }
 
-func handleGetActivity(writer http.ResponseWriter, request *http.Request, service data.IService) {
+func (h handle) getPublicActivities(writer http.ResponseWriter, _ *http.Request) {
+	activities, err := h.dataService.GetActivitiesByPrivacy(models.Privacy.Public)
+	if err != nil {
+		h.log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = activityService.UpdateAll(activities, h.dataService)
+	if err != nil {
+		h.log.Error(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reply, _ := json.Marshal(activities)
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+
+	_, err = writer.Write(reply)
+	if err != nil {
+		h.log.Error(err)
+	}
+}
+
+func (h handle) getActivity(writer http.ResponseWriter, request *http.Request) {
 
 	vars := mux.Vars(request)
-	activityId := models.ActivityId(vars["ActivityId"])
+	activityID := models.ActivityId(vars["ActivityId"])
 
-	foundActivity, err := service.GetActivity(activityId)
+	foundActivity, err := h.dataService.GetActivity(activityID)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-    if foundActivity.UpdateState(){
-		err = service.UpdateActivity(*foundActivity)
+	if foundActivity.UpdateState() {
+		err = h.dataService.UpdateActivity(*foundActivity)
 		if err != nil {
-			log.Error(err)
+			h.log.Error(err)
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	}
-
 
 	reply, _ := json.Marshal(foundActivity)
 	writer.Header().Set("Content-Type", "application/json")
@@ -509,7 +463,7 @@ func handleGetActivity(writer http.ResponseWriter, request *http.Request, servic
 
 	_, err = writer.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 
 }

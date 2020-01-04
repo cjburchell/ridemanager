@@ -29,7 +29,7 @@ func (s service) GetUsers() ([]models.User, error) {
 
 	return users, nil
 }
-func (s service) GetStravaUser(athleteId int64) (*models.User, error) {
+func (s service) GetStravaUser(athleteId int32) (*models.User, error) {
 	var user models.User
 	err := s.db.C(usersCollection).Find(bson.M{"athlete.strava_athlete_id": athleteId}).One(&user)
 

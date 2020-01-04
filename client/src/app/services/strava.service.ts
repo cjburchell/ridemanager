@@ -3,7 +3,6 @@ import {Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TokenService} from './token.service';
 import {SegmentType} from './activity.service';
-import {IAthlete} from './user.service';
 
 
 export interface ISegmentSummary {

@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ActivityService, IActivity, ICategory, IParticipant} from '../services/activity.service';
+import {ActivityService, IActivity, IParticipant} from '../services/activity.service';
 import {TokenService} from '../services/token.service';
 import {Gender, IAthlete, UserService} from '../services/user.service';
 import {HttpErrorResponse} from '@angular/common/http';

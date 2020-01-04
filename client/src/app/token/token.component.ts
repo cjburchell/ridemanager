@@ -4,8 +4,7 @@ import {TokenService} from '../services/token.service';
 
 @Component({
   selector: 'app-token',
-  templateUrl: './token.component.html',
-  styleUrls: ['./token.component.scss']
+  templateUrl: './token.component.html'
 })
 export class TokenComponent implements OnInit {
 

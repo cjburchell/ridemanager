@@ -3,33 +3,38 @@ package settings_route
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cjburchell/ridemanager/settings"
 	"net/http"
 
-	"github.com/cjburchell/go.strava"
+	"github.com/cjburchell/ridemanager/settings"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/gorilla/mux"
 )
 
-// SetupDataRoute setup the route
-func Setup(r *mux.Router) {
-	dataRoute := r.PathPrefix("/api/v1/settings").Subrouter()
-	dataRoute.HandleFunc("/{Setting}", handleGetSettings).Methods("GET")
+type handler struct {
+	settings.Configuration
+	log log.ILog
 }
 
-func handleGetSettings(w http.ResponseWriter, r *http.Request) {
+// SetupDataRoute setup the route
+func Setup(r *mux.Router, configuration settings.Configuration, logger log.ILog) {
+	dataRoute := r.PathPrefix("/api/v1/settings").Subrouter()
+	handle := handler{configuration, logger}
+	dataRoute.HandleFunc("/{Setting}", handle.getSettings).Methods("GET")
+}
+
+func (h handler) getSettings(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	setting := vars["Setting"]
 
 	result := ""
 	switch setting {
 	case "stravaClientId":
-		result = fmt.Sprintf("%d", strava.ClientId)
+		result = fmt.Sprintf("%d", h.StravaClientId)
 	case "stravaRedirect":
-		result = settings.StravaRedirectURI
+		result = h.StravaRedirectURI
 	case "mapboxAccessToken":
-		result = settings.MapboxToken
+		result = h.MapboxToken
 	}
 
 	if result == "" {
@@ -42,6 +47,6 @@ func handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }

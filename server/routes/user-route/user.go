@@ -2,8 +2,9 @@ package user_route
 
 import (
 	"encoding/json"
-	"github.com/cjburchell/ridemanager/service/data/models"
 	"net/http"
+
+	"github.com/cjburchell/ridemanager/service/data/models"
 
 	"github.com/cjburchell/go-uatu"
 
@@ -13,35 +14,40 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Setup(r *mux.Router, service data.IService) {
+type handler struct {
+	log log.ILog
+}
+
+func Setup(r *mux.Router, service data.IService, validator token.Validator, logger log.ILog) {
 	dataRoute := r.PathPrefix("/api/v1/user").Subrouter()
-	dataRoute.HandleFunc("/me", token.ValidateMiddleware(
+	handle := handler{logger}
+	dataRoute.HandleFunc("/me", validator.ValidateMiddleware(
 		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetUser(writer, request, service)
+			handle.getUser(writer, request, service)
 		})).Methods("GET")
 
-	dataRoute.HandleFunc("/me/achievements", token.ValidateMiddleware(
+	dataRoute.HandleFunc("/me/achievements", validator.ValidateMiddleware(
 		func(writer http.ResponseWriter, request *http.Request) {
-			handleGetUserAchievements(writer, request, service)
+			handle.getUserAchievements(writer, request, service)
 		})).Methods("GET")
 }
 
 type Achievements struct {
-	FirstCount int `json:"first_count"`
-	SecondCount int `json:"second_count"`
-	ThirdCount int `json:"third_count"`
+	FirstCount    int `json:"first_count"`
+	SecondCount   int `json:"second_count"`
+	ThirdCount    int `json:"third_count"`
 	FinishedCount int `json:"finished_count"`
 }
 
-func handleGetUserAchievements(w http.ResponseWriter, request *http.Request, dataService data.IService) {
+func (h handler) getUserAchievements(w http.ResponseWriter, request *http.Request, dataService data.IService) {
 	user, err := token.GetUser(request, dataService)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	if user == nil{
+	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -49,28 +55,28 @@ func handleGetUserAchievements(w http.ResponseWriter, request *http.Request, dat
 	var achievements Achievements
 	achievements.FinishedCount, err = dataService.GetAthleteActivitiesByStateCount(user.Athlete.Id, models.ActivityStates.Finished)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	achievements.FirstCount, err = dataService.GetAthleteActivitiesPlaceCount(user.Athlete.Id, 1)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	achievements.SecondCount, err = dataService.GetAthleteActivitiesPlaceCount(user.Athlete.Id, 2)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	achievements.ThirdCount, err = dataService.GetAthleteActivitiesPlaceCount(user.Athlete.Id, 3)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -81,15 +87,15 @@ func handleGetUserAchievements(w http.ResponseWriter, request *http.Request, dat
 
 	_, err = w.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
-	
+
 }
 
-func handleGetUser(w http.ResponseWriter, r *http.Request, dataService data.IService) {
+func (h handler) getUser(w http.ResponseWriter, r *http.Request, dataService data.IService) {
 	user, err := token.GetUser(r, dataService)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -105,6 +111,6 @@ func handleGetUser(w http.ResponseWriter, r *http.Request, dataService data.ISer
 
 	_, err = w.Write(reply)
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }

@@ -1,14 +1,14 @@
 package models
 
 import (
-	"github.com/cjburchell/go.strava"
-	"sort"
 	"time"
+
+	"github.com/cjburchell/strava-go"
 )
 
 type ActivityType string
 
-var  ActivityTypes = struct {
+var ActivityTypes = struct {
 	GroupRide ActivityType
 	Race      ActivityType
 	Triathlon ActivityType
@@ -17,14 +17,14 @@ var  ActivityTypes = struct {
 type ActivityPrivacy string
 
 var Privacy = struct {
-	Public ActivityPrivacy
+	Public  ActivityPrivacy
 	Private ActivityPrivacy
 }{"public", "private"}
 
 type ActivityState string
 
 var ActivityStates = struct {
-	Upcoming ActivityState
+	Upcoming   ActivityState
 	InProgress ActivityState
 	Finished   ActivityState
 }{"upcoming", "in_progress", "finished"}
@@ -43,20 +43,20 @@ type Map struct {
 }
 
 type Athlete struct {
-	Id                 AthleteId     `json:"id" bson:"id"`
-	StravaAthleteId    int64         `json:"strava_athlete_id" bson:"strava_athlete_id"`
-	Name               string        `json:"name" bson:"name"`
-	ProfileImage       string        `json:"profile" bson:"profile"`
-	ProfileMediumImage string        `json:"profile_medium" bson:"profile_medium"`
-	Gender             strava.Gender `json:"sex" bson:"sex"`
+	Id                 AthleteId `json:"id" bson:"id"`
+	StravaAthleteId    int32     `json:"strava_athlete_id" bson:"strava_athlete_id"`
+	Name               string    `json:"name" bson:"name"`
+	ProfileImage       string    `json:"profile" bson:"profile"`
+	ProfileMediumImage string    `json:"profile_medium" bson:"profile_medium"`
+	Sex                string    `json:"sex" bson:"sex"`
 }
 
-func (a *Athlete)Update(athlete strava.AthleteSummary)  {
+func (a *Athlete) Update(athlete strava.SummaryAthlete) {
 	a.StravaAthleteId = athlete.Id
-	a.Name = athlete.FirstName + " " + athlete.LastName
+	a.Name = athlete.Firstname + " " + athlete.Lastname
 	a.ProfileMediumImage = athlete.ProfileMedium
 	a.ProfileImage = athlete.Profile
-	a.Gender = athlete.Gender
+	a.Sex = athlete.Sex
 }
 
 type ActivityId string
@@ -70,21 +70,21 @@ type Activity struct {
 	StartTime       time.Time       `json:"start_time" bson:"start_time"`
 	EndTime         time.Time       `json:"end_time" bson:"end_time"`
 	TotalDistance   float64         `json:"total_distance" bson:"total_distance"`
-	Duration        float64           `json:"duration" bson:"duration"`
-	TimeLeft        float64           `json:"time_left" bson:"time_left"`
-	StartsIn        float64           `json:"starts_in" bson:"starts_in"`
+	Duration        float64         `json:"duration" bson:"duration"`
+	TimeLeft        float64         `json:"time_left" bson:"time_left"`
+	StartsIn        float64         `json:"starts_in" bson:"starts_in"`
 	Route           *Route          `json:"route" bson:"route"`
 	Privacy         ActivityPrivacy `json:"privacy" bson:"privacy"`
 	Categories      []Category      `json:"categories" bson:"categories"`
 	Stages          []Stage         `json:"stages" bson:"stages"`
-	Participants    []*Participant   `json:"participants" bson:"participants"`
+	Participants    []*Participant  `json:"participants" bson:"participants"`
 	State           ActivityState   `json:"state" bson:"state"`
 	MaxParticipants int             `json:"max_participants" bson:"max_participants"`
 }
 
-func (activity Activity)FindParticipant(id AthleteId) *Participant   {
-	for _, participant := range activity.Participants{
-		if participant.Athlete.Id == id{
+func (activity Activity) FindParticipant(id AthleteId) *Participant {
+	for _, participant := range activity.Participants {
+		if participant.Athlete.Id == id {
 			return participant
 		}
 	}
@@ -110,7 +110,7 @@ func (activity *Activity) updateActivityState() {
 	}
 }
 
-func (activity *Activity)UpdateState() bool {
+func (activity *Activity) UpdateState() bool {
 	oldState := activity.State
 	activity.updateActivityState()
 
@@ -121,95 +121,12 @@ func (activity *Activity)UpdateState() bool {
 	return oldState != activity.State
 }
 
-func (activity *Activity) UpdateResults(accessToken string) error  {
-	activity.UpdateState()
-	if activity.State == ActivityStates.Upcoming {
-		return nil
-	}
-
-	for p := range activity.Participants {
-		err := activity.Participants[p].UpdateParticipantsResults(activity, accessToken)
-		if err != nil{
-			return err
-		}
-	}
-
-	activity.UpdateStandings()
-
-	return  nil
-}
-
 type ResultItem struct {
-Result *Result
-Participant *Participant
+	Result      *Result
+	Participant *Participant
 }
 
-func filterResultItem(ss []ResultItem, test func(ResultItem) bool) (ret []ResultItem) {
-	for _, s := range ss {
-		if test(s) {
-			ret = append(ret, s)
-		}
-	}
-	return
-}
-
-
-func (activity *Activity) UpdateStandings() {
-	if activity.ActivityType == ActivityTypes.Triathlon || activity.ActivityType == ActivityTypes.Race {
-		return
-	}
-
-	genders := []strava.Gender {strava.Genders.Male, strava.Genders.Female}
-	for _, category := range activity.Categories {
-		for _, gender := range genders{
-			stageParticipants := filterParticipants(activity.Participants, func(participant *Participant) bool {
-				return participant.CategoryId == category.CategoryId && participant.Athlete.Gender == gender
-			})
-
-
-			stageCount := len(activity.Stages)
-			finishedParticipants := filterParticipants(stageParticipants, func(participant *Participant) bool {
-				return participant.StagesComplete == stageCount
-			})
-
-			sort.Slice(finishedParticipants, func(i, j int) bool {
-				return finishedParticipants[i].Time < finishedParticipants[j].Time
-			})
-
-			activity.calculateRank(finishedParticipants, len(stageParticipants))
-
-			if len(finishedParticipants) != 0 {
-				topParticipant := finishedParticipants[0]
-				activity.calculateOffset(finishedParticipants, topParticipant)
-			}
-
-			for stageIndex := range activity.Stages{
-				results:= make([]ResultItem  , len(stageParticipants))
-
-				for index, participant := range stageParticipants{
-					results[index].Participant = participant
-					results[index].Result = &participant.Results[stageIndex]
-				}
-
-				sortedResults:= filterResultItem(results, func(item ResultItem) bool {
-					return item.Result.ActivityId != 0
-				})
-
-				sort.Slice(sortedResults,func(i, j int) bool {
-					return sortedResults[i].Result.Time < sortedResults[j].Result.Time
-				})
-
-				stageRank := 0
-				for _, item := range sortedResults{
-					stageRank++
-					item.Result.Rank = stageRank
-				}
-			}
-		}
-	}
-}
-
-func (activity *Activity) calculateRank(finishedParticipants []*Participant, totalParticipants int) {
+func (activity *Activity) CalculateRank(finishedParticipants []*Participant, totalParticipants int) {
 	rank := 0
 	for _, p := range finishedParticipants {
 		rank++
@@ -218,7 +135,7 @@ func (activity *Activity) calculateRank(finishedParticipants []*Participant, tot
 	}
 }
 
-func (activity *Activity) calculateOffset(finishedParticipants []*Participant, topParticipant *Participant) {
+func (activity *Activity) CalculateOffset(finishedParticipants []*Participant, topParticipant *Participant) {
 	for _, p := range finishedParticipants {
 		p.OffsetTime = p.Time - topParticipant.Time
 	}

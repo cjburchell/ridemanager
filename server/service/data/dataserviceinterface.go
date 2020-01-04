@@ -5,7 +5,7 @@ import "github.com/cjburchell/ridemanager/service/data/models"
 type IService interface {
 	GetUsers() ([]models.User, error)
 	GetUser(athleteId models.AthleteId) (*models.User, error)
-	GetStravaUser(athleteId int64) (*models.User, error)
+	GetStravaUser(athleteId int32) (*models.User, error)
 
 	AddUser(user *models.User) error
 	UpdateUser(user models.User) error

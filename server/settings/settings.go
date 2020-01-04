@@ -2,72 +2,90 @@ package settings
 
 import (
 	"fmt"
+
 	log "github.com/cjburchell/go-uatu"
 	"github.com/cjburchell/tools-go/env"
 	"github.com/pkg/errors"
 )
 
-const defaultMongoUrl ="localhost"
-var MongoUrl = env.Get("MONGO_URL", defaultMongoUrl)
-
-const defaultPort  = 8091
-var Port = env.GetInt("PORT", defaultPort)
-
-const defaultPollInterval  = "@hourly"
-var PollInterval = env.Get("POLL_INTERVAL", defaultPollInterval)
-
-var StravaClientId = env.GetInt("STRAVA_CLIENT_ID", 0)
-var StravaClientSecret = env.Get("STRAVA_CLIENT_SECRET", "")
-
+const defaultMongoUrl = "localhost"
+const defaultPort = 8091
+const defaultPollInterval = "@hourly"
 const defaultStravaRedirectURI = "http://localhost:8091/api/v1/login"
-var StravaRedirectURI = env.Get("STRAVA_REDIRECT_URI", defaultStravaRedirectURI)
-
 const defaultJwtSecret = "test"
-var JwtSecret = env.Get("JWT_SECRET", defaultJwtSecret)
+const defaultClientLocation = "client/dist/ridemanager-client"
 
-const defaultClientLocation  = "client/dist/ridemanager-client"
-var ClientLocation = env.Get("CLIENT_LOCATION", defaultClientLocation)
+type Configuration struct {
+	MongoUrl           string
+	Port               int
+	PollInterval       string
+	StravaClientId     int
+	StravaClientSecret string
+	StravaRedirectURI  string
+	JwtSecret          string
+	ClientLocation     string
+	MapboxToken        string
+}
 
-var MapboxToken = env.Get("MAPBOX_ACCESS_TOKEN", "")
+func Get(logger log.ILog) (*Configuration, error) {
+	config := &Configuration{
+		MongoUrl:           env.Get("MONGO_URL", defaultMongoUrl),
+		Port:               env.GetInt("PORT", defaultPort),
+		PollInterval:       env.Get("POLL_INTERVAL", defaultPollInterval),
+		StravaClientId:     env.GetInt("STRAVA_CLIENT_ID", 0),
+		StravaClientSecret: env.Get("STRAVA_CLIENT_SECRET", ""),
+		StravaRedirectURI:  env.Get("STRAVA_REDIRECT_URI", defaultStravaRedirectURI),
+		JwtSecret:          env.Get("JWT_SECRET", defaultJwtSecret),
+		ClientLocation:     env.Get("CLIENT_LOCATION", defaultClientLocation),
+		MapboxToken:        env.Get("MAPBOX_ACCESS_TOKEN", ""),
+	}
 
-func Verify() error {
+	err := config.verify(logger)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
+func (config Configuration) verify(logger log.ILog) error {
 
 	warningMessage := ""
-	if MongoUrl == defaultMongoUrl {
-		warningMessage += fmt.Sprintf("\nMONGO_URL set to default value (%s)", MongoUrl)
+	if config.MongoUrl == defaultMongoUrl {
+		warningMessage += fmt.Sprintf("\nMONGO_URL set to default value (%s)", config.MongoUrl)
 	}
 
-	if StravaRedirectURI == defaultStravaRedirectURI {
-		warningMessage += fmt.Sprintf("\nSTRAVA_REDIRECT_URI set to default value (%s)", StravaRedirectURI)
+	if config.StravaRedirectURI == defaultStravaRedirectURI {
+		warningMessage += fmt.Sprintf("\nSTRAVA_REDIRECT_URI set to default value (%s)", config.StravaRedirectURI)
 	}
 
-	if ClientLocation == defaultClientLocation {
-		warningMessage += fmt.Sprintf("\nCLIENT_LOCATION set to default value (%s)", ClientLocation)
+	if config.ClientLocation == defaultClientLocation {
+		warningMessage += fmt.Sprintf("\nCLIENT_LOCATION set to default value (%s)", config.ClientLocation)
 	}
 
-	if JwtSecret == defaultJwtSecret {
-		warningMessage += fmt.Sprintf("\nJWT_SECRET set to default value (%s)", JwtSecret)
+	if config.JwtSecret == defaultJwtSecret {
+		warningMessage += fmt.Sprintf("\nJWT_SECRET set to default value (%s)", config.JwtSecret)
 	}
 
 	if warningMessage != "" {
-		log.Warn("Warning: " + warningMessage)
+		logger.Warn("Warning: " + warningMessage)
 	}
 
 	errorMessage := ""
-	if MapboxToken == "" {
+	if config.MapboxToken == "" {
 		errorMessage += "\nMAPBOX_ACCESS_TOKEN Not set"
 	}
 
-	if StravaClientId == 0 {
+	if config.StravaClientId == 0 {
 		errorMessage += "\nSTRAVA_CLIENT_ID Not set"
 	}
 
-	if StravaClientSecret == "" {
+	if config.StravaClientSecret == "" {
 		errorMessage += "\nSTRAVA_CLIENT_SECRET Not set"
 	}
 
 	if errorMessage != "" {
-		log.Error(nil, "ERRORS: "+errorMessage)
+		logger.Error(nil, "ERRORS: "+errorMessage)
 		return errors.New("Missing Env Settings")
 	}
 

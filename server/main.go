@@ -8,74 +8,64 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/cjburchell/ridemanager/routes/activity-route"
-	"github.com/cjburchell/ridemanager/routes/client-route"
-	"github.com/cjburchell/ridemanager/routes/settings-route"
-	"github.com/cjburchell/ridemanager/routes/status-route"
-	"github.com/cjburchell/ridemanager/routes/strava-route"
-	"github.com/cjburchell/ridemanager/routes/user-route"
+	"github.com/cjburchell/ridemanager/service/stravaService"
+
+	"github.com/cjburchell/ridemanager/routes/token"
+
+	activityRoute "github.com/cjburchell/ridemanager/routes/activity-route"
+	clientRoute "github.com/cjburchell/ridemanager/routes/client-route"
+	loginRoute "github.com/cjburchell/ridemanager/routes/login-route"
+	settingsRoute "github.com/cjburchell/ridemanager/routes/settings-route"
+	statusRoute "github.com/cjburchell/ridemanager/routes/status-route"
+	stravaRoute "github.com/cjburchell/ridemanager/routes/strava-route"
+	userRoute "github.com/cjburchell/ridemanager/routes/user-route"
 
 	"github.com/cjburchell/ridemanager/service/data"
 	"github.com/cjburchell/ridemanager/settings"
 
-	"github.com/cjburchell/ridemanager/routes/login-route"
-
-	"github.com/cjburchell/go.strava"
-
 	"github.com/robfig/cron"
 
 	"github.com/cjburchell/go-uatu"
-	logSettings "github.com/cjburchell/go-uatu/settings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	err := logSettings.SetupLogger()
+	logger := log.Create()
+
+	config, err := settings.Get(logger)
 	if err != nil {
-		log.Warn(err, "Unable to Connect to logger")
+		logger.Fatal(err, "Unable to verify settings")
 	}
 
-	err = settings.Verify()
-	if err != nil{
-		log.Fatal(err, "Unable to verify settings")
-	}
-
-	dataService, err := data.NewService(settings.MongoUrl)
+	dataService, err := data.NewService(config.MongoUrl)
 	if err != nil {
-		log.Fatal(err, "Unable to Connect to mongo")
+		logger.Fatal(err, "Unable to Connect to mongo")
 	}
 
-	setupStrava()
+	srv := startHTTPServer(*config, dataService, logger)
+	defer stopHTTPServer(srv, logger)
 
-	srv := startHttpServer(settings.Port, dataService)
-	defer stopHttpServer(srv)
-
-	cronTasks := startProcessor(settings.PollInterval)
+	cronTasks := startProcessor(config.PollInterval, logger)
 	defer cronTasks.Stop()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
 
-	log.Print("shutting down")
+	logger.Print("shutting down")
 	os.Exit(0)
 }
 
-func setupStrava() {
-	strava.ClientId = settings.StravaClientId
-	strava.ClientSecret = settings.StravaClientSecret
-}
-
-func startProcessor(interval string) *cron.Cron {
+func startProcessor(interval string, logger log.ILog) *cron.Cron {
 	cronTasks := cron.New()
 	err := cronTasks.AddFunc(interval, func() {
 
 	})
 
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	cronTasks.Start()
@@ -83,40 +73,44 @@ func startProcessor(interval string) *cron.Cron {
 	return cronTasks
 }
 
-func startHttpServer(port int, service data.IService) *http.Server {
+func startHTTPServer(config settings.Configuration, service data.IService, logger log.ILog) *http.Server {
 	r := mux.NewRouter()
-	login_route.Setup(r, service)
-	user_route.Setup(r, service)
-	activity_route.Setup(r, service)
-	strava_route.Setup(r, service)
-	status_route.Setup(r)
-	settings_route.Setup(r)
-	client_route.Setup(r)
+
+	tokenValidator := token.GetValidator(config.JwtSecret)
+	tokenBuilder := token.GetBuilder(config.JwtSecret)
+	authenticator := stravaService.GetAuthenticator(config.StravaClientId, config.StravaClientSecret)
+	loginRoute.Setup(r, service, tokenValidator, tokenBuilder, authenticator, logger)
+	userRoute.Setup(r, service, tokenValidator, logger)
+	activityRoute.Setup(r, service, tokenValidator, authenticator, logger)
+	stravaRoute.Setup(r, service, tokenValidator, authenticator, logger)
+	statusRoute.Setup(r, logger)
+	settingsRoute.Setup(r, config, logger)
+	clientRoute.Setup(r, config.ClientLocation, logger)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 
-	log.Printf("Starting Server at port %d", port)
+	logger.Printf("Starting Server at port %d", config.Port)
 	srv := &http.Server{
 		Handler:      loggedRouter,
-		Addr:         fmt.Sprintf(":%d", port),
+		Addr:         fmt.Sprintf(":%d", config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Error(err)
+			logger.Error(err)
 		}
 	}()
 
 	return srv
 }
 
-func stopHttpServer(srv *http.Server) {
+func stopHTTPServer(srv *http.Server, logger log.ILog) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 	err := srv.Shutdown(ctx)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 }

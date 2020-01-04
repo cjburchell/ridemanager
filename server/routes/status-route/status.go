@@ -7,14 +7,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Setup(r *mux.Router) {
-	r.HandleFunc("/@status", handleGetStatus).Methods("GET")
+type handler struct {
+	log log.ILog
 }
 
-func handleGetStatus(w http.ResponseWriter, r *http.Request) {
+func Setup(r *mux.Router, logger log.ILog) {
+	handle := handler{logger}
+	r.HandleFunc("/@status", handle.getStatus).Methods("GET")
+}
+
+func (h handler) getStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_, err := w.Write([]byte("Ok"))
 	if err != nil {
-		log.Error(err)
+		h.log.Error(err)
 	}
 }

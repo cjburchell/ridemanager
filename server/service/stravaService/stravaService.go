@@ -1,67 +1,113 @@
 package stravaService
-import (
-	log "github.com/cjburchell/go-uatu"
-	"time"
 
-	"github.com/cjburchell/go.strava"
+import (
+	"context"
+
+	"github.com/antihax/optional"
+	"github.com/cjburchell/strava-go"
 )
 
 type IService interface {
-	GetStaredSegments(page int, perPage int) ([]*strava.SegmentSummary, error)
-	GetRoutes(athleteId int64, page int, perPage int) ([]*strava.Route, error)
-	GetRoute(routeId int64) (*strava.Route, error)
-	GetSegment(segmentId int64) (*strava.SegmentDetailed, error)
-
-	SegmentsListEfforts(segmentId int64, athleteId int64, startTime time.Time, endTime time.Time) ([]*strava.SegmentEffortSummary, error)
+	GetStaredSegments(page int32, perPage int32) ([]strava.SummarySegment, error)
+	GetRoutes(athleteId int32, page int32, perPage int32) ([]strava.Route, error)
+	GetRoute(routeId int32) (*strava.Route, error)
+	GetSegment(segmentId int64) (*strava.DetailedSegment, error)
+	SegmentsListEfforts(segmentId int32, page int32, perPage int32) ([]strava.DetailedSegmentEffort, error)
 }
 
 type service struct {
-	client *strava.Client
+	client *strava.APIClient
+	token  TokenManager
 }
 
-func (s service) GetRoutes(athleteId int64, page int, perPage int) ([]*strava.Route, error) {
-	log.Print("Strava GetRoutes")
-	athletes := strava.NewAthletesService(s.client)
-	return athletes.Routes(athleteId).PerPage(perPage).Page(page+1).Do()
+func (s service) GetRoutes(athleteId int32, page int32, perPage int32) ([]strava.Route, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	routes, _, err := s.client.RoutesApi.GetRoutesByAthleteId(ctx, athleteId, &strava.GetRoutesByAthleteIdOpts{Page: optional.NewInt32(page + 1), PerPage: optional.NewInt32(perPage)})
+	return routes, err
 }
 
-func (s service) GetRoute(routeId int64) (*strava.Route, error) {
-	log.Print("Strava GetRoute")
-	routes := strava.NewRoutesService(s.client)
-	return routes.Get(routeId).Do()
+func (s service) getContext() (context.Context, error) {
+	ctx := context.Background()
+	token, err := s.token.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx = context.WithValue(ctx, strava.ContextAccessToken, token.AccessToken)
+	return ctx, nil
 }
 
-func (s service) GetRouteStreams(routeId int64, streamTypes []strava.StreamType) (*strava.StreamSet, error) {
-	log.Print("Strava GetRouteStreams")
-	routes := strava.NewRoutesStreamsService(s.client)
-	return routes.Get(routeId, streamTypes).Do()
+func (s service) GetRoute(routeId int32) (*strava.Route, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.RoutesApi.GetRouteById(ctx, routeId)
+	return &result, err
 }
 
-func (s service) GetSegmentStream(segmentId int64, streamTypes []strava.StreamType) (*strava.StreamSet, error) {
-	log.Print("Strava GetSegmentStream")
-	routes := strava.NewSegmentStreamsService(s.client)
-	return routes.Get(segmentId, streamTypes).Do()
+func (s service) GetRouteStreams(routeId int64) (*strava.StreamSet, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.StreamsApi.GetRouteStreams(ctx, routeId)
+	return &result, err
 }
 
-func (s service) GetStaredSegments(page int, perPage int) ([]*strava.SegmentSummary, error) {
-	log.Print("Strava GetStaredSegments")
-	segments := strava.NewSegmentsService(s.client)
-	return segments.Starred().PerPage(perPage).Page(page + 1).Do()
+func (s service) GetSegmentStream(segmentId int64, streamTypes []string) (*strava.StreamSet, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.StreamsApi.GetSegmentStreams(ctx, segmentId, streamTypes, true)
+	return &result, err
 }
 
-func (s service) SegmentsListEfforts(segmentId int64, athleteId int64, startTime time.Time, endTime time.Time) ([]*strava.SegmentEffortSummary, error) {
-	log.Print("Strava SegmentsListEfforts")
-	segments := strava.NewSegmentsService(s.client)
-	return segments.ListEfforts(segmentId).AthleteId(athleteId).DateRange(startTime, endTime).Do()
+func (s service) GetStaredSegments(page int32, perPage int32) ([]strava.SummarySegment, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.SegmentsApi.GetLoggedInAthleteStarredSegments(ctx, &strava.GetLoggedInAthleteStarredSegmentsOpts{
+		Page:    optional.NewInt32(page + 1),
+		PerPage: optional.NewInt32(perPage),
+	})
+	return result, err
 }
 
-func (s service) GetSegment(segmentId int64) (*strava.SegmentDetailed, error) {
-	log.Print("Strava GetSegment")
-	segments := strava.NewSegmentsService(s.client)
-	return segments.Get(segmentId).Do()
+func (s service) SegmentsListEfforts(segmentId int32, page int32, perPage int32) ([]strava.DetailedSegmentEffort, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.SegmentEffortsApi.GetEffortsBySegmentId(ctx, segmentId, &strava.GetEffortsBySegmentIdOpts{
+		Page:    optional.NewInt32(page + 1),
+		PerPage: optional.NewInt32(perPage),
+	})
+	return result, err
 }
 
-func NewService(accessToken string) IService {
-	client := strava.NewClient(accessToken)
-	return &service{client: client}
+func (s service) GetSegment(segmentId int64) (*strava.DetailedSegment, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.SegmentsApi.GetSegmentById(ctx, segmentId)
+	return &result, err
+}
+
+func NewService(token TokenManager) IService {
+	client := strava.NewAPIClient(strava.NewConfiguration())
+	return &service{client: client, token: token}
 }

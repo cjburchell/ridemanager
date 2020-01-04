@@ -27,6 +27,6 @@ export class LoginButtonComponent implements OnInit {
 
   getAuthorizationURL(): string {
     return `${this.basePath}/oauth/authorize?client_id=${this.stravaClientId}` +
-      `&response_type=code&redirect_uri=${this.stravaRedirect}&scope=view_private`;
+      `&response_type=code&redirect_uri=${this.stravaRedirect}&scope=profile:read_all,activity:read_all`;
   }
 }

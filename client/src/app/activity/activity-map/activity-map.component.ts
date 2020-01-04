@@ -167,8 +167,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                   }
               },
               layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
+
               },
               paint: {
                 'line-color': '#F00',

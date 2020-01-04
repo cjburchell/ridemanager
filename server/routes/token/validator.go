@@ -4,40 +4,24 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/cjburchell/ridemanager/service/data"
-
-	"github.com/cjburchell/ridemanager/service/data/models"
-	"github.com/cjburchell/ridemanager/settings"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
 )
 
-func Build(userId models.AthleteId) (string, error) {
-	expirationTime := time.Now().Add(1 * time.Hour).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user": userId,
-		"exp":  expirationTime,
-	})
-
-	tokenString, err := token.SignedString([]byte(settings.JwtSecret))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+type Validator interface {
+	ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc
 }
 
-func GetUser(r *http.Request, dataService data.IService) (*models.User, error) {
-	decoded := context.Get(r, "decoded")
-	claims := decoded.(jwt.MapClaims)
-	userId := claims["user"].(string)
-	return dataService.GetUser(models.AthleteId(userId))
+type validator struct {
+	jwtSecret string
 }
 
-func ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func GetValidator(jwt string) Validator {
+	return validator{jwt}
+}
+
+func (v validator) ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		authorizationHeader := req.Header.Get("Authorization")
 		if authorizationHeader != "" {
@@ -47,7 +31,7 @@ func ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc {
 					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 						return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 					}
-					return []byte(settings.JwtSecret), nil
+					return []byte(v.jwtSecret), nil
 				})
 
 				if err != nil {
