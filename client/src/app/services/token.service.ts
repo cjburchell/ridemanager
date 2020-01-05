@@ -36,11 +36,13 @@ export class TokenService {
     return this.http.get<boolean>(`api/v1/login/status`, httpOptions);
   }
 
-  checkLogin() {
+  checkLogin(goToMain: boolean = false) {
     if (this.getToken() !== null) {
       this.validateToken().subscribe((isLoggedIn: boolean) => {
         if (!isLoggedIn) {
           this.router.navigate([`/login`]);
+        } else if (goToMain) {
+          this.router.navigate([`/main`]);
         }
       }, (err: HttpErrorResponse) => {
         console.log(err);

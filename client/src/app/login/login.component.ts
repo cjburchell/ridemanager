@@ -16,6 +16,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.tokenService.checkLogin();
+    this.tokenService.checkLogin(true);
   }
 }

@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/antihax/optional v1.0.0
 	github.com/cjburchell/go-uatu v0.0.0-20200102205442-b88a75ff9c21
-	github.com/cjburchell/strava-go v0.0.0-20200104030700-ba9c584ec48e
+	github.com/cjburchell/strava-go v0.0.0-20200105041017-48a6762541bb
 	github.com/cjburchell/tools-go v0.0.0-20181126150745-9a148bb98f00
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
@@ -20,8 +20,10 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
 	golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c // indirect
+	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 	gopkg.in/yaml.v2 v2.2.7 // indirect
