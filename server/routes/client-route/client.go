@@ -20,33 +20,16 @@ func Setup(r *mux.Router, clientLocation string, logger log.ILog) {
 		logger.Error(err)
 	}
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	handleClient := func (w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
+	}
 
-	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
-	r.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
-	r.HandleFunc("/main/{mode}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
-	r.HandleFunc("/activity/{activityId}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
-	r.HandleFunc("/edit/{activityId}", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
-	r.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, clientLocation+"/index.html")
-	})
-
+	r.HandleFunc("/", handleClient)
+	r.HandleFunc("/login", handleClient)
+	r.HandleFunc("/main", handleClient)
+	r.HandleFunc("/main/{mode}", handleClient)
+	r.HandleFunc("/activity/{activityId}", handleClient)
+	r.HandleFunc("/edit/{activityId}", handleClient)
+	r.HandleFunc("/token", handleClient)
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(clientLocation))))
 }
