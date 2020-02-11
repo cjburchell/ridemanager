@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ActivityType} from '../services/activity.service';
+import {ActivityType} from '../services/contracts/activity';
 
 @Pipe({
   name: 'activityTypeToImage'

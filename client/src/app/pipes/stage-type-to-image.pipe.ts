@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {SegmentType} from '../services/activity.service';
+import {SegmentType} from '../services/contracts/activity';
 
 @Pipe({
   name: 'stageTypeToImage'

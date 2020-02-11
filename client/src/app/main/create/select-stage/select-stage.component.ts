@@ -1,5 +1,6 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {ISegmentSummary, StravaService} from '../../../services/strava.service';
+import {ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
+import {ISegmentSummary} from '../../../services/contracts/strava';
+import {IStravaService} from '../../../services/strava.service';
 
 
 @Component({
@@ -15,37 +16,36 @@ export class SelectStageComponent {
   selectedStage: ISegmentSummary;
   @Output() stageSelected: EventEmitter<ISegmentSummary> = new EventEmitter();
 
-  constructor(private stravaService: StravaService,
-              private ref: ChangeDetectorRef) { }
+  constructor(private stravaService: IStravaService,
+              private ref: ChangeDetectorRef) {
+  }
 
-  public show() {
+  public async show() {
     this.stageSearchText = '';
     this.selectedStage = undefined;
     this.stages = undefined;
-    this.getStages();
+    await this.getStages();
   }
 
   selectStage(stage: ISegmentSummary) {
     this.selectedStage = stage;
   }
 
-  getStages() {
+  async getStages() {
     this.loading = true;
     const perPage = 100;
     this.stages = [];
-    const loop = (page: number) => {
-      this.stravaService.getStaredSegments(page, perPage).subscribe((segments: ISegmentSummary[]) => {
-        this.stages = this.stages.concat(segments.filter(item => !item.private));
-        if (segments.length !== perPage) {
-          this.loading = false;
-          this.ref.detectChanges();
-        } else {
-          loop(page + 1);
-        }
-
-      });
+    const loop = async (page: number) => {
+      const segments = await this.stravaService.getStaredSegments(page, perPage);
+      this.stages = this.stages.concat(segments.filter(item => !item.private));
+      if (segments.length !== perPage) {
+        this.loading = false;
+        this.ref.detectChanges();
+      } else {
+        await loop(page + 1);
+      }
     };
 
-    loop(0);
+    await loop(0);
   }
 }

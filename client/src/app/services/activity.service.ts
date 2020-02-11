@@ -1,226 +1,148 @@
 import { Injectable } from '@angular/core';
-import {IAthlete} from './user.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {TokenService} from './token.service';
-import {Observable} from 'rxjs';
-import {IMap} from './strava.service';
+import {ITokenService} from './token.service';
+import {IActivity, IParticipant} from './contracts/activity';
 
-export type ActivityType = 'group_ride' | 'race' | 'triathlon' | 'group_run' | 'group_ski';
-export type ActivityState = 'upcoming' |'in_progress' |'finished';
-export type ActivityPrivacy = 'public' | 'private';
+export abstract class IActivityService {
+  public abstract createActivity(activity: IActivity): Promise<string>;
 
-export type SegmentType =
-  'Ride'
-  | 'AlpineSki'
-  | 'BackcountrySki'
-  | 'Hike'
-  | 'IceSkate'
-  | 'InlineSkate'
-  | 'NordicSki'
-  | 'RollerSki'
-  | 'Run'
-  | 'Walk'
-  | 'Workout'
-  | 'Snowboard'
-  | 'Snowshoe'
-  | 'Kitesurf'
-  | 'Windsurf'
-  | 'Swim'
-  | 'VirtualRide'
-  | 'EBikeRide'
-  | 'WaterSport'
-  | 'Canoeing'
-  | 'Kayaking'
-  | 'Rowing'
-  | 'StandUpPaddling'
-  | 'Surfing'
-  | 'Crossfit'
-  | 'Elliptical'
-  | 'RockClimbing'
-  | 'StairStepper'
-  | 'WeightTraining'
-  | 'Yoga'
-  | 'WinterSport'
-  | 'CrossCountrySkiing';
+  public abstract updateActivity(activity: IActivity): Promise<any>;
 
+  public abstract deleteActivity(activity: IActivity): Promise<any>;
 
-export interface IActivity {
-  activity_id: string;
-  activity_type: ActivityType;
-  owner: IAthlete;
-  name: string;
-  description: string;
-  start_time: Date;
-  end_time: Date;
-  total_distance: number;
-  duration: number;
-  time_left: number;
-  starts_in: number;
-  route: IRoute;
-  privacy: ActivityPrivacy;
-  categories: ICategory[];
-  stages: IStage[];
-  participants: IParticipant[];
-  state: ActivityState;
-  max_participants: number;
+  public abstract getActivity(activityId: string): Promise<IActivity>;
+
+  public abstract getActivities(): Promise<IActivity[]>;
+
+  public abstract getJoined(): Promise<IActivity[]>;
+
+  public abstract getMyActivities(): Promise<IActivity[]>;
+
+  public abstract addParticipant(activity: IActivity, participant: IParticipant): Promise<boolean>;
+
+  public abstract leaveActivity(activity: IActivity, athleteId: string): Promise<boolean>;
+
+  public abstract updateUserResults(activity: IActivity, athleteId: string): Promise<boolean>;
+
+  public abstract updateResults(activity: IActivity): Promise<boolean>;
 }
 
-export interface IRoute {
-  id: number;
-  name: string;
-  distance: number;
-  map: IMap;
-}
-
-export interface IParticipant {
-  athlete: IAthlete;
-  category_id: string;
-  results: IResult[];
-  time: number;
-  rank: number;
-  out_of: number;
-  stages: number;
-  offset_time: number;
-}
-export interface IResult {
-  rank: number;
-  segment_id: number;
-  activity_id: number;
-  time: number;
-  stage_number: number;
-}
-
-export interface ICategory {
-  category_id: string;
-  name: string;
-}
-
-export interface IStage {
-  segment_id: number;
-  distance: number;
-  number: number;
-  activity_type: SegmentType;
-  name: string;
-  map: IMap;
-  start_latlng: number[];
-  end_latlng: number[];
-}
 
 @Injectable({
   providedIn: 'root'
 })
-export class ActivityService {
+export class ActivityService implements IActivityService {
 
-  constructor(private http: HttpClient, private token: TokenService) {
+  constructor(private http: HttpClient, private token: ITokenService) {
   }
 
-  createActivity(activity: IActivity): Observable<string> {
+  createActivity(activity: IActivity): Promise<string> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<string>('api/v1/activity', activity, httpOptions);
+    return this.http.post<string>('api/v1/activity', activity, httpOptions).toPromise();
   }
 
-  updateActivity(activity: IActivity) {
+  updateActivity(activity: IActivity): Promise<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.patch(`api/v1/activity/${activity.activity_id}`, activity, httpOptions);
+    return this.http.patch(`api/v1/activity/${activity.activity_id}`, activity, httpOptions).toPromise();
   }
 
-  deleteActivity(activity: IActivity) {
+  deleteActivity(activity: IActivity): Promise<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.delete(`api/v1/activity/${activity.activity_id}`, httpOptions);
+    return this.http.delete(`api/v1/activity/${activity.activity_id}`, httpOptions).toPromise();
   }
 
-  getActivity(activityId: string): Observable<IActivity> {
+  getActivity(activityId: string): Promise<IActivity> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity>(`api/v1/activity/${activityId}`, httpOptions);
+    return this.http.get<IActivity>(`api/v1/activity/${activityId}`, httpOptions).toPromise();
   }
 
-  getActivities(): Observable<IActivity[]> {
+  getActivities(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/public`, httpOptions);
+    return this.http.get<IActivity[]>(`api/v1/activity/public`, httpOptions).toPromise();
   }
 
-  getJoined(): Observable<IActivity[]> {
+  getJoined(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/joined`, httpOptions);
+    return this.http.get<IActivity[]>(`api/v1/activity/joined`, httpOptions).toPromise();
   }
 
-  getMyActivities(): Observable<IActivity[]> {
+  getMyActivities(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/my`, httpOptions);
+    return this.http.get<IActivity[]>(`api/v1/activity/my`, httpOptions).toPromise();
   }
 
-  addParticipant(activity: IActivity, participant: IParticipant): Observable<boolean> {
+  addParticipant(activity: IActivity, participant: IParticipant): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/participant`, participant, httpOptions);
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/participant`, participant, httpOptions).toPromise();
   }
 
-  leaveActivity(activity: IActivity, athleteId: string): Observable<boolean> {
+  leaveActivity(activity: IActivity, athleteId: string): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.delete<boolean>(`api/v1/activity/${activity.activity_id}/participant/${athleteId}`, httpOptions);
+    return this.http.delete<boolean>(`api/v1/activity/${activity.activity_id}/participant/${athleteId}`, httpOptions).toPromise();
   }
 
-  updateUserResults(activity: IActivity, athleteId: string): Observable<boolean> {
+  updateUserResults(activity: IActivity, athleteId: string): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update/${athleteId}`, null, httpOptions);
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update/${athleteId}`, null, httpOptions).toPromise();
   }
 
-  updateResults(activity: IActivity): Observable<boolean> {
+  updateResults(activity: IActivity): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update`, null, httpOptions);
+    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update`, null, httpOptions).toPromise();
   }
 }

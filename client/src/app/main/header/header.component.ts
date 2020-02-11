@@ -1,41 +1,44 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {IAthlete, UserService} from '../../services/user.service';
-import {TokenService} from '../../services/token.service';
+import { Component, Input } from '@angular/core';
+import {ITokenService} from '../../services/token.service';
 import {Router} from '@angular/router';
+import {IAthlete} from '../../services/contracts/user';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
   @Input() public user: IAthlete;
 
-  constructor(private tokenService: TokenService,
+  constructor(private tokenService: ITokenService,
               private router: Router) {
   }
 
-  ngOnInit() {
-  }
-
-  onLogOut() {
+  async onLogOut() {
     this.tokenService.logOut();
-    this.router.navigate([`/login`]);
+    await this.router.navigate([`/login`]);
   }
 
-  showToMain() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main`]);
+  async showToMain() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main`]);
   }
 
-  showManageActivities() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/manage`]);
+  async showManageActivities() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/manage`]);
   }
 
-  showUserHistory() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/history`]);
+  async showUserHistory() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/history`]);
   }
 }

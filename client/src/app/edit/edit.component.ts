@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {TokenService} from '../services/token.service';
-import {IAthlete, UserService} from '../services/user.service';
+import {IUserService} from '../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ActivityService, IActivity} from '../services/activity.service';
+import {IActivity} from '../services/contracts/activity';
+import {ITokenService} from '../services/token.service';
+import {IActivityService} from '../services/activity.service';
+import {IAthlete} from '../services/contracts/user';
 
 @Component({
   selector: 'app-edit',
@@ -13,44 +15,37 @@ export class EditComponent implements OnInit {
   private user: IAthlete;
   private Activity: IActivity;
 
-  constructor(private tokenService: TokenService,
+  constructor(private tokenService: ITokenService,
               private router: Router,
-              private activityService: ActivityService,
-              private userService: UserService,
+              private activityService: IActivityService,
+              private userService: IUserService,
               private activatedRoute: ActivatedRoute) {
   }
 
-  ngOnInit() {
-    this.tokenService.checkLogin();
+  async ngOnInit() {
+    if (await this.tokenService.checkLogin()) {
+      return;
+    }
 
-    this.userService.getMe().subscribe((user: IAthlete) => {
-      this.user = user;
-    });
-
+    this.user = await this.userService.getMe();
     this.activatedRoute.params.subscribe(params => {
       this.getActivity(params.activityId);
     });
   }
 
-  private getActivity(activityId: string) {
-    this.activityService.getActivity(activityId).subscribe((activity: IActivity) => {
-      if (activity === undefined || activity === null) {
-        this.router.navigate([`/main`]);
-      } else {
-        this.Activity = activity;
-      }
-    });
+   private async getActivity(activityId: string) {
+    this.Activity = await this.activityService.getActivity(activityId);
+    if (this.Activity === undefined || this.Activity === null) {
+      await this.router.navigate([`/main`]);
+    }
   }
 
-  save() {
-    this.activityService.updateActivity(this.Activity).subscribe(() => {
-        this.router.navigate([`/activity/${this.Activity.activity_id}`]);
-      }
-    );
-
+  async save() {
+    await this.activityService.updateActivity(this.Activity);
+    await this.router.navigate([`/activity/${this.Activity.activity_id}`]);
   }
 
-  back() {
-    this.router.navigate([`/activity/${this.Activity.activity_id}`]);
+  async back() {
+    await this.router.navigate([`/activity/${this.Activity.activity_id}`]);
   }
 }

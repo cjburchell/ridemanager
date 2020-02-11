@@ -1,8 +1,9 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {ActivityService, IActivity, ICategory, IParticipant} from '../../services/activity.service';
-import {IAthlete} from '../../services/user.service';
+import {IActivityService} from '../../services/activity.service';
 import {JoinDialogComponent} from '../join-dialog/join-dialog.component';
 import {Router} from '@angular/router';
+import {IActivity, ICategory, IParticipant} from '../../services/contracts/activity';
+import {IAthlete} from '../../services/contracts/user';
 
 @Component({
   selector: 'app-activity-menu',
@@ -20,42 +21,38 @@ export class ActivityMenuComponent {
 
   @ViewChild('selectCategory', {static: false}) selectCategory: JoinDialogComponent;
 
-  constructor(private activityService: ActivityService,
+  constructor(private activityService: IActivityService,
               private router: Router) { }
 
-  updateMyResults() {
-    this.activityService.updateUserResults(this.activity, this.user.id).subscribe(() => {
-      this.activityUpdate.emit();
-    });
+  async updateMyResults() {
+   await this.activityService.updateUserResults(this.activity, this.user.id);
+   this.activityUpdate.emit();
   }
 
-  leave() {
-    this.activityService.leaveActivity(this.activity, this.user.id).subscribe(() => {
-      this.activityUpdate.emit();
-    });
+  async leave() {
+    await this.activityService.leaveActivity(this.activity, this.user.id);
+    this.activityUpdate.emit();
   }
 
-  edit() {
-    this.router.navigate([`/edit/${this.activity.activity_id}`]);
+  async edit() {
+    await this.router.navigate([`/edit/${this.activity.activity_id}`]);
   }
 
-  updateActivityResults() {
-    this.activityService.updateResults(this.activity).subscribe(() => {
-      this.activityUpdate.emit();
-    });
+  async updateActivityResults() {
+    await this.activityService.updateResults(this.activity);
+    this.activityUpdate.emit();
   }
 
-  deleteActivity() {
-    this.activityService.deleteActivity(this.activity).subscribe(() => {
-      this.router.navigate([`/main`]);
-    });
+  async deleteActivity() {
+    await this.activityService.deleteActivity(this.activity);
+    await this.router.navigate([`/main`]);
   }
 
-  join(category: ICategory) {
-    this.addParticipant(this.user, category);
+  async join(category: ICategory) {
+    await this.addParticipant(this.user, category);
   }
 
-  private addParticipant(athlete: IAthlete, category: ICategory) {
+  private async addParticipant(athlete: IAthlete, category: ICategory) {
     const participant: IParticipant = {
       athlete,
       category_id: category.category_id,
@@ -67,10 +64,7 @@ export class ActivityMenuComponent {
       offset_time: undefined
     };
 
-    this.activityService.addParticipant(this.activity, participant).subscribe(
-      () => {
-        this.activityUpdate.emit();
-      }
-    );
+    await this.activityService.addParticipant(this.activity, participant);
+    this.activityUpdate.emit();
   }
 }

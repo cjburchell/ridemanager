@@ -1,5 +1,6 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {IRouteSummary, ISegmentSummary, StravaService} from '../../../services/strava.service';
+import {ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
+import {IStravaService} from '../../../services/strava.service';
+import {IRouteSummary} from '../../../services/contracts/strava';
 
 export interface IRouteSet {
   addStages: boolean;
@@ -21,36 +22,34 @@ export class SelectRouteComponent {
 
   @Output() routeSelected: EventEmitter<IRouteSet> = new EventEmitter();
 
-  constructor(private stravaService: StravaService,
+  constructor(private stravaService: IStravaService,
               private ref: ChangeDetectorRef) {
   }
 
-  show() {
+  async show() {
     this.routeSearchText = '';
     this.autoAddStages = true;
     this.selectedRoute = undefined;
     this.routes = undefined;
-    this.getRoutes();
+    await this.getRoutes();
   }
 
-  getRoutes() {
+  async getRoutes() {
     this.loading = true;
     const perPage = 100;
     this.routes = [];
-    const loop = (page: number) => {
-      this.stravaService.getRoutes(page, perPage).subscribe((routes: IRouteSummary[]) => {
-        this.routes = this.routes.concat(routes);
-        if (routes.length !== perPage) {
-          this.loading = false;
-          this.ref.detectChanges();
-        } else {
-          loop(page + 1);
-        }
-
-      });
+    const loop = async (page: number) => {
+      const routes = await this.stravaService.getRoutes(page, perPage);
+      this.routes = this.routes.concat(routes);
+      if (routes.length !== perPage) {
+        this.loading = false;
+        this.ref.detectChanges();
+      } else {
+        await loop(page + 1);
+      }
     };
 
-    loop(0);
+    await loop(0);
   }
 
   selectRoute(route: IRouteSummary) {

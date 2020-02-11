@@ -1,12 +1,23 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Router} from '@angular/router';
+
+export abstract class ITokenService {
+  public abstract checkLogin(): Promise<boolean>;
+
+  public abstract validateToken(): Promise<boolean>;
+
+  public abstract getToken(): string;
+
+  public abstract setToken(token: string);
+
+  public abstract logOut();
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class TokenService {
+export class TokenService implements ITokenService {
 
   private tokenKey = 'app_token';
 
@@ -26,30 +37,27 @@ export class TokenService {
     localStorage.removeItem(this.tokenKey);
   }
 
-  validateToken(): Observable<boolean> {
+  validateToken(): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.getToken()
       })
     };
 
-    return this.http.get<boolean>(`api/v1/login/status`, httpOptions);
+    return this.http.get<boolean>(`api/v1/login/status`, httpOptions).toPromise();
   }
 
-  checkLogin(goToMain: boolean = false) {
+  async checkLogin(): Promise<boolean> {
     if (this.getToken() !== null) {
-      this.validateToken().subscribe((isLoggedIn: boolean) => {
-        if (!isLoggedIn) {
-          this.router.navigate([`/login`]);
-        } else if (goToMain) {
-          this.router.navigate([`/main`]);
-        }
-      }, (err: HttpErrorResponse) => {
-        console.log(err);
-        this.router.navigate([`/login`]);
-      });
+      const isLoggedIn = await this.validateToken();
+      if (!isLoggedIn) {
+        await this.router.navigate([`/login`]);
+        return false;
+      }
     } else {
-      this.router.navigate([`/login`]);
+      await this.router.navigate([`/login`]);
+      return false;
     }
+    return true;
   }
 }

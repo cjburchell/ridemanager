@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivityService, IActivity} from '../../services/activity.service';
+import { IActivityService} from '../../services/activity.service';
+import {IActivity} from '../../services/contracts/activity';
 
 @Component({
   selector: 'app-join',
@@ -9,10 +10,10 @@ import {ActivityService, IActivity} from '../../services/activity.service';
 export class JoinComponent implements OnInit {
 
   activities: IActivity[];
-  constructor(private activityService: ActivityService) { }
+  constructor(private activityService: IActivityService) { }
 
-  ngOnInit() {
-    this.activityService.getActivities().subscribe(activities => this.activities = activities);
+  async ngOnInit() {
+    this.activities = await this.activityService.getActivities();
   }
 
 }

@@ -1,10 +1,10 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {IActivity} from '../../services/activity.service';
 import * as mapboxgl from 'mapbox-gl';
 import {LngLatLike, LngLatBoundsLike} from 'mapbox-gl';
 import {Polyline} from '../../services/polyline';
 import * as geojson from 'geojson';
-import {SettingsService} from '../../services/settings.service';
+import {ISettingsService} from '../../services/settings.service';
+import {IActivity} from '../../services/contracts/activity';
 
 @Component({
   selector: 'app-activity-map',
@@ -27,29 +27,27 @@ export class ActivityMapComponent implements OnInit, OnChanges {
     return points;
   }
 
-  constructor(private settingsService: SettingsService) {
+  constructor(private settingsService: ISettingsService) {
   }
 
-  async ngOnInit() {
-    this.settingsService.getSetting('mapboxAccessToken').subscribe(token => {
-      this.token = token;
-      // @ts-ignore
-      mapboxgl.accessToken = token;
+  async ngOnInit(): Promise<void> {
+    this.token = await this.settingsService.getSetting('mapboxAccessToken');
+    // @ts-ignore
+    mapboxgl.accessToken = token;
 
-      this.map = new mapboxgl.Map({
-        container: 'map',
-        style: this.style,
-        zoom: 13,
-        center: [0, 0]
-      });
-
-      // Add map controls
-      this.map.addControl(new mapboxgl.NavigationControl());
-
-      if (this.activity) {
-        this.UpdateActivity();
-      }
+    this.map = new mapboxgl.Map({
+      container: 'map',
+      style: this.style,
+      zoom: 13,
+      center: [0, 0]
     });
+
+    // Add map controls
+    this.map.addControl(new mapboxgl.NavigationControl());
+
+    if (this.activity) {
+      this.UpdateActivity();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -139,7 +137,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
             'line-width': 3
           }
         };
-        this.map.addLayer(layer);
+        // this.map.addLayer(layer);
       }
 
       if (this.activity.stages) {
@@ -174,9 +172,9 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                 'line-width': 3,
               }
             };
-            tempMap.addLayer(trackLayer);
+            // tempMap.addLayer(trackLayer);
 
-            const pointslayer: mapboxgl.Layer = {
+            const pointsLayer: mapboxgl.Layer = {
               id: 'stage_points' + stage.number,
               type: 'line',
               source: {
@@ -213,7 +211,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
               layout: {
               }
             };
-            tempMap.addLayer(pointslayer);
+            tempMap.addLayer(pointsLayer);
           }
         });
       }

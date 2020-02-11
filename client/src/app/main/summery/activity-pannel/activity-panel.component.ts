@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnInit} from '@angular/core';
-import {IActivity, IParticipant} from '../../../services/activity.service';
-import {IAthlete} from '../../../services/user.service';
+import {IActivity, IParticipant} from '../../../services/contracts/activity';
+import {IAthlete} from '../../../services/contracts/user';
 
 @Component({
   selector: 'app-activity-panel',

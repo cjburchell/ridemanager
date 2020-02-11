@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {IAchievements, UserService} from '../../../services/user.service';
+import {IUserService} from '../../../services/user.service';
+import {IAchievements} from '../../../services/contracts/user';
 
 @Component({
   selector: 'app-result-summary',
@@ -9,11 +10,11 @@ import {IAchievements, UserService} from '../../../services/user.service';
 export class ResultSummaryComponent implements OnInit {
   achievements: IAchievements;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: IUserService) {
   }
 
-  ngOnInit() {
-    this.userService.getAchievements().subscribe(achievements => this.achievements = achievements);
+  async ngOnInit() {
+    this.achievements = await this.userService.getAchievements();
   }
 
 }

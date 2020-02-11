@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TokenService} from '../services/token.service';
+import {ITokenService} from '../services/token.service';
 
 @Component({
   selector: 'app-token',
@@ -8,7 +8,7 @@ import {TokenService} from '../services/token.service';
 })
 export class TokenComponent implements OnInit {
 
-  constructor(private tokenService: TokenService,
+  constructor(private tokenService: ITokenService,
               private router: Router,
               private activatedRoute: ActivatedRoute) {
     tokenService.setToken(activatedRoute.snapshot.queryParamMap.get('token'));

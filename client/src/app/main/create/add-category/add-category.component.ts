@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {ICategory} from '../../../services/activity.service';
 import * as uuid from 'uuid';
+import {ICategory} from '../../../services/contracts/activity';
 
 @Component({
   selector: 'app-add-category',

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ICategory} from '../../services/activity.service';
+import {ICategory} from '../../services/contracts/activity';
 
 @Component({
   selector: 'app-join-dialog',

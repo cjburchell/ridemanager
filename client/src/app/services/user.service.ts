@@ -1,51 +1,38 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {TokenService} from './token.service';
+import {ITokenService} from './token.service';
+import {IAchievements, IAthlete} from './contracts/user';
 
-export type Gender = 'M' | 'F' | '';
-
-export interface IAthlete {
-  id: string;
-  strava_athlete_id: number;
-  name: string;
-  sex: Gender;
-  profile: string;
-  profile_medium: string;
-}
-
-export interface IAchievements {
-  first_count: number;
-  second_count: number;
-  third_count: number;
-  finished_count: number;
+export abstract class IUserService {
+  public abstract getMe(): Promise<IAthlete>;
+  public abstract getAchievements(): Promise<IAchievements>;
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService implements IUserService {
 
   constructor(private http: HttpClient,
-              private token: TokenService) { }
+              private token: ITokenService) { }
 
-  getMe(): Observable<IAthlete> {
+  getMe(): Promise<IAthlete> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IAthlete>(`api/v1/user/me`, httpOptions);
+    return this.http.get<IAthlete>(`api/v1/user/me`, httpOptions).toPromise();
   }
 
-  getAchievements(): Observable<IAchievements> {
+  getAchievements(): Promise<IAchievements> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IAchievements>(`api/v1/user/me/achievements`, httpOptions);
+    return this.http.get<IAchievements>(`api/v1/user/me/achievements`, httpOptions).toPromise();
   }
 }

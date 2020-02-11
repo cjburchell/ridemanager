@@ -1,12 +1,10 @@
 import { Component, Input, OnChanges} from '@angular/core';
-import {
-  ActivityService,
-  IActivity
-} from '../../services/activity.service';
-import {IAthlete} from '../../services/user.service';
 import {Router} from '@angular/router';
-import {TokenService} from '../../services/token.service';
 import * as uuid from 'uuid';
+import {IActivity} from '../../services/contracts/activity';
+import {ITokenService} from '../../services/token.service';
+import {IActivityService} from '../../services/activity.service';
+import {IAthlete} from '../../services/contracts/user';
 
 @Component({
   selector: 'app-create',
@@ -18,9 +16,9 @@ export class CreateComponent implements OnChanges {
   Activity: IActivity;
   @Input() user: IAthlete;
 
-  constructor(private tokenService: TokenService,
+  constructor(private tokenService: ITokenService,
               private router: Router,
-              private activityService: ActivityService) {
+              private activityService: IActivityService) {
   }
 
 
@@ -54,17 +52,19 @@ export class CreateComponent implements OnChanges {
     }
   }
 
-  back() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main`]);
+  async back() {
+    if (await this.tokenService.checkLogin()) {
+      await this.router.navigate([`/main`]);
+    }
   }
 
-  create() {
-    this.activityService.createActivity(this.Activity).subscribe(result => {
-      if (result !== undefined && result !== null) {
-        this.tokenService.checkLogin();
-        this.router.navigate([`/main`]);
+  async create() {
+    const result = await this.activityService.createActivity(this.Activity);
+    if (result !== undefined && result !== null) {
+      if (!await this.tokenService.checkLogin()) {
+        return;
       }
-    }, error1 => console.log(error1));
+      await this.router.navigate([`/main`]);
+    }
   }
 }

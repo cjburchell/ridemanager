@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {TokenService} from '../services/token.service';
-import {Router, ActivatedRoute} from '@angular/router';
-import {IAthlete, UserService} from '../services/user.service';
-import {HttpErrorResponse} from '@angular/common/http';
+import {ActivatedRoute} from '@angular/router';
+import {ITokenService} from '../services/token.service';
+import {IUserService} from '../services/user.service';
+import {IAthlete} from '../services/contracts/user';
+
 
 @Component({
   selector: 'app-main',
@@ -13,17 +14,17 @@ export class MainComponent implements OnInit {
   pageId = 'summery';
   user: IAthlete;
 
-  constructor(private tokenService: TokenService,
-              private userService: UserService,
+  constructor(private tokenService: ITokenService,
+              private userService: IUserService,
               private activatedRoute: ActivatedRoute) {
   }
 
-  ngOnInit() {
-    this.tokenService.checkLogin();
+  async ngOnInit() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
 
-    this.userService.getMe().subscribe((user: IAthlete) => {
-      this.user = user;
-    });
+    this.user = await this.userService.getMe();
 
     this.activatedRoute.params.subscribe(params => {
       this.pageId = params.pageId;
@@ -32,5 +33,4 @@ export class MainComponent implements OnInit {
       }
     });
   }
-
 }

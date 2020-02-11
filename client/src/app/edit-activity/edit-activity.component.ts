@@ -1,10 +1,11 @@
 import {Component, Input, OnChanges, ViewChild} from '@angular/core';
-import { IActivity, ICategory, IStage} from '../services/activity.service';
-import {IAthlete} from '../services/user.service';
 import {SelectStageComponent} from '../main/create/select-stage/select-stage.component';
 import {SelectRouteComponent} from '../main/create/select-route/select-route.component';
-import {IRouteSummary, ISegmentSummary, StravaService} from '../services/strava.service';
+import {IStravaService} from '../services/strava.service';
 import {AddCategoryComponent} from '../main/create/add-category/add-category.component';
+import {IRouteSummary, ISegmentSummary} from '../services/contracts/strava';
+import {IActivity, ICategory, IStage} from '../services/contracts/activity';
+import {IAthlete} from '../services/contracts/user';
 
 
 @Component({
@@ -21,7 +22,7 @@ export class EditActivityComponent implements OnChanges {
   @ViewChild('selectRoute', {static: false}) selectRoute: SelectRouteComponent;
   @ViewChild('addCategoryItem', {static: false}) addCategoryItem: AddCategoryComponent;
 
-  constructor(private stravaService: StravaService) { }
+  constructor(private stravaService: IStravaService) { }
 
   ngOnChanges() {
     if (this.Activity !== undefined) {
@@ -88,35 +89,31 @@ export class EditActivityComponent implements OnChanges {
     }
   }
 
-  addStage(segment: ISegmentSummary) {
-    this.stravaService.getSegment(segment.id).subscribe((fullSegment: ISegmentSummary) => {
-      this.Activity.stages.push({
-        segment_id: fullSegment.id,
-        distance: fullSegment.distance,
-        activity_type: fullSegment.activity_type,
-        name: fullSegment.name,
-        number: this.Activity.stages.length + 1,
-        map: fullSegment.map,
-        start_latlng: fullSegment.start_latlng,
-        end_latlng: fullSegment.end_latlng
-      });
-      this.updateDistance();
-      this.updateSortedStages();
+  async addStage(segment: ISegmentSummary) {
+    const fullSegment = await this.stravaService.getSegment(segment.id);
+    this.Activity.stages.push({
+      segment_id: fullSegment.id,
+      distance: fullSegment.distance,
+      activity_type: fullSegment.activity_type,
+      name: fullSegment.name,
+      number: this.Activity.stages.length + 1,
+      map: fullSegment.map,
+      start_latlng: fullSegment.start_latlng,
+      end_latlng: fullSegment.end_latlng
     });
+    this.updateDistance();
+    this.updateSortedStages();
   }
 
-  setRoute(selectedRoute: IRouteSummary, addStages: boolean) {
+  async setRoute(selectedRoute: IRouteSummary, addStages: boolean) {
     this.Activity.route = selectedRoute;
-    this.stravaService.getRoute(selectedRoute.id).subscribe(
-      (fullRoute: IRouteSummary) => {
-        this.Activity.route.map = fullRoute.map;
-        if (addStages) {
-          for (const segment of fullRoute.segments) {
-            this.addStage(segment);
-          }
-        }
+    const fullRoute = await this.stravaService.getRoute(selectedRoute.id);
+    this.Activity.route.map = fullRoute.map;
+    if (addStages) {
+      for (const segment of fullRoute.segments) {
+        this.addStage(segment);
       }
-    );
+    }
   }
 
   private updateDistance() {

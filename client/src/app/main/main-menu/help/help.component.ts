@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from '@angular/router';
-import {TokenService} from '../../../services/token.service';
+import {ITokenService} from '../../../services/token.service';
 
 @Component({
   selector: 'app-help',
@@ -9,18 +9,22 @@ import {TokenService} from '../../../services/token.service';
 })
 export class HelpComponent implements OnInit {
 
-  constructor(private router: Router, private tokenService: TokenService ) { }
+  constructor(private router: Router, private tokenService: ITokenService ) { }
 
   ngOnInit() {
   }
 
-  showFAQ() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/faq`]);
+  async showFAQ() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/faq`]);
   }
 
-  showAbout() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/about`]);
+  async showAbout() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/about`]);
   }
 }

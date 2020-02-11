@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {SettingsService} from '../../services/settings.service';
+import {ISettingsService} from '../../services/settings.service';
 
 @Component({
   selector: 'app-login-button',
@@ -12,17 +12,12 @@ export class LoginButtonComponent implements OnInit {
   public stravaRedirect = 'http://localhost:8091/api/v1/login';
   basePath = 'https://www.strava.com/api/v3';
 
-  constructor(private settingsService: SettingsService) {
+  constructor(private settingsService: ISettingsService) {
   }
 
-  ngOnInit() {
-    this.settingsService.getSetting('stravaClientId').subscribe((stravaClientId: string) => {
-      this.stravaClientId = stravaClientId;
-    });
-
-    this.settingsService.getSetting('stravaRedirect').subscribe((stravaRedirect: string) => {
-      this.stravaRedirect = stravaRedirect;
-    });
+  public async ngOnInit(): Promise<void> {
+    this.stravaClientId = await this.settingsService.getSetting('stravaClientId');
+    this.stravaRedirect = await this.settingsService.getSetting('stravaRedirect');
   }
 
   getAuthorizationURL(): string {

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {IAthlete} from '../../services/user.service';
+import {IAthlete} from '../../services/contracts/user';
 
 @Component({
   selector: 'app-athlete',

@@ -49,6 +49,12 @@ import { DateTimeComponent } from './common/date-time/date-time.component';
 import { ActivityMenuComponent } from './activity/activity-menu/activity-menu.component';
 import { ActivityMapComponent } from './activity/activity-map/activity-map.component';
 import { ActivityElevationComponent } from './activity/activity-elevation/activity-elevation.component';
+import {IUserService, UserService} from './services/user.service';
+import {ISettingsService, SettingsService} from './services/settings.service';
+import {IStravaService, StravaService} from './services/strava.service';
+import {ITokenService, TokenService} from './services/token.service';
+import {ActivityService, IActivityService} from './services/activity.service';
+import {MockDataService} from './services/mock/mockdata.service';
 
 
 @NgModule({
@@ -105,7 +111,20 @@ import { ActivityElevationComponent } from './activity/activity-elevation/activi
     BrowserAnimationsModule,
     ChartsModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: IUserService, useClass: MockDataService },
+    { provide: IActivityService, useClass: MockDataService },
+    { provide: ISettingsService, useClass: MockDataService },
+    { provide: IStravaService, useClass: MockDataService },
+    { provide: ITokenService, useClass: MockDataService },
+
+/*{ provide: IUserService, useClass: UserService },
+{ provide: IActivityService, useClass: ActivityService },
+{ provide: ISettingsService, useClass: SettingsService },
+{ provide: IStravaService, useClass: StravaService },
+{ provide: ITokenService, useClass: TokenService },*/
+],
+bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

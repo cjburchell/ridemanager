@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ActivityService, IActivity} from '../../services/activity.service';
-import {IAthlete} from '../../services/user.service';
+import {IActivityService} from '../../services/activity.service';
+import {IActivity} from '../../services/contracts/activity';
+import {IAthlete} from '../../services/contracts/user';
 
 @Component({
   selector: 'app-summery',
@@ -14,16 +15,15 @@ export class SummeryComponent implements OnInit {
   activitiesInProgress: IActivity[];
   activitiesFinished: IActivity[];
 
-  constructor(private activityService: ActivityService) {
+  constructor(private activityService: IActivityService) {
   }
 
-  ngOnInit() {
-    this.activityService.getJoined().subscribe((activities: IActivity[]) => {
-      if (activities !== undefined && activities !== null) {
-        this.activitiesUpcoming = activities.filter(item => item.state === 'upcoming');
-        this.activitiesInProgress = activities.filter(item => item.state === 'in_progress');
-        this.activitiesFinished = activities.filter(item => item.state === 'finished');
-      }
-    });
+  async ngOnInit() {
+    const activities = await this.activityService.getJoined();
+    if (activities !== undefined && activities !== null) {
+      this.activitiesUpcoming = activities.filter(item => item.state === 'upcoming');
+      this.activitiesInProgress = activities.filter(item => item.state === 'in_progress');
+      this.activitiesFinished = activities.filter(item => item.state === 'finished');
+    }
   }
 }

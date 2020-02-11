@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from '@angular/router';
-import {TokenService} from '../../../services/token.service';
+import {ITokenService} from '../../../services/token.service';
 
 @Component({
   selector: 'app-actions',
@@ -10,19 +10,23 @@ import {TokenService} from '../../../services/token.service';
 export class ActionsComponent implements OnInit {
 
   constructor(private router: Router,
-              private tokenService: TokenService) {
+              private tokenService: ITokenService) {
   }
 
   ngOnInit() {
   }
 
-  showJoin() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/join`]);
+  async showJoin() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/join`]);
   }
 
-  showCreate() {
-    this.tokenService.checkLogin();
-    this.router.navigate([`/main/create`]);
+  async showCreate() {
+    if (!await this.tokenService.checkLogin()) {
+      return;
+    }
+    await this.router.navigate([`/main/create`]);
   }
 }
