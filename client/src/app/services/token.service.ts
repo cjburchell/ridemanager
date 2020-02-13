@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Router} from '@angular/router';
 
 export abstract class ITokenService {
-  public abstract checkLogin(): Promise<boolean>;
+  public abstract async checkLogin(): Promise<boolean>;
 
-  public abstract validateToken(): Promise<boolean>;
+  public abstract async validateToken(): Promise<boolean>;
 
   public abstract getToken(): string;
 
@@ -37,24 +37,32 @@ export class TokenService implements ITokenService {
     localStorage.removeItem(this.tokenKey);
   }
 
-  validateToken(): Promise<boolean> {
+  async validateToken(): Promise<boolean> {
+    if (this.getToken() === null) {
+      return false;
+    }
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.getToken()
       })
     };
 
-    return this.http.get<boolean>(`api/v1/login/status`, httpOptions).toPromise();
+    let isValid = false;
+    try {
+      isValid = await this.http.get<boolean>(`api/v1/login/status`, httpOptions).toPromise();
+    } catch (e) {
+    }
+
+    if (!isValid) {
+      this.setToken(null);
+    }
+
+    return isValid;
   }
 
   async checkLogin(): Promise<boolean> {
-    if (this.getToken() !== null) {
-      const isLoggedIn = await this.validateToken();
-      if (!isLoggedIn) {
-        await this.router.navigate([`/login`]);
-        return false;
-      }
-    } else {
+    const isLoggedIn = await this.validateToken();
+    if (!isLoggedIn) {
       await this.router.navigate([`/login`]);
       return false;
     }

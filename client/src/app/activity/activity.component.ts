@@ -36,17 +36,12 @@ export class ActivityComponent implements OnInit {
   }
 
   private async updateLoggedInState() {
-    this.isLoggedIn = true;
-    if (this.tokenService.getToken() !== null) {
-      this.isLoggedIn = await this.tokenService.validateToken();
-      if (this.isLoggedIn) {
-        this.user = await this.userService.getMe();
-        if (this.activity !== undefined) {
-          this.isParticipant = this.activity.participants.findIndex(item => item.athlete.id === this.user.id) !== -1;
-        }
+    this.isLoggedIn = await this.tokenService.validateToken();
+    if (this.isLoggedIn) {
+      this.user = await this.userService.getMe();
+      if (this.activity !== undefined) {
+        this.isParticipant = this.activity.participants.findIndex(item => item.athlete.id === this.user.id) !== -1;
       }
-    } else {
-      this.isLoggedIn = false;
     }
   }
 

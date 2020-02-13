@@ -16,7 +16,8 @@
         <ul class="navbar-nav" *ngIf="user">
           <li class="nav-item dropdown">
            <a class="nav-link dropdown-toggle user-dropdown" data-toggle="dropdown" href="#" id="navbardrop" >
-              <img class="rounded-circle" [src]="user?.profile_medium" width="24" height="24"/> {{user?.name}}
+              <img *ngIf="user?.profile_medium" class="rounded-circle" [src]="user?.profile_medium" width="24" height="24" alt=""/>
+              <img *ngIf="!user?.profile_medium" class="rounded-circle" src="../../../assets/images/medium.png" width="24" height="24" alt=""/>{{user?.name}}
            </a>
            <div class="dropdown-menu">
              <a class="dropdown-item" [href]="'https://www.strava.com/athletes/' + user?.strava_athlete_id" target="_blank">Profile</a>
