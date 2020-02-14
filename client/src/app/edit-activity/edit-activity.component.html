@@ -74,7 +74,7 @@
               <tbody>
               <tr *ngFor="let category of Activity?.categories">
                 <td>{{category.name}}</td>
-                <td><button type="button" class="close" (click)="deleteCategory(category)"><i class="fa fa-times-circle"></i></button></td>
+                <td><button type="button" class="close" (click)="deleteCategory(category)"><fa-icon [icon]="'times-circle'"></fa-icon></button></td>
               </tr>
               </tbody>
             </table>
@@ -127,9 +127,9 @@
                 <td><a [href]="'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
                 <td>{{stage.distance/1000 | number : '1.2-2'}}km</td>
                 <td class="btn-group">
-                  <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><i class="fa fa-arrow-up"></i></button>
-                  <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><i class="fa fa-arrow-down"></i></button>
-                  <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><i class="fa fa-times-circle"></i></button>
+                  <button class="btn btn-outline-secondary" [disabled]="stage.number === 1" (click)="moveStageUp(stage)"><fa-icon [icon]="'arrow-up'"></fa-icon></button>
+                  <button class="btn btn-outline-secondary" [disabled]="stage.number === Activity.stages.length" (click)="moveStageDown(stage)"><fa-icon [icon]="'arrow-down'"></fa-icon></button>
+                  <button class="btn btn-outline-secondary" (click)="deleteStage(stage)"><fa-icon [icon]="'times-circle'"></fa-icon></button>
                 </td>
               </tr>
               </tbody>

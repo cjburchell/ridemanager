@@ -94,11 +94,13 @@ const activity1: IActivity = {
         segment_id: 0,
         time: 50000,
         stage_number: 0,
+        activity_id: 0
       }, {
         rank: 1,
         segment_id: 1,
         time: 50000,
         stage_number: 1,
+        activity_id: 0
       }],
       time: 100000,
       rank: 1,

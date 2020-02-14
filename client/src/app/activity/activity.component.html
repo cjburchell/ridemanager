@@ -14,7 +14,7 @@
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
               <h2 class = "title">
                 {{activity.name}}<img [src]="activity.activity_type | activityTypeToImage" height="40" width="40" data-toggle="tooltip"/>
-                <i *ngIf="activity.privacy !== 'public'" class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" title="Private"></i>
+                <fa-icon *ngIf="activity.privacy !== 'public'" [icon]="['fas', 'lock']" aria-hidden="true" data-toggle="tooltip" title="Private"></fa-icon>
               </h2>
               <h5 class="created-by"><small>Created by <app-athlete [athlete]="activity.owner"></app-athlete></small></h5>
             </div>
@@ -61,7 +61,7 @@
                     <td style="vertical-align:center"> <app-athlete [athlete]="participant.athlete"></app-athlete></td>
                     <td *ngIf="activity.categories.length > 1 && !categoryFilter">{{getCategoryName(participant.category_id)}}</td>
                     <td *ngIf="showSexFilter() && !sexFilter">>{{participant.athlete.sex}}</td>
-                    <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant(participant)"> <i class="fa fa-times-circle"></i></a></td>
+                    <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant(participant)"> <fa-icon [icon]="'times-circle'"></fa-icon> </a></td>
                   </tr>
                 </tbody>
               </table>
@@ -80,9 +80,10 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let participant of activity.participants | filter: categoryFilter: 'category_id' ">
-                    <td *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'"><i *ngIf="participant.rank===1" class="fa fa-trophy" style="color: gold"></i>
-                      <i *ngIf="participant.rank===2" class="fa fa-trophy" style="color: silver"></i>
-                      <i *ngIf="participant.rank===3" class="fa fa-trophy" style="color: #8C7853"></i> {{participant.rank}}</td>
+                    <td *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">
+                      <fa-icon *ngIf="participant.rank===1" [icon]="'trophy'" style="color: gold"></fa-icon>
+                      <fa-icon *ngIf="participant.rank===2" [icon]="'trophy'" style="color: silver"></fa-icon>
+                      <fa-icon *ngIf="participant.rank===3" [icon]="'trophy'" style="color: #8C7853"></fa-icon>{{participant.rank}}</td>
                     <td><app-athlete [athlete]="participant.athlete"></app-athlete></td>
                     <td *ngIf="!categoryFilter && activity.categories.length > 1">{{getCategoryName(participant.category_id)}}</td>
                     <td *ngIf="!sexFilter && showSexFilter()">{{participant.athlete.sex}}</td>
@@ -92,7 +93,7 @@
                       <div *ngIf="participant.time && activity.stages.length !== 1 && participant.rank===1">{{participant.time | secondsToTime}}</div>
                       <div *ngIf="!participant.time && activity.stages.length !== 1">DNF</div>
                     </td>
-                    <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant(participant)"> <i class="fa fa-times-circle"></i></a></td>
+                    <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant(participant)"> <fa-icon [icon]="'times-circle'"></fa-icon></a></td>
                   </tr>
                 </tbody>
               </table>

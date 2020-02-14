@@ -80,6 +80,7 @@ export interface IParticipant {
 }
 export interface IResult {
   rank: number;
+  activity_id: number;
   segment_id: number;
   time: number;
   stage_number: number;

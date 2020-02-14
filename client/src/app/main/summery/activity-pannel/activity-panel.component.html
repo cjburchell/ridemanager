@@ -35,7 +35,7 @@
 
       <span *ngIf="!(activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon'))">
         <span *ngIf="activity.stages.length === participant.results.length">
-          <i *ngIf="participant?.rank<=3" class="fa fa-trophy"></i>Rank: {{participant.rank}}/{{participant.out_of}}
+          <fa-icon *ngIf="participant?.rank<=3" [icon]="'trophy'"></fa-icon>Rank: {{participant.rank}}/{{participant.out_of}}
         </span>
 
         <span *ngIf="activity.stages.length !== participant.results.length">
