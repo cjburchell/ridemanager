@@ -4,7 +4,7 @@ import {SelectRouteComponent} from '../main/create/select-route/select-route.com
 import {IStravaService} from '../services/strava.service';
 import {AddCategoryComponent} from '../main/create/add-category/add-category.component';
 import {IRouteSummary, ISegmentSummary} from '../services/contracts/strava';
-import {IActivity, ICategory, IStage} from '../services/contracts/activity';
+import {IActivity, ICategory, IRoute, IStage} from '../services/contracts/activity';
 import {IAthlete} from '../services/contracts/user';
 
 
@@ -91,7 +91,7 @@ export class EditActivityComponent implements OnChanges {
 
   async addStage(segment: ISegmentSummary) {
     const fullSegment = await this.stravaService.getSegment(segment.id);
-    this.Activity.stages.push({
+    const stage: IStage = {
       segment_id: fullSegment.id,
       distance: fullSegment.distance,
       activity_type: fullSegment.activity_type,
@@ -99,14 +99,25 @@ export class EditActivityComponent implements OnChanges {
       number: this.Activity.stages.length + 1,
       map: fullSegment.map,
       start_latlng: fullSegment.start_latlng,
-      end_latlng: fullSegment.end_latlng
-    });
+      end_latlng: fullSegment.end_latlng,
+      elevation: await this.stravaService.getSegmentElevation(segment.id),
+    };
+
+    this.Activity.stages.push(stage);
     this.updateDistance();
     this.updateSortedStages();
   }
 
   async setRoute(selectedRoute: IRouteSummary, addStages: boolean) {
-    this.Activity.route = selectedRoute;
+    const route: IRoute = {
+      distance: selectedRoute.distance,
+      elevation: await this.stravaService.getRouteElevation(selectedRoute.id),
+      id: selectedRoute.id,
+      map: selectedRoute.map,
+      name: selectedRoute.name
+    };
+
+    this.Activity.route = route;
     const fullRoute = await this.stravaService.getRoute(selectedRoute.id);
     this.Activity.route.map = fullRoute.map;
     if (addStages) {

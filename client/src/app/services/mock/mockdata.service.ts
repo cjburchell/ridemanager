@@ -3,7 +3,7 @@ import {ISettingsService} from '../settings.service';
 import {IStravaService} from '../strava.service';
 import {IUserService} from '../user.service';
 import {ITokenService} from '../token.service';
-import {IActivity, IParticipant, IResult} from '../contracts/activity';
+import {IActivity, IElevation, IParticipant} from '../contracts/activity';
 import {IRouteSummary, ISegmentSummary} from '../contracts/strava';
 import {IAchievements, IAthlete} from '../contracts/user';
 
@@ -36,7 +36,8 @@ const activity1: IActivity = {
     map: {
       // tslint:disable-next-line:max-line-length
       polyline: 'wxkwG|abnMfCwOzBuEQm@a@vAm@a@vByEkAeA\\u@lAIWcBvAmAl@Z[yAj@Ir@c@S}@AiBdAm@e@kBrCdAh@GZaBhByAgD?b@s@uA}BRkA~@oA_@]\\cBb@l@f@EJo@rCNdAY^yA_@u@[Xg@eAjAsB`@wHj@u@BgAk@{AYwGlDcATHZj@TFNPVl@p@F`BYj@[LSx@Wb@FVANJZdAv@Z\\`@RG`@a@d@Fd@Ph@z@FR`@XZb@\\~BEXNl@NVd@PDZr@`@Xd@VFFPf@PPb@Hb@PPPFPGh@l@VDpBfAR?b@a@RFJt@CXIXQJSAs@v@Ir@Ar@UzAVj@Ij@Sl@Iz@Cd@Fj@OpA@nATbC?Gq@PqByJaBvGCsEs@PUxBSa@JeAc@h@Ow@c@zCgBw@_@k@Mh@u@EoA}BwAt@uEK?@}@kGMaBJsIEgAEYQc@KOQISGc@N_A|@?AGlDdAVg@zAt@pAIzAcAVa@vBb@|@m@l@aAfFg@W]|B|@nAI~@mAf@k@jADzAOz@q@o@E~Bc@aAMdBKb@yAQq@hDgA|@Qa@mFpERy@Kk@yApA@_Au@hBm@a@O[z@{B_GnA_FvDgEXMz@_@WK^n@~A}ASEt@yDiFsFuD}@vAc@tA`@m@Dz@s@`AyCaCkAG]dAtHnBpKlDlCfAdChAjHjCNGJfA',
-    }
+    },
+    elevation: [{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}, {y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]
   },
   privacy: 'private',
   categories: [
@@ -63,7 +64,8 @@ const activity1: IActivity = {
       end_latlng: [
         45.933615,
         -75.863959
-      ]
+      ],
+      elevation: [{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}]
     },
     {
       segment_id: 1,
@@ -82,7 +84,8 @@ const activity1: IActivity = {
       end_latlng: [
         45.93931,
         -75.869704
-      ]
+      ],
+      elevation: [{y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]
     }
   ],
   participants: [
@@ -133,7 +136,7 @@ const segments: ISegmentSummary[] = [
     end_latlng: [
       45.933615,
       -75.863959
-    ]
+    ],
   },
   {
     private: false,
@@ -152,7 +155,7 @@ const segments: ISegmentSummary[] = [
     end_latlng: [
       45.93931,
       -75.869704
-    ]
+    ],
   }
 ];
 
@@ -322,5 +325,21 @@ export class MockDataService implements IActivityService, ISettingsService, IStr
 
   validateToken(): Promise<boolean> {
     return new Promise<boolean>(resolve => resolve(true));
+  }
+
+  getRouteElevation(routeId: number): Promise<IElevation[]> {
+    return new Promise<IElevation[]>(resolve => {
+      resolve([{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}, {y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]);
+    });
+  }
+
+  getSegmentElevation(segmentId: number): Promise<IElevation[]> {
+    return new Promise<IElevation[]>(resolve => {
+      if (segmentId === 0) {
+        resolve([{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}]);
+      } else {
+        resolve([{y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]);
+      }
+    });
   }
 }

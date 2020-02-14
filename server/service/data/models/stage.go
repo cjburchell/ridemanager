@@ -11,4 +11,5 @@ type Stage struct {
 	Map          Map                 `json:"map" bson:"map"`
 	StartLatlng  strava.LatLng       `json:"start_latlng,omitempty" bson:"start_latlng"`
 	EndLatlng    strava.LatLng       `json:"end_latlng,omitempty" bson:"end_latlng"`
+	Elevation    []Elevation         `json:"elevation" bson:"elevation"`
 }

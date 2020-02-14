@@ -1,4 +1,4 @@
-import {SegmentType} from './activity';
+import {IElevation, SegmentType} from './activity';
 
 
 export interface ISegmentSummary {

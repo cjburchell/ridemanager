@@ -66,6 +66,12 @@ export interface IRoute {
   name: string;
   distance: number;
   map: IMap;
+  elevation: IElevation[];
+}
+
+export interface IElevation {
+  x: number;
+  y: number;
 }
 
 export interface IParticipant {
@@ -100,4 +106,5 @@ export interface IStage {
   map: IMap;
   start_latlng: number[];
   end_latlng: number[];
+  elevation: IElevation[];
 }

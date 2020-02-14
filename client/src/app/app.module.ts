@@ -117,17 +117,16 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule
   ],
   providers: [
-    { provide: IUserService, useClass: MockDataService },
+    /*{ provide: IUserService, useClass: MockDataService },
     { provide: IActivityService, useClass: MockDataService },
     { provide: ISettingsService, useClass: MockDataService },
     { provide: IStravaService, useClass: MockDataService },
-    { provide: ITokenService, useClass: MockDataService },
-
-/*{ provide: IUserService, useClass: UserService },
-{ provide: IActivityService, useClass: ActivityService },
-{ provide: ISettingsService, useClass: SettingsService },
-{ provide: IStravaService, useClass: StravaService },
-{ provide: ITokenService, useClass: TokenService },*/
+    { provide: ITokenService, useClass: MockDataService },*/
+  { provide: IUserService, useClass: UserService },
+  { provide: IActivityService, useClass: ActivityService },
+  { provide: ISettingsService, useClass: SettingsService },
+  { provide: IStravaService, useClass: StravaService },
+  { provide: ITokenService, useClass: TokenService },
 ],
 bootstrap: [AppComponent]
 })

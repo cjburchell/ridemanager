@@ -1,6 +1,11 @@
 <div class="activity-elevation">
-
+  <canvas baseChart
+          [datasets]="lineChartData"
+          [labels]="lineChartLabels"
+          [options]="lineChartOptions"
+          [colors]="lineChartColors"
+          [legend]="lineChartLegend"
+          [chartType]="lineChartType"
+          [plugins]="lineChartPlugins">
+  </canvas>
 </div>
-<!--<canvas *ngIf="elevationData.length !== 0" id="elevation" class="chart chart-line" chart-data="elevationData" chart-options="elevationChartOptions">-->
-<!--  -->
-<!--</canvas>-->

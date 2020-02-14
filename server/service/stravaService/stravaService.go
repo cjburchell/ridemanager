@@ -13,6 +13,8 @@ type IService interface {
 	GetRoute(routeId int32) (*strava.Route, error)
 	GetSegment(segmentId int64) (*strava.DetailedSegment, error)
 	SegmentsListEfforts(segmentId int32, page int32, perPage int32) ([]strava.DetailedSegmentEffort, error)
+	GetRouteStreams(routeId int64, streamTypes []string) (*strava.StreamSet, error)
+	GetSegmentStream(segmentId int64, streamTypes []string) (*strava.StreamSet, error)
 }
 
 type service struct {
@@ -51,13 +53,13 @@ func (s service) GetRoute(routeId int32) (*strava.Route, error) {
 	return &result, err
 }
 
-func (s service) GetRouteStreams(routeId int64) (*strava.StreamSet, error) {
+func (s service) GetRouteStreams(routeId int64, streamTypes []string) (*strava.StreamSet, error) {
 	ctx, err := s.getContext()
 	if err != nil {
 		return nil, err
 	}
 
-	result, _, err := s.client.StreamsApi.GetRouteStreams(ctx, routeId)
+	result, _, err := s.client.StreamsApi.GetRouteStreams(ctx, routeId, streamTypes, true)
 	return &result, err
 }
 
