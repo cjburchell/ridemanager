@@ -26,7 +26,10 @@
           </thead>
           <tbody>
           <tr *ngFor="let stage of stages| filter: stageSearchText: 'name'" (click)="selectStage(stage)">
-            <td><i *ngIf="stage === selectedStage" class="fa fa-check-circle"></i></td>
+            <td>
+              <fa-icon *ngIf="stage === selectedStage" [icon]="['far', 'check-circle']"></fa-icon>
+              <fa-icon *ngIf="stage !== selectedStage" [icon]="['far', 'circle']"></fa-icon>
+            </td>
             <td><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
             <td><a [href]=" 'https://www.strava.com/segments/' + stage.id" target="_blank">{{stage.name}}</a></td>
             <td>{{stage.distance/1000 | number : '1.2-2'}}km</td>

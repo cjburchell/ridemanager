@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
-import {LngLatLike, LngLatBoundsLike} from 'mapbox-gl';
+import {LngLatLike, LngLatBoundsLike, SymbolLayout} from 'mapbox-gl';
 import {Polyline} from '../../services/polyline';
 import * as geojson from 'geojson';
 import {ISettingsService} from '../../services/settings.service';
@@ -159,64 +159,39 @@ export class ActivityMapComponent implements OnInit, OnChanges {
               layout: {},
               paint: {
                 'line-color': '#F00',
-                'line-width': 1,
+                'line-width': 3,
               }
             };
             this.map.addLayer(trackLayer);
 
-            const pointsLayer2: mapboxgl.Layer = {
-              id: 'stage_point_start' + stage.number,
-              type: 'line',
-              source: {
-                type: 'geojson',
-                data: {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [stage.start_latlng[0], stage.start_latlng[1]],
-                  },
-                  properties: {
-                    title: 'Start Stage ' + stage.number,
-                    description: stage.name,
-                    url: 'https://www.strava.com/segments/' + stage.segment_id
-                  },
-                }
-              },
-              layout: {}
-            };
-            this.map.addLayer(pointsLayer2);
-
-            const gleason1: mapboxgl.Layer = {
-              id: 'stage_point_start' + stage.number,
-              type: 'line',
-              source: {
-                type: 'geojson',
-                data: {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [stage.start_latlng[0], stage.start_latlng[1]],
-                  },
-                  properties: {
-                    title: 'Start Stage ' + stage.number,
-                    description: stage.name,
-                    url: 'https://www.strava.com/segments/' + stage.segment_id
-                  },
-                }
-              },
-              layout: {}
+            const layout: mapboxgl.SymbolLayout = {
+              'icon-image': ['concat', ['get', 'icon'], '-15'],
+              'text-field': ['get', 'title'],
+              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+              'text-offset': [0, 0.6],
+              'text-anchor': 'top'
             };
 
-            this.map.addLayer(gleason1);
+            function stageIcon(): string {
+              switch (stage.activity_type) {
+                case 'Swim':
+                  return 'swimming';
+                case 'Ride':
+                  return 'bicycle';
+                default:
+                  return 'triangle';
+              }
+            }
 
             const pointsLayer: mapboxgl.Layer = {
               id: 'stage_points' + stage.number,
-              type: 'line',
+              type: 'symbol',
               source: {
                 type: 'geojson',
                 data: {
                   type: 'FeatureCollection',
-                  features: [{
+                  features: [
+                    {
                     type: 'Feature',
                     geometry: {
                       type: 'Point',
@@ -224,7 +199,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                     },
                     properties: {
                       title: 'Start Stage ' + stage.number,
-                      icon: 'monument',
+                      icon: stageIcon(),
                       description: stage.name,
                       url: 'https://www.strava.com/segments/' + stage.segment_id
                     },
@@ -235,7 +210,8 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                       coordinates: [stage.end_latlng[1], stage.end_latlng[0]],
                     },
                     properties: {
-                      title: 'Start Stage ' + stage.number,
+                      title: 'End Stage ' + stage.number,
+                      icon: 'embassy',
                       description: stage.name,
                       url: 'https://www.strava.com/segments/' + stage.segment_id
                     },
@@ -243,7 +219,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                   ]
                 }
               },
-              layout: {}
+              layout
             };
             this.map.addLayer(pointsLayer);
           }

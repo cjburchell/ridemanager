@@ -55,6 +55,10 @@ import {IStravaService, StravaService} from './services/strava.service';
 import {ITokenService, TokenService} from './services/token.service';
 import {ActivityService, IActivityService} from './services/activity.service';
 import {MockDataService} from './services/mock/mockdata.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCheckCircle as farCheckCircle, faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+// import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -109,7 +113,8 @@ import {MockDataService} from './services/mock/mockdata.service';
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
     BrowserAnimationsModule,
-    ChartsModule
+    ChartsModule,
+    FontAwesomeModule
   ],
   providers: [
     { provide: IUserService, useClass: MockDataService },
@@ -127,4 +132,8 @@ import {MockDataService} from './services/mock/mockdata.service';
 bootstrap: [AppComponent]
 })
 export class AppModule {
+  constructor(library: FaIconLibrary) {
+    // Add multiple icons to the library
+    library.addIcons(farCheckCircle, farCircle);
+  }
 }
