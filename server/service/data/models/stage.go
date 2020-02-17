@@ -8,8 +8,7 @@ type Stage struct {
 	Number       int                 `json:"number" bson:"number"`
 	ActivityType strava.ActivityType `json:"activity_type" bson:"activity_type"`
 	Name         string              `json:"name" bson:"name"`
-	Map          Map                 `json:"map" bson:"map"`
+	Map          []Point             `json:"map" bson:"map"`
 	StartLatlng  strava.LatLng       `json:"start_latlng,omitempty" bson:"start_latlng"`
 	EndLatlng    strava.LatLng       `json:"end_latlng,omitempty" bson:"end_latlng"`
-	Elevation    []Elevation         `json:"elevation" bson:"elevation"`
 }

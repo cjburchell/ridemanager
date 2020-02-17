@@ -97,10 +97,9 @@ export class EditActivityComponent implements OnChanges {
       activity_type: fullSegment.activity_type,
       name: fullSegment.name,
       number: this.Activity.stages.length + 1,
-      map: fullSegment.map,
       start_latlng: fullSegment.start_latlng,
       end_latlng: fullSegment.end_latlng,
-      elevation: await this.stravaService.getSegmentElevation(segment.id),
+      map: await this.stravaService.getSegmentMap(segment.id),
     };
 
     this.Activity.stages.push(stage);
@@ -111,16 +110,14 @@ export class EditActivityComponent implements OnChanges {
   async setRoute(selectedRoute: IRouteSummary, addStages: boolean) {
     const route: IRoute = {
       distance: selectedRoute.distance,
-      elevation: await this.stravaService.getRouteElevation(selectedRoute.id),
+      map: await this.stravaService.getRouteMap(selectedRoute.id),
       id: selectedRoute.id,
-      map: selectedRoute.map,
       name: selectedRoute.name
     };
 
     this.Activity.route = route;
-    const fullRoute = await this.stravaService.getRoute(selectedRoute.id);
-    this.Activity.route.map = fullRoute.map;
     if (addStages) {
+      const fullRoute = await this.stravaService.getRoute(selectedRoute.id);
       for (const segment of fullRoute.segments) {
         this.addStage(segment);
       }

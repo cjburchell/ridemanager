@@ -3,7 +3,7 @@ import {ISettingsService} from '../settings.service';
 import {IStravaService} from '../strava.service';
 import {IUserService} from '../user.service';
 import {ITokenService} from '../token.service';
-import {IActivity, IElevation, IParticipant} from '../contracts/activity';
+import {IActivity, IPoint, IParticipant} from '../contracts/activity';
 import {IRouteSummary, ISegmentSummary} from '../contracts/strava';
 import {IAchievements, IAthlete} from '../contracts/user';
 
@@ -33,11 +33,7 @@ const activity1: IActivity = {
     id: 1,
     name: 'MSM Enduro',
     distance: 8769.18,
-    map: {
-      // tslint:disable-next-line:max-line-length
-      polyline: 'wxkwG|abnMfCwOzBuEQm@a@vAm@a@vByEkAeA\\u@lAIWcBvAmAl@Z[yAj@Ir@c@S}@AiBdAm@e@kBrCdAh@GZaBhByAgD?b@s@uA}BRkA~@oA_@]\\cBb@l@f@EJo@rCNdAY^yA_@u@[Xg@eAjAsB`@wHj@u@BgAk@{AYwGlDcATHZj@TFNPVl@p@F`BYj@[LSx@Wb@FVANJZdAv@Z\\`@RG`@a@d@Fd@Ph@z@FR`@XZb@\\~BEXNl@NVd@PDZr@`@Xd@VFFPf@PPb@Hb@PPPFPGh@l@VDpBfAR?b@a@RFJt@CXIXQJSAs@v@Ir@Ar@UzAVj@Ij@Sl@Iz@Cd@Fj@OpA@nATbC?Gq@PqByJaBvGCsEs@PUxBSa@JeAc@h@Ow@c@zCgBw@_@k@Mh@u@EoA}BwAt@uEK?@}@kGMaBJsIEgAEYQc@KOQISGc@N_A|@?AGlDdAVg@zAt@pAIzAcAVa@vBb@|@m@l@aAfFg@W]|B|@nAI~@mAf@k@jADzAOz@q@o@E~Bc@aAMdBKb@yAQq@hDgA|@Qa@mFpERy@Kk@yApA@_Au@hBm@a@O[z@{B_GnA_FvDgEXMz@_@WK^n@~A}ASEt@yDiFsFuD}@vAc@tA`@m@Dz@s@`AyCaCkAG]dAtHnBpKlDlCfAdChAjHjCNGJfA',
-    },
-    elevation: [{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}, {y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]
+    map: undefined,
   },
   privacy: 'private',
   categories: [
@@ -53,10 +49,7 @@ const activity1: IActivity = {
       number: 1,
       activity_type: 'Ride',
       name: 'Wild-Side Enduro Stage 1 (2016)',
-      map: {
-        // tslint:disable-next-line:max-line-length
-        polyline: 'uliwGdn`nMGGCIMuAKi@A_@UYIOSeAGMSYEMI{@SS]XDRMbAENi@bAEPEb@BP@j@EDO?Os@C]XoAH{@EBIPMd@KP?UDYDMBUKBEFa@nAKr@EHMEBw@J[?[KOKf@An@CJKNCKBc@A[MIGDGPCREl@OrAK@O_@QWIIe@EIIUg@GEEDAd@GDk@FMMCUGOo@iAWCYBQDBP?\\ONW?WEc@SaAUa@QWC',
-      },
+      map: undefined,
       start_latlng: [
         45.928592,
         -75.865462
@@ -64,8 +57,7 @@ const activity1: IActivity = {
       end_latlng: [
         45.933615,
         -75.863959
-      ],
-      elevation: [{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}]
+      ]
     },
     {
       segment_id: 1,
@@ -73,10 +65,7 @@ const activity1: IActivity = {
       number: 2,
       activity_type: 'Ride',
       name: 'WildSide Enduro Stage 2 (2016)',
-      map: {
-        // tslint:disable-next-line:max-line-length
-        polyline: '}sjwG~n_nM@NBP?NBJINCRNPTALDDp@KXDT@j@|@`AV`ACTMVy@@MGMAMBKJM`@Er@Ob@LHX?JBDJALIHODa@HMFKLGLI\\Qd@a@vBGJKAGGGAEDGZAz@@PDLLTLNPHFFBL?d@Kb@IHK@WAIBIJY|@c@z@G`@Af@Kt@GHO[GGEBEFGTBl@CJG@IIM[SIEHJn@Af@I`@ULa@Dc@KKDSZKRGTEh@IXKPc@Za@j@GQFa@OIaBbBGNM?c@RmA`AKBZc@HGNc@OMSEM@',
-      },
+      map: undefined,
       start_latlng: [
         45.934873,
         -75.860471
@@ -84,8 +73,7 @@ const activity1: IActivity = {
       end_latlng: [
         45.93931,
         -75.869704
-      ],
-      elevation: [{y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]
+      ]
     }
   ],
   participants: [
@@ -125,10 +113,6 @@ const segments: ISegmentSummary[] = [
     distance: 1213,
     activity_type: 'Ride',
     name: 'Wild-Side Enduro Stage 1 (2016)',
-    map: {
-      // tslint:disable-next-line:max-line-length
-      polyline: 'uliwGdn`nMGGCIMuAKi@A_@UYIOSeAGMSYEMI{@SS]XDRMbAENi@bAEPEb@BP@j@EDO?Os@C]XoAH{@EBIPMd@KP?UDYDMBUKBEFa@nAKr@EHMEBw@J[?[KOKf@An@CJKNCKBc@A[MIGDGPCREl@OrAK@O_@QWIIe@EIIUg@GEEDAd@GDk@FMMCUGOo@iAWCYBQDBP?\\ONW?WEc@SaAUa@QWC',
-    },
     start_latlng: [
       45.928592,
       -75.865462
@@ -144,10 +128,6 @@ const segments: ISegmentSummary[] = [
     distance: 1428.8,
     activity_type: 'Ride',
     name: 'WildSide Enduro Stage 2 (2016)',
-    map: {
-      // tslint:disable-next-line:max-line-length
-      polyline: '}sjwG~n_nM@NBP?NBJINCRNPTALDDp@KXDT@j@|@`AV`ACTMVy@@MGMAMBKJM`@Er@Ob@LHX?JBDJALIHODa@HMFKLGLI\\Qd@a@vBGJKAGGGAEDGZAz@@PDLLTLNPHFFBL?d@Kb@IHK@WAIBIJY|@c@z@G`@Af@Kt@GHO[GGEBEFGTBl@CJG@IIM[SIEHJn@Af@I`@ULa@Dc@KKDSZKRGTEh@IXKPc@Za@j@GQFa@OIaBbBGNM?c@RmA`AKBZc@HGNc@OMSEM@',
-    },
     start_latlng: [
       45.934873,
       -75.860471
@@ -170,9 +150,6 @@ const routes: IRouteSummary[] = [
     {
       distance: 16869.324,
       id: 0,
-      map: {
-        polyline: undefined,
-      },
       name: 'Powerline loop',
       type: 1,
       segments: [],
@@ -181,9 +158,6 @@ const routes: IRouteSummary[] = [
     segments: [],
     distance: 7017.786,
     id: 1,
-    map: {
-      polyline: undefined
-    },
     name: 'E-Ride 2',
     type: 1,
   },
@@ -191,9 +165,6 @@ const routes: IRouteSummary[] = [
     segments: [],
     distance: 5312.458,
     id: 2,
-    map: {
-      polyline: undefined
-    },
     name: 'Test Run',
     type: 2,
   },
@@ -201,10 +172,6 @@ const routes: IRouteSummary[] = [
     segments,
     distance: 8769.18,
     id: 3,
-    map: {
-      // tslint:disable-next-line:max-line-length
-      polyline: 'wxkwG|abnMfCwOzBuEQm@a@vAm@a@vByEkAeA\\u@lAIWcBvAmAl@Z[yAj@Ir@c@S}@AiBdAm@e@kBrCdAh@GZaBhByAgD?b@s@uA}BRkA~@oA_@]\\cBb@l@f@EJo@rCNdAY^yA_@u@[Xg@eAjAsB`@wHj@u@BgAk@{AYwGlDcATHZj@TFNPVl@p@F`BYj@[LSx@Wb@FVANJZdAv@Z\\`@RG`@a@d@Fd@Ph@z@FR`@XZb@\\~BEXNl@NVd@PDZr@`@Xd@VFFPf@PPb@Hb@PPPFPGh@l@VDpBfAR?b@a@RFJt@CXIXQJSAs@v@Ir@Ar@UzAVj@Ij@Sl@Iz@Cd@Fj@OpA@nATbC?Gq@PqByJaBvGCsEs@PUxBSa@JeAc@h@Ow@c@zCgBw@_@k@Mh@u@EoA}BwAt@uEK?@}@kGMaBJsIEgAEYQc@KOQISGc@N_A|@?AGlDdAVg@zAt@pAIzAcAVa@vBb@|@m@l@aAfFg@W]|B|@nAI~@mAf@k@jADzAOz@q@o@E~Bc@aAMdBKb@yAQq@hDgA|@Qa@mFpERy@Kk@yApA@_Au@hBm@a@O[z@{B_GnA_FvDgEXMz@_@WK^n@~A}ASEt@yDiFsFuD}@vAc@tA`@m@Dz@s@`AyCaCkAG]dAtHnBpKlDlCfAdChAjHjCNGJfA'
-    },
     name: 'MSM Enduro',
     type: 1,
   },
@@ -212,9 +179,6 @@ const routes: IRouteSummary[] = [
     segments: [],
     distance: 8460.628,
     id: 4,
-    map: {
-      polyline: undefined
-    },
     name: 'E- Ride',
     type: 1,
   }
@@ -282,14 +246,11 @@ export class MockDataService implements IActivityService, ISettingsService, IStr
 
   getSetting(setting: string): Promise<string> {
     return new Promise<string>(resolve => {
-      switch (setting) {
-        case 'mapboxAccessToken':
-          resolve('pk.eyJ1IjoiY2pidXJjaGVsbCIsImEiOiJjaXJzc2hpNDMwaTY0ZmZtNnViZzg5NmRrIn0.LSuKYxyhwBDpHCtjim-g0A');
-          break;
-        default:
-          resolve('test');
+      if (setting === 'mapboxAccessToken') {
+        resolve('pk.eyJ1IjoiY2pidXJjaGVsbCIsImEiOiJjaXJzc2hpNDMwaTY0ZmZtNnViZzg5NmRrIn0.LSuKYxyhwBDpHCtjim-g0A');
+      } else {
+        resolve('test');
       }
-
     });
   }
 
@@ -327,18 +288,18 @@ export class MockDataService implements IActivityService, ISettingsService, IStr
     return new Promise<boolean>(resolve => resolve(true));
   }
 
-  getRouteElevation(routeId: number): Promise<IElevation[]> {
-    return new Promise<IElevation[]>(resolve => {
-      resolve([{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}, {y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]);
+  getRouteMap(routeId: number): Promise<IPoint[]> {
+    return new Promise<IPoint[]>(resolve => {
+      resolve(undefined);
     });
   }
 
-  getSegmentElevation(segmentId: number): Promise<IElevation[]> {
-    return new Promise<IElevation[]>(resolve => {
+  getSegmentMap(segmentId: number): Promise<IPoint[]> {
+    return new Promise<IPoint[]>(resolve => {
       if (segmentId === 0) {
-        resolve([{y: 85, x: 1}, {y: 72, x: 2}, {y: 78, x: 3}]);
+        resolve(undefined);
       } else {
-        resolve([{y: 75, x: 4}, {y: 77, x: 5}, {y: 75, x: 6}]);
+        resolve(undefined);
       }
     });
   }

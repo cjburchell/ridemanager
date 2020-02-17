@@ -29,23 +29,17 @@ var ActivityStates = struct {
 	Finished   ActivityState
 }{"upcoming", "in_progress", "finished"}
 
-type Elevation struct {
-	X float32 `json:"x" bson:"x"`
-	Y float32 `json:"y" bson:"y"`
+type Point struct {
+	LatLong   strava.LatLng `json:"p" bson:"p"`
+	Distance  float32       `json:"d" bson:"d"`
+	Elevation float32       `json:"e" bson:"e"`
 }
 
 type Route struct {
-	RouteId   int         `json:"id" bson:"id"`
-	Name      string      `json:"name" bson:"name"`
-	Distance  float64     `json:"distance" bson:"distance"`
-	Map       Map         `json:"map" bson:"map"`
-	Elevation []Elevation `json:"elevation" bson:"elevation"`
-}
-
-type Map struct {
-	Id              string `json:"id" bson:"id"`
-	Polyline        string `json:"polyline" bson:"polyline"`
-	SummaryPolyline string `json:"summary_polyline" bson:"summary_polyline"`
+	RouteId  int     `json:"id" bson:"id"`
+	Name     string  `json:"name" bson:"name"`
+	Distance float64 `json:"distance" bson:"distance"`
+	Map      []Point `json:"map" bson:"map"`
 }
 
 type Athlete struct {
