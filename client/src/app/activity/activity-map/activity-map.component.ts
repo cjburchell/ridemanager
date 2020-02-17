@@ -1,10 +1,9 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
-import {LngLatLike, LngLatBoundsLike, SymbolLayout} from 'mapbox-gl';
-import {Polyline} from '../../services/polyline';
+import {LngLatBoundsLike, LngLatLike} from 'mapbox-gl';
 import * as geojson from 'geojson';
 import {ISettingsService} from '../../services/settings.service';
-import {IActivity} from '../../services/contracts/activity';
+import {IActivity, IPoint} from '../../services/contracts/activity';
 
 @Component({
   selector: 'app-activity-map',
@@ -17,11 +16,10 @@ export class ActivityMapComponent implements OnInit, OnChanges {
   style = 'mapbox://styles/mapbox/outdoors-v11';
   @Input() activity: IActivity;
 
-  private static swapLatLong(points: number[][]): number[][] {
-    for (const point of points) {
-      const temp = point[0];
-      point[0] = point[1];
-      point[1] = temp;
+  private static swapLatLong(map: IPoint[]): number[][] {
+    const points: number[][] = [];
+    for (const point of map) {
+      points.push([point.p[1], point.p[0]]);
     }
     return points;
   }
@@ -31,9 +29,8 @@ export class ActivityMapComponent implements OnInit, OnChanges {
 
   async ngOnInit(): Promise<void> {
 
-    const token = await this.settingsService.getSetting('mapboxAccessToken');
     // @ts-ignore
-    mapboxgl.accessToken = token;
+    mapboxgl.accessToken = await this.settingsService.getSetting('mapboxAccessToken');
 
     this.map = new mapboxgl.Map({
       container: 'map',
@@ -76,24 +73,22 @@ export class ActivityMapComponent implements OnInit, OnChanges {
         minLong = Math.min(minLong, stage.start_latlng[1]);
         minLong = Math.min(minLong, stage.end_latlng[1]);
 
-        const points = Polyline.decode(stage.map.polyline);
-        for (const point of points) {
-          maxLat = Math.max(maxLat, point[0]);
-          minLat = Math.min(minLat, point[0]);
-          maxLong = Math.max(maxLong, point[1]);
-          minLong = Math.min(minLong, point[1]);
+        for (const point of stage.map) {
+          maxLat = Math.max(maxLat, point.p[0]);
+          minLat = Math.min(minLat, point.p[0]);
+          maxLong = Math.max(maxLong, point.p[1]);
+          minLong = Math.min(minLong, point.p[1]);
         }
       }
     }
 
     if (this.activity.route) {
-      if (this.activity.route.map && this.activity.route.map.polyline) {
-        const decodedPoints = Polyline.decode(this.activity.route.map.polyline);
-        for (const point of decodedPoints) {
-          maxLat = Math.max(maxLat, point[0]);
-          minLat = Math.min(minLat, point[0]);
-          maxLong = Math.max(maxLong, point[1]);
-          minLong = Math.min(minLong, point[1]);
+      if (this.activity.route.map) {
+        for (const point of this.activity.route.map) {
+          maxLat = Math.max(maxLat, point.p[0]);
+          minLat = Math.min(minLat, point.p[0]);
+          maxLong = Math.max(maxLong, point.p[1]);
+          minLong = Math.min(minLong, point.p[1]);
         }
       }
     }
@@ -123,7 +118,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
               type: 'Feature',
               geometry: {
                 type: 'LineString',
-                coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(this.activity.route.map.polyline)),
+                coordinates: ActivityMapComponent.swapLatLong(this.activity.route.map),
               },
               properties: {},
             }
@@ -151,7 +146,7 @@ export class ActivityMapComponent implements OnInit, OnChanges {
                   type: 'Feature',
                   geometry: {
                     type: 'LineString',
-                    coordinates: ActivityMapComponent.swapLatLong(Polyline.decode(stage.map.polyline)),
+                    coordinates: ActivityMapComponent.swapLatLong(stage.map),
                   },
                   properties: {},
                 }

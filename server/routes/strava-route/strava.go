@@ -2,9 +2,10 @@ package strava_route
 
 import (
 	"encoding/json"
-	"github.com/cjburchell/ridemanager/service/data/models"
 	"net/http"
 	"strconv"
+
+	"github.com/cjburchell/ridemanager/service/data/models"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/cjburchell/ridemanager/routes/token"
@@ -27,8 +28,8 @@ func Setup(r *mux.Router, service data.IService, validator token.Validator, auth
 	dataRoute.HandleFunc("/routes", validator.ValidateMiddleware(handle.getRoutes)).Methods("GET").Queries("page", "{page}", "perPage", "{perPage}")
 	dataRoute.HandleFunc("/routes/{RouteId}", validator.ValidateMiddleware(handle.getRoute)).Methods("GET")
 	dataRoute.HandleFunc("/segments/{SegmentId}", validator.ValidateMiddleware(handle.getSegment)).Methods("GET")
-	dataRoute.HandleFunc("/routes/{RouteId}/elevation", validator.ValidateMiddleware(handle.getRouteElevation)).Methods("GET")
-	dataRoute.HandleFunc("/segments/{SegmentId}/elevation", validator.ValidateMiddleware(handle.getSegmentElevation)).Methods("GET")
+	dataRoute.HandleFunc("/routes/{RouteId}/map", validator.ValidateMiddleware(handle.getRouteMap)).Methods("GET")
+	dataRoute.HandleFunc("/segments/{SegmentId}/map", validator.ValidateMiddleware(handle.getSegmentMap)).Methods("GET")
 }
 
 func (h handler) getSegment(writer http.ResponseWriter, request *http.Request) {
@@ -214,7 +215,7 @@ func (h handler) getStarredSegments(writer http.ResponseWriter, request *http.Re
 	}
 }
 
-func (h handler) getSegmentElevation(writer http.ResponseWriter, request *http.Request) {
+func (h handler) getSegmentMap(writer http.ResponseWriter, request *http.Request) {
 	user, err := token.GetUser(request, h.service)
 	if err != nil {
 		writer.WriteHeader(http.StatusUnauthorized)
@@ -237,25 +238,26 @@ func (h handler) getSegmentElevation(writer http.ResponseWriter, request *http.R
 
 	strava := stravaService.NewService(stravaService.GetTokenManager(h.authenticator, user.Athlete.Id, h.service, &user.StravaToken))
 
-	streamSet, err := strava.GetSegmentStream(segmentId, []string{"distance", "altitude"})
+	streamSet, err := strava.GetSegmentStream(segmentId, []string{"distance", "altitude", "latlng"})
 	if err != nil {
 		writer.WriteHeader(http.StatusNotFound)
 		h.log.Error(err)
 		return
 	}
 
-	if streamSet == nil || streamSet.Altitude == nil || streamSet.Distance == nil {
+	if streamSet == nil || streamSet.Altitude == nil || streamSet.Distance == nil || streamSet.Latlng == nil {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	elevation := make( []models.Elevation, len(streamSet.Distance.Data))
-	for i:=0; i<len(streamSet.Distance.Data); i++{
-		elevation[i].X = streamSet.Distance.Data[i]
-		elevation[i].Y = streamSet.Altitude.Data[i]
+	points := make([]models.Point, len(streamSet.Distance.Data))
+	for i := 0; i < len(streamSet.Distance.Data); i++ {
+		points[i].Distance = streamSet.Distance.Data[i]
+		points[i].Elevation = streamSet.Altitude.Data[i]
+		points[i].LatLong = streamSet.Latlng.Data[i]
 	}
 
-	reply, _ := json.Marshal(elevation)
+	reply, _ := json.Marshal(points)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 
@@ -265,7 +267,7 @@ func (h handler) getSegmentElevation(writer http.ResponseWriter, request *http.R
 	}
 }
 
-func (h handler) getRouteElevation(writer http.ResponseWriter, request *http.Request) {
+func (h handler) getRouteMap(writer http.ResponseWriter, request *http.Request) {
 	h.log.Debug("getRouteElevation")
 	user, err := token.GetUser(request, h.service)
 	if err != nil {
@@ -290,25 +292,26 @@ func (h handler) getRouteElevation(writer http.ResponseWriter, request *http.Req
 
 	strava := stravaService.NewService(stravaService.GetTokenManager(h.authenticator, user.Athlete.Id, h.service, &user.StravaToken))
 
-	streamSet, err := strava.GetRouteStreams(activityId, []string{"distance", "altitude"})
+	streamSet, err := strava.GetRouteStreams(activityId)
 	if err != nil {
 		writer.WriteHeader(http.StatusNotFound)
 		h.log.Error(err)
 		return
 	}
 
-	if streamSet == nil || streamSet.Altitude == nil || streamSet.Distance == nil {
+	if streamSet == nil || streamSet.Altitude == nil || streamSet.Distance == nil || streamSet.Latlng == nil {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	elevation := make( []models.Elevation, len(streamSet.Distance.Data))
-	for i:=0; i<len(streamSet.Distance.Data); i++{
-		elevation[i].X = streamSet.Distance.Data[i]
-		elevation[i].Y = streamSet.Altitude.Data[i]
+	points := make([]models.Point, len(streamSet.Distance.Data))
+	for i := 0; i < len(streamSet.Distance.Data); i++ {
+		points[i].Distance = streamSet.Distance.Data[i]
+		points[i].Elevation = streamSet.Altitude.Data[i]
+		points[i].LatLong = streamSet.Latlng.Data[i]
 	}
 
-	reply, _ := json.Marshal(elevation)
+	reply, _ := json.Marshal(points)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 

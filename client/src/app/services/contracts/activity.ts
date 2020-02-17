@@ -1,4 +1,3 @@
-import {IMap} from './strava';
 import {IAthlete} from './user';
 
 export type ActivityType = 'group_ride' | 'race' | 'triathlon' | 'group_run' | 'group_ski';
@@ -65,13 +64,13 @@ export interface IRoute {
   id: number;
   name: string;
   distance: number;
-  map: IMap;
-  elevation: IElevation[];
+  map: IPoint[];
 }
 
-export interface IElevation {
-  x: number;
-  y: number;
+export interface IPoint {
+  p: number[];
+  d: number;
+  e: number;
 }
 
 export interface IParticipant {
@@ -103,8 +102,7 @@ export interface IStage {
   number: number;
   activity_type: SegmentType;
   name: string;
-  map: IMap;
+  map: IPoint[];
   start_latlng: number[];
   end_latlng: number[];
-  elevation: IElevation[];
 }

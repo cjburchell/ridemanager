@@ -1,4 +1,4 @@
-import {IElevation, SegmentType} from './activity';
+import {SegmentType} from './activity';
 
 
 export interface ISegmentSummary {
@@ -9,11 +9,6 @@ export interface ISegmentSummary {
   distance: number;
   start_latlng: number[];
   end_latlng: number[];
-  map: IMap;
-}
-
-export interface IMap {
-  polyline: string;
 }
 
 export interface IRouteSummary {
@@ -22,5 +17,4 @@ export interface IRouteSummary {
   distance: number;
   type: number;
   segments: ISegmentSummary[];
-  map: IMap;
 }
