@@ -80,8 +80,16 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
+                  "maximumWarning": "4mb",
                   "maximumError": "5mb"
+                }
+              ]
+            },
+            "mock": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mock.ts"
                 }
               ]
             }
@@ -95,6 +103,9 @@
           "configurations": {
             "production": {
               "browserTarget": "ridemanager-client:build:production"
+            },
+            "mock": {
+              "browserTarget": "ridemanager-client:build:mock"
             }
           }
         },

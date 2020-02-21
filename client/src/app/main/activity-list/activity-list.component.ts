@@ -16,6 +16,10 @@ export class ActivityListComponent implements OnChanges {
 
   constructor() { }
 
+  public changeFilter(value: string) {
+    this.activityFilter = value;
+  }
+
   ngOnChanges(): void {
     this.isFinished = this.activities.some((item) => {
       return item.state === 'finished';

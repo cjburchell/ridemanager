@@ -1,4 +1,4 @@
-FROM node:10.16-alpine as uibuilder
+FROM node:12.14-alpine as uibuilder
 COPY . .
 RUN cd client && npm install
 RUN cd client && node_modules/@angular/cli/bin/ng build --prod

@@ -30,8 +30,8 @@ export class ActivityComponent implements OnInit {
   async ngOnInit() {
     await this.updateLoggedInState();
 
-    this.activatedRoute.params.subscribe(params => {
-      this.getActivity(params.activityId);
+    this.activatedRoute.params.subscribe(async params => {
+      await this.getActivity(params.activityId);
     });
   }
 
@@ -47,6 +47,7 @@ export class ActivityComponent implements OnInit {
 
   private async getActivity(activityId: string) {
     this.activity = await this.activityService.getActivity(activityId);
+    console.log(this.activity);
     if (this.activity === undefined || this.activity === null) {
       await this.router.navigate([`/main`]);
     } else {

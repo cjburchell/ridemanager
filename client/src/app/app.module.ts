@@ -57,10 +57,24 @@ import {ActivityService, IActivityService} from './services/activity.service';
 import {MockDataService} from './services/mock/mockdata.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckCircle as farCheckCircle, faCircle as farCircle, faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
-import { faLock, faTimesCircle, faTrophy, faCalendar, faRedo, faSync, faSearch, faArrowDown, faArrowUp, faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
+import {
+  faLock,
+  faTimesCircle,
+  faTrophy,
+  faCalendar,
+  faRedo,
+  faSync,
+  faSearch,
+  faArrowDown,
+  faArrowUp,
+  faFlagCheckered
+} from '@fortawesome/free-solid-svg-icons';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import {environment} from '../environments/environment';
 
+console.log(environment.production);
 
+// @ts-ignore
 @NgModule({
   declarations: [
     AppComponent,
@@ -117,16 +131,11 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule
   ],
   providers: [
-    /*{ provide: IUserService, useClass: MockDataService },
-    { provide: IActivityService, useClass: MockDataService },
-    { provide: ISettingsService, useClass: MockDataService },
-    { provide: IStravaService, useClass: MockDataService },
-    { provide: ITokenService, useClass: MockDataService },*/
-  { provide: IUserService, useClass: UserService },
-  { provide: IActivityService, useClass: ActivityService },
-  { provide: ISettingsService, useClass: SettingsService },
-  { provide: IStravaService, useClass: StravaService },
-  { provide: ITokenService, useClass: TokenService },
+    { provide: IUserService, useClass: !environment.mockData ? UserService : MockDataService  },
+    { provide: IActivityService, useClass: !environment.mockData ? ActivityService : MockDataService  },
+    { provide: ISettingsService, useClass: !environment.mockData ? SettingsService : MockDataService  },
+    { provide: IStravaService, useClass: !environment.mockData ? StravaService : MockDataService  },
+    { provide: ITokenService, useClass: !environment.mockData ? TokenService : MockDataService  },
 ],
 bootstrap: [AppComponent]
 })

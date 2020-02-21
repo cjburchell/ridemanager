@@ -13,7 +13,7 @@ import {IAthlete} from '../services/contracts/user';
 })
 export class EditComponent implements OnInit {
   private user: IAthlete;
-  private Activity: IActivity;
+  public Activity: IActivity;
 
   constructor(private tokenService: ITokenService,
               private router: Router,
@@ -28,8 +28,8 @@ export class EditComponent implements OnInit {
     }
 
     this.user = await this.userService.getMe();
-    this.activatedRoute.params.subscribe(params => {
-      this.getActivity(params.activityId);
+    this.activatedRoute.params.subscribe(async params => {
+      await this.getActivity(params.activityId);
     });
   }
 

@@ -4,11 +4,19 @@
   <div class="activity-state-filter" *ngIf="isUpcoming && isInProgress ||
                 isUpcoming && isFinished ||
                 isFinished && isInProgress">
-        <div class="btn-group">
-            <input type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="">All
-            <input *ngIf="isUpcoming" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="upcoming">Upcoming
-            <input *ngIf="isInProgress" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="in_progress">In Progress
-            <input *ngIf="isFinished" type="radio" class="btn btn-primary" [(ngModel)]="activityFilter" value="finished">Finished
+        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin-bottom: 5px">
+          <label class="btn btn-light active">
+            <input type="radio" (click)="changeFilter('')" [ngModel]="activityFilter" value="">All
+          </label>
+          <label class="btn btn-light">
+            <input  *ngIf="isUpcoming" type="radio" (click)="changeFilter('upcoming')" [ngModel]="activityFilter" value="upcoming">Upcoming
+          </label>
+          <label class="btn btn-light">
+            <input  *ngIf="isInProgress" type="radio" (click)="changeFilter('in_progress')" [ngModel]="activityFilter" value="in_progress">In Progress
+          </label>
+          <label class="btn btn-light">
+            <input  *ngIf="isFinished" type="radio" (click)="changeFilter('finished')" [ngModel]="activityFilter" value="finished">Finished
+          </label>
         </div>
   </div>
 
