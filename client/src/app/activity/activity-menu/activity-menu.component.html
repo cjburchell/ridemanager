@@ -1,18 +1,17 @@
-<app-login-button *ngIf="!isLoggedIn"></app-login-button>
 <div class="card activity-menu" *ngIf="isLoggedIn">
   <div class="card-header card actions-menu"><b>Actions</b></div>
   <div class="card-body list-group">
     <div *ngIf="isLoggedIn && user">
-        <a *ngIf="isParticipant && activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateMyResults()">Update My Results</a>
-        <a *ngIf="isParticipant" class="list-group-item list-group-item-action" (click)="leave()">Leave Activity</a>
-        <a *ngIf="!isParticipant && (activity.state !== 'finished' &&
+        <button  *ngIf="isParticipant && activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateMyResults()">Update My Results</button>
+        <button  *ngIf="isParticipant" class="list-group-item list-group-item-action" (click)="leave()">Leave Activity</button>
+        <button  *ngIf="!isParticipant && (activity.state !== 'finished' &&
                           (activity.owner.id !== user.id ? activity.privacy == 'public' : true)  &&
                           activity.max_participants > activity.participants.length)"
-           class="list-group-item list-group-item-action" data-toggle="modal" data-target="#joinDialog" (click)="selectCategory.show()">Join Activity</a>
+           class="list-group-item list-group-item-action" data-toggle="modal" data-target="#joinDialog" (click)="selectCategory.show()">Join Activity</button>
 
-        <a *ngIf="activity.owner.id == user.id && activity.state === 'upcoming'" class="list-group-item list-group-item-action" (click)="edit()">Edit</a>
-        <a *ngIf="activity.owner.id == user.id && activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateActivityResults()">Update Results</a>
-        <a *ngIf="activity.owner.id == user.id" class="list-group-item list-group-item-action" (click)="deleteActivity()">Delete</a>
+        <button  *ngIf="activity.owner.id == user.id && activity.state === 'upcoming'" class="list-group-item list-group-item-action" (click)="edit()">Edit</button>
+        <button  *ngIf="activity.owner.id == user.id && activity.state !== 'upcoming'" class="list-group-item list-group-item-action" (click)="updateActivityResults()">Update Results</button>
+        <button  *ngIf="activity.owner.id == user.id" class="list-group-item list-group-item-action" (click)="deleteActivity()">Delete</button>
     </div>
     <!--<div class="fb-share-button" style="margin-top: 10px; margin-left: 10px" data-href="{{'http://www.ridemanager.net/activity/' + activity.activity_id }}}" data-layout="button" data-size="small" data-mobile-iframe="true">
       <a class="fb-xfbml-parse-ignore" target="_blank" [href]=" 'https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.ridemanager.net%2Factivity%2F' + activity.activity_id +'&amp;src=sdkpreparse'">Share</a>

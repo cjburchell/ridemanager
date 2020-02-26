@@ -11,6 +11,7 @@ import {IAthlete} from '../../services/contracts/user';
 export class HeaderComponent {
 
   @Input() public user: IAthlete;
+  @Input() public isLoggedIn: boolean;
 
   constructor(private tokenService: ITokenService,
               private router: Router) {
@@ -21,21 +22,24 @@ export class HeaderComponent {
     await this.router.navigate([`/login`]);
   }
 
-  async showToMain() {
+  async showToMain($event: MouseEvent) {
+    $event.preventDefault();
     if (!await this.tokenService.checkLogin()) {
       return;
     }
     await this.router.navigate([`/main`]);
   }
 
-  async showManageActivities() {
+  async showManageActivities($event: MouseEvent) {
+    $event.preventDefault();
     if (!await this.tokenService.checkLogin()) {
       return;
     }
     await this.router.navigate([`/main/manage`]);
   }
 
-  async showUserHistory() {
+  async showUserHistory($event: MouseEvent) {
+    $event.preventDefault();
     if (!await this.tokenService.checkLogin()) {
       return;
     }

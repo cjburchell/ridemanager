@@ -3,8 +3,35 @@
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
         <h4>
-          <img [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/>
-          <a [href]="'/activity/' + activity.activity_id ">{{activity.name}}</a></h4>
+          <a [href]="'/activity/' + activity.activity_id ">{{activity.name}}</a>
+          <img class="activity-type" [src]="activity.activity_type | activityTypeToImage" height="24" width="24" data-toggle="tooltip"/>
+        </h4>
+        <h4 class="rank">
+          <span *ngIf="activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon')">
+              <span *ngIf="activity.route">
+                {{activity.route.distance/1000 | number : '0.0-2'}}km
+              </span>
+            <span *ngIf="!activity.route">
+              {{activity.total_distance/1000 | number : '0.0-2'}}km
+            </span>
+
+            <span *ngIf="activity.stages?.length > 0">
+              <small>{{activity.stages.length}} Timed Stages</small>
+            </span>
+          </span>
+
+              <span *ngIf="!(activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon'))">
+            <span *ngIf="activity.stages.length === participant.results.length">
+              <fa-icon *ngIf="participant?.rank<=3" [icon]="'trophy'"></fa-icon>Rank: {{participant.rank}}/{{participant.out_of}}
+            </span>
+
+            <span *ngIf="activity.stages.length !== participant.results.length">
+               Stages: {{participant.results.length}}/{{activity.stages.length}}>
+            </span>
+
+            <small>Total Time: {{participant.time | secondsToTime }}</small>
+          </span>
+        </h4>
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
         <div *ngIf="activity.state === 'upcoming'">
@@ -19,31 +46,5 @@
         </div>
       </div>
     </div>
-    <h4 class="rank">
-      <span *ngIf="activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon')">
-          <span *ngIf="activity.route">
-            {{activity.route.distance/1000 | number : '0.0-2'}}km
-          </span>
-        <span *ngIf="!activity.route">
-          {{activity.total_distance/1000 | number : '0.0-2'}}km
-        </span>
-
-        <span *ngIf="activity.stages?.length > 0">
-          <small>{{activity.stages.length}} Timed Stages</small>
-        </span>
-      </span>
-
-      <span *ngIf="!(activity.state === 'upcoming' || (activity.activity_type != 'race' && activity.activity_type !== 'triathlon'))">
-        <span *ngIf="activity.stages.length === participant.results.length">
-          <fa-icon *ngIf="participant?.rank<=3" [icon]="'trophy'"></fa-icon>Rank: {{participant.rank}}/{{participant.out_of}}
-        </span>
-
-        <span *ngIf="activity.stages.length !== participant.results.length">
-           Stages: {{participant.results.length}}/{{activity.stages.length}}>
-        </span>
-
-        <small>Total Time: {{participant.time | secondsToTime }}</small>
-      </span>
-    </h4>
   </div>
 </div>

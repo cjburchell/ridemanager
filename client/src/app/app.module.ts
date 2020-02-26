@@ -71,6 +71,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import {environment} from '../environments/environment';
+import { ActivityDetailsComponent } from './activity/activity-details/activity-details.component';
 
 console.log(environment.production);
 
@@ -117,7 +118,8 @@ console.log(environment.production);
     DateTimeComponent,
     ActivityMenuComponent,
     ActivityMapComponent,
-    ActivityElevationComponent
+    ActivityElevationComponent,
+    ActivityDetailsComponent
   ],
   imports: [
     BrowserModule,

@@ -4,9 +4,9 @@
             achievements.finished_count !== 0)" class="card result-summary">
   <div class="card-header" style="text-align: center" ><b>Achievements</b></div>
   <div class="card-body">
-    <div *ngIf="achievements.first_count !== 0"><fa-icon [icon]="'trophy'" style="color: gold"></fa-icon>{{achievements.first_count}}</div>
-    <div *ngIf="achievements.second_count !== 0"><fa-icon [icon]="'trophy'" style="color: silver"></fa-icon>{{achievements.second_count}}</div>
-    <div *ngIf="achievements.third_count !== 0"><fa-icon [icon]="'trophy'" style="color: #8C7853"></fa-icon>{{achievements.third_count}}</div>
-    <div *ngIf="achievements.finished_count !== 0"><fa-icon [icon]="'flag-checkered'" aria-hidden="true"></fa-icon>{{achievements.finished_count}}</div>
+    <div *ngIf="achievements.first_count !== 0"><fa-icon class="result-icon" [icon]="'trophy'" style="color: gold"></fa-icon>{{achievements.first_count}}</div>
+    <div *ngIf="achievements.second_count !== 0"><fa-icon class="result-icon" [icon]="'trophy'" style="color: silver"></fa-icon>{{achievements.second_count}}</div>
+    <div *ngIf="achievements.third_count !== 0"><fa-icon class="result-icon" [icon]="'trophy'" style="color: #8C7853"></fa-icon>{{achievements.third_count}}</div>
+    <div *ngIf="achievements.finished_count !== 0"><fa-icon class="result-icon" [icon]="'flag-checkered'" aria-hidden="true"></fa-icon>{{achievements.finished_count}}</div>
   </div>
 </div>

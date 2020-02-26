@@ -1,0 +1,64 @@
+.activity-details{
+  app-activity-map {
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 500px;
+  }
+
+  app-activity-elevation{
+    max-height: 200px;
+    margin-top: 20px;
+  }
+
+  .privacy-icon{
+    margin-left: 5px;
+  }
+
+  .results-area{
+    margin-bottom: 10px;
+  }
+
+  .route-area{
+    margin-bottom: 10px;
+  }
+
+  .elevation-area{
+    margin-top: 10px;
+    margin-bottom: 50px;
+  }
+
+  .menu {
+    .actions-menu {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    .login {
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+  }
+
+  .title {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  .created-by {
+    margin-top: 0;
+  }
+
+  .state {
+    text-align: right;
+
+    h4 {
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+  }
+}

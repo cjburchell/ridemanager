@@ -1,0 +1,168 @@
+<div class="activity-details">
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+      <h2 class = "title">
+        {{activity.name}}
+        <img [src]="activity.activity_type | activityTypeToImage" height="40" width="40" data-toggle="tooltip"/>
+        <fa-icon class="privacy-icon" *ngIf="activity.privacy !== 'public'" [icon]="['fas', 'lock']" aria-hidden="true" data-toggle="tooltip" title="Private"></fa-icon>
+      </h2>
+      <h5 class="created-by"><small>Created by <app-athlete [athlete]="activity.owner"></app-athlete></small></h5>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 state">
+      <h4 *ngIf="activity.state === 'upcoming'">Starts in: {{ activity.starts_in | secondsToCountdown}}</h4>
+      <h4 *ngIf="activity.state === 'in_progress'">Time left: {{ activity.time_left | secondsToCountdown}}</h4>
+      <h4 *ngIf="activity.state === 'finished'">Finished</h4>
+      <h4><small>{{ activity.start_time | date: 'short'}} to {{ activity.end_time | date: 'short'}}</small></h4>
+    </div>
+  </div>
+  <p>{{activity.description}}</p>
+
+  <div class="card results-area">
+    <div class="card-body">
+      <h4 *ngIf="activity.state==='upcoming'">Registered</h4>
+      <h4 *ngIf="activity.state!=='upcoming'">Results</h4>
+      <div *ngIf="activity.participants?.length !==0">
+        <div *ngIf="activity.categories.length > 1" style="text-align: center">
+          <div class="btn-group">
+            <input type="radio" class="btn btn-primary" [(ngModel)]="categoryFilter" value="">All
+            <div *ngFor="let category of activity.categories">
+              <input type="radio" class="btn btn-primary" [(ngModel)]="categoryFilter" value="{{category.category_id}}">{{category.name}}
+            </div>
+          </div>
+
+          <div *ngIf="showSexFilter()" class="btn-group">
+            <input type="radio" class="btn btn-primary" [(ngModel)]="sexFilter" value="">All
+            <input type="radio" class="btn btn-primary" [(ngModel)]="sexFilter" value="M">Men
+            <input type="radio" class="btn btn-primary" [(ngModel)]="sexFilter" value="F">Women
+          </div>
+        </div>
+
+        <table class="table table-striped" *ngIf="activity.state === 'upcoming'">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th *ngIf="activity.categories.length > 1 && !categoryFilter">Category</th>
+            <th *ngIf="showSexFilter() && !sexFilter">Sex</th>
+            <th *ngIf="user && user.id === activity.owner.id"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let participant of activity.participants | filter: categoryFilter: 'category_id'">
+            <td style="vertical-align:center"> <app-athlete [athlete]="participant.athlete"></app-athlete></td>
+            <td *ngIf="activity.categories.length > 1 && !categoryFilter">{{getCategoryName(participant.category_id)}}</td>
+            <td *ngIf="showSexFilter() && !sexFilter">>{{participant.athlete.sex}}</td>
+            <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant.emit(participant)"> <fa-icon [icon]="'times-circle'"></fa-icon> </a></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-striped" *ngIf="activity.state !== 'upcoming'">
+          <thead>
+          <tr>
+            <th *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">Rank</th>
+            <th>Name</th>
+            <th *ngIf="!categoryFilter && activity.categories.length > 1">Category</th>
+            <th *ngIf="!sexFilter && showSexFilter()">Sex</th>
+            <th *ngFor="let stage of activity.stages">Stage {{stage.number}}</th>
+            <th *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">Total Time</th>
+            <th *ngIf="user && user.id === activity.owner.id"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let participant of activity.participants | filter: categoryFilter: 'category_id' ">
+            <td *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">
+              <fa-icon *ngIf="participant.rank===1" [icon]="'trophy'" style="color: gold"></fa-icon>
+              <fa-icon *ngIf="participant.rank===2" [icon]="'trophy'" style="color: silver"></fa-icon>
+              <fa-icon *ngIf="participant.rank===3" [icon]="'trophy'" style="color: #8C7853"></fa-icon>{{participant.rank}}</td>
+            <td><app-athlete [athlete]="participant.athlete"></app-athlete></td>
+            <td *ngIf="!categoryFilter && activity.categories.length > 1">{{getCategoryName(participant.category_id)}}</td>
+            <td *ngIf="!sexFilter && showSexFilter()">{{participant.athlete.sex}}</td>
+            <td *ngFor="let stage of participant.results"><a [href]=" 'https://www.strava.com/activities/' + stage.activity_id " target="_blank">{{ stage.time | secondsToTime }}</a><span *ngIf="stage.rank!==undefined "> ({{stage.rank}})</span></td>
+            <td *ngIf="activity.activity_type === 'race' || activity.activity_type === 'triathlon'">
+              <div *ngIf="participant.time && activity.stages.length !== 1 && participant.rank!=1">+{{participant.offset_time | secondsToTime}} ({{participant.time | secondsToTime}})</div>
+              <div *ngIf="participant.time && activity.stages.length !== 1 && participant.rank===1">{{participant.time | secondsToTime}}</div>
+              <div *ngIf="!participant.time && activity.stages.length !== 1">DNF</div>
+            </td>
+            <td *ngIf="user && user.id === activity.owner.id"><a (click)="removeParticipant.emit(participant)"> <fa-icon [icon]="'times-circle'"></fa-icon></a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="activity.participants?.length === 0">
+        <p class="error">There are no participants entered in the activity.</p>
+        <p *ngIf="isLoggedIn" class="error">Press join to enter the activity.</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="activity.stages.length === 0">
+
+    <div *ngIf="activity.route" class="card route-area">
+      <div class="card-body">
+        <h4>Route</h4>
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <a [href]=" 'https://www.strava.com/routes/' + activity.route.id" target="_blank">{{activity.route.name}}</a>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="text-align: right">
+            {{activity.route.distance/1000 | number : '0.0-2'}}km
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div *ngIf="activity.stages.length !== 0">
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <app-activity-map [activity]="activity"></app-activity-map>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div *ngIf="activity.route" class="card route-area">
+          <div class="card-body">
+            <h4>Route</h4>
+            <div class="row">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <a [href]="'https://www.strava.com/routes/' + activity.route.id" target="_blank">{{activity.route.name}}</a>
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="text-align: right">
+                {{activity.route.distance/1000 | number : '0.0-2'}}km
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="activity.stages.length !== 0" class="card">
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Activity</th>
+                <th>Dist.</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let stage of activity.stages">
+                <td style="vertical-align:center">{{stage.number}}</td>
+                <td style="vertical-align:center"><img [src]="stage.activity_type | stageTypeToImage" height="20" width="20" data-toggle="tooltip" title="{{stage.activity_type}}"/></td>
+                <td style="vertical-align:center"><a [href]=" 'https://www.strava.com/segments/' + stage.segment_id" target="_blank">{{stage.name}}</a></td>
+                <td style="vertical-align:center">{{stage.distance/1000 | number : '0.0-2'}}km</td>
+              </tr>
+              </tbody>
+            </table>
+            <p><label>Total Distance</label> {{activity.total_distance/1000 | number : '0.0-2'}}km</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card elevation-area">
+    <div class="card-body">
+      <app-activity-elevation [activity]="activity"></app-activity-elevation>
+    </div>
+  </div>
+</div>

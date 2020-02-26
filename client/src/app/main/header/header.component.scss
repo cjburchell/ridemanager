@@ -2,7 +2,11 @@
 .main-header {
   .user-dropdown{
     padding-bottom: 0;
-    padding-top: 12px;
+    padding-top: 6px;
+  }
+
+  .user-icon{
+    margin-right: 5px;
   }
 
   .poweredbywrapper {
@@ -12,7 +16,7 @@
     margin-bottom: 0;
     margin-left: 5px;
     color: #999999;
-    padding: 3px 0 0;
+    padding: 0 0 0;
 
     .poweredbystrava {
       height: 35px !important;

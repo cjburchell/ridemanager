@@ -17,8 +17,6 @@ export class ActivityComponent implements OnInit {
   public isLoggedIn: boolean;
   public user: IAthlete;
   private isParticipant: boolean;
-  categoryFilter: string;
-  sexFilter: Gender;
 
   constructor(private activatedRoute: ActivatedRoute,
               private activityService: IActivityService,
@@ -45,6 +43,11 @@ export class ActivityComponent implements OnInit {
     }
   }
 
+  async removeParticipant(participant: IParticipant) {
+    await this.activityService.leaveActivity(this.activity, participant.athlete.id);
+    await this.getActivity(this.activity.activity_id);
+  }
+
   private async getActivity(activityId: string) {
     this.activity = await this.activityService.getActivity(activityId);
     console.log(this.activity);
@@ -55,29 +58,5 @@ export class ActivityComponent implements OnInit {
         this.isParticipant = this.activity.participants.findIndex(item => item.athlete.id === this.user.id) !== -1;
       }
     }
-  }
-
-  showSexFilter(): boolean {
-    let foundMale = false;
-    let foundFemale = false;
-
-    this.activity.participants.forEach(item => {
-      if (item.athlete.sex === 'M') {
-        foundMale = true;
-      } else {
-        foundFemale = true;
-      }
-    });
-
-    return foundFemale && foundMale;
-  }
-
-  getCategoryName(categoryId: string) {
-    return this.activity.categories.find(item => item.category_id === categoryId).name;
-  }
-
-  async removeParticipant(participant: IParticipant) {
-    await this.activityService.leaveActivity(this.activity, participant.athlete.id);
-    this.getActivity(this.activity.activity_id);
   }
 }
