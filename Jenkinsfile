@@ -8,7 +8,7 @@ pipeline{
 
     parameters {
             booleanParam(name: 'UnitTests', defaultValue: false, description: 'Should unit tests run?')
-    		booleanParam(name: 'Lint', defaultValue: false, description: 'Should Lint run?')
+    		booleanParam(name: 'Lint', defaultValue: true, description: 'Should Lint run?')
         }
 
     stages{
@@ -20,30 +20,63 @@ pipeline{
              /* Let's make sure we have the repository cloned to our workspace */
              checkout scm
              }
-         }
+        }
 
-        stage('Lint') {
-            when { expression { params.Lint } }
-            steps {
-                script{
-                        docker.image('cjburchell/goci:latest').inside("-v ${env.WORKSPACE}:${PROJECT_PATH}"){
-                            sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
-                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
+        stage('Static Analysis') {
+                  when { expression { params.Lint } }
+                  parallel {
+                      stage('Vet') {
+                          agent {
+                              docker {
+                                  image 'cjburchell/goci:1.13'
+                                  args '-v $WORKSPACE:$PROJECT_PATH'
+                              }
+                          }
+                          steps {
+                              script{
+                                      sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
+                                      def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
-                            sh """go tool vet ${paths}"""
-                            sh """golint ${paths}"""
+                                      sh """go vet ${paths}"""
 
-                            warnings canComputeNew: true, canResolveRelativePaths: true, categoriesPattern: '', consoleParsers: [[parserName: 'Go Vet'], [parserName: 'Go Lint']], defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', unHealthy: ''
-                        }
-                    }
-            }
+                                      def checkVet = scanForIssues tool: [$class: 'GoVet']
+                                      publishIssues issues:[checkVet]
+                              }
+                          }
+                      }
+
+                      stage('Lint') {
+                          agent {
+                              docker {
+                                  image 'cjburchell/goci:1.13'
+                                  args '-v $WORKSPACE:$PROJECT_PATH'
+                              }
+                          }
+                          steps {
+                              script{
+                                  sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
+                                  def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
+
+                                  sh """golint ${paths}"""
+
+                                  def checkLint = scanForIssues tool: [$class: 'GoLint']
+                                  publishIssues issues:[checkLint]
+                              }
+                          }
+                      }
+                  }
         }
 
         stage('Tests') {
             when { expression { params.UnitTests } }
+            agent {
+                                          docker {
+                                              image 'cjburchell/goci:1.13'
+                                              args '-v $WORKSPACE:$PROJECT_PATH'
+                                          }
+                                      }
             steps {
                 script{
-                        docker.image('cjburchell/goci:latest').inside("-v ${env.WORKSPACE}:${PROJECT_PATH}"){
                             sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
                             def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
@@ -55,7 +88,6 @@ pipeline{
                             archiveArtifacts 'test_results.txt'
                             archiveArtifacts 'tests.xml'
                             junit allowEmptyResults: true, testResults: 'tests.xml'
-                        }
                 }
             }
         }
