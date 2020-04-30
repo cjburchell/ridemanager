@@ -64,31 +64,6 @@ pipeline{
             }
         }
 
-        stage('Tests') {
-            when { expression { params.UnitTests } }
-            agent {
-                docker {
-                    image 'cjburchell/goci:1.13'
-                    args '-v $WORKSPACE:$PROJECT_PATH'
-                }
-            }
-            steps {
-                script{
-                            sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
-                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
-
-                            def testResults = sh returnStdout: true, script:"""go test -v ${paths}"""
-                            writeFile file: 'test_results.txt', text: testResults
-                            sh """go2xunit -input test_results.txt > tests.xml"""
-                            sh """cd ${PROJECT_PATH} && ls"""
-
-                            archiveArtifacts 'test_results.txt'
-                            archiveArtifacts 'tests.xml'
-                            junit allowEmptyResults: true, testResults: 'tests.xml'
-                }
-            }
-        }
-
         stage('Build') {
             parallel {
                 stage('Build API') {
