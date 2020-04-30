@@ -37,7 +37,7 @@ pipeline{
                                       sh """cd ${PROJECT_PATH}/server && go list ./... | grep -v /vendor/ > projectPaths"""
                                       def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
-                                      sh """go vet ${PROJECT_PATH}/server/..."""
+                                      sh """cd ${PROJECT_PATH}/server go vet ./..."""
 
                                       def checkVet = scanForIssues tool: [$class: 'GoVet']
                                       publishIssues issues:[checkVet]
