@@ -34,10 +34,10 @@ pipeline{
                           }
                           steps {
                               script{
-                                      sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
+                                      sh """cd ${PROJECT_PATH}/server && go list ./... | grep -v /vendor/ > projectPaths"""
                                       def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
-                                      sh """go vet ${paths}"""
+                                      sh """go vet ${PROJECT_PATH}/server/..."""
 
                                       def checkVet = scanForIssues tool: [$class: 'GoVet']
                                       publishIssues issues:[checkVet]
