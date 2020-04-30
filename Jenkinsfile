@@ -28,7 +28,7 @@ pipeline{
         stage('Static Analysis') {
             when { expression { params.Lint } }
             parallel {
-                stage('Vet') {
+                stage('Go Vet') {
                     agent {
                         docker {
                             image 'cjburchell/goci:1.13'
@@ -37,10 +37,7 @@ pipeline{
                     }
                     steps {
                         script{
-                            sh """cd ${PROJECT_PATH}/server && go list ./... | grep -v /vendor/ > projectPaths"""
-                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
-
-                            sh """cd ${PROJECT_PATH}/server && go vet ./..."""
+                            sh """cd ${PROJECT_PATH}/servers && go vet ./..."""
 
                             def checkVet = scanForIssues tool: [$class: 'GoVet']
                             publishIssues issues:[checkVet]
@@ -48,7 +45,7 @@ pipeline{
                     }
                 }
 
-                stage('Lint') {
+                stage('Go Lint') {
                     agent {
                         docker {
                             image 'cjburchell/goci:1.13'
@@ -57,10 +54,7 @@ pipeline{
                     }
                     steps {
                         script{
-                            sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
-                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
-
-                            sh """golint ${paths}"""
+                            sh """cd ${PROJECT_PATH}/servers && golint ./... """
 
                             def checkLint = scanForIssues tool: [$class: 'GoLint']
                             publishIssues issues:[checkLint]
