@@ -19,64 +19,65 @@ pipeline{
                 script{
                     slackSend color: "good", message: "Job: ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} started"
                 }
-             /* Let's make sure we have the repository cloned to our workspace */
-             checkout scm
+				
+				/* Let's make sure we have the repository cloned to our workspace */
+				checkout scm
              }
         }
 
         stage('Static Analysis') {
-                  when { expression { params.Lint } }
-                  parallel {
-                      stage('Vet') {
-                          agent {
-                              docker {
-                                  image 'cjburchell/goci:1.13'
-                                  args '-v $WORKSPACE:$PROJECT_PATH'
-                              }
-                          }
-                          steps {
-                              script{
-                                      sh """cd ${PROJECT_PATH}/server && go list ./... | grep -v /vendor/ > projectPaths"""
-                                      def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
+            when { expression { params.Lint } }
+            parallel {
+                stage('Vet') {
+                    agent {
+                        docker {
+                            image 'cjburchell/goci:1.13'
+                            args '-v $WORKSPACE:$PROJECT_PATH'
+                        }
+                    }
+                    steps {
+                        script{
+                            sh """cd ${PROJECT_PATH}/server && go list ./... | grep -v /vendor/ > projectPaths"""
+                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
-                                      sh """cd ${PROJECT_PATH}/server && go vet ./..."""
+                            sh """cd ${PROJECT_PATH}/server && go vet ./..."""
 
-                                      def checkVet = scanForIssues tool: [$class: 'GoVet']
-                                      publishIssues issues:[checkVet]
-                              }
-                          }
-                      }
+                            def checkVet = scanForIssues tool: [$class: 'GoVet']
+                            publishIssues issues:[checkVet]
+                        }
+                    }
+                }
 
-                      stage('Lint') {
-                          agent {
-                              docker {
-                                  image 'cjburchell/goci:1.13'
-                                  args '-v $WORKSPACE:$PROJECT_PATH'
-                              }
-                          }
-                          steps {
-                              script{
-                                  sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
-                                  def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
+                stage('Lint') {
+                    agent {
+                        docker {
+                            image 'cjburchell/goci:1.13'
+                            args '-v $WORKSPACE:$PROJECT_PATH'
+                        }
+                    }
+                    steps {
+                        script{
+                            sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
+                            def paths = sh returnStdout: true, script:"""awk '{printf "/go/src/%s ",\$0} END {print ""}' projectPaths"""
 
-                                  sh """golint ${paths}"""
+                            sh """golint ${paths}"""
 
-                                  def checkLint = scanForIssues tool: [$class: 'GoLint']
-                                  publishIssues issues:[checkLint]
-                              }
-                          }
-                      }
-                  }
+                            def checkLint = scanForIssues tool: [$class: 'GoLint']
+                            publishIssues issues:[checkLint]
+                        }
+                    }
+                }
+            }
         }
 
         stage('Tests') {
             when { expression { params.UnitTests } }
             agent {
-                                          docker {
-                                              image 'cjburchell/goci:1.13'
-                                              args '-v $WORKSPACE:$PROJECT_PATH'
-                                          }
-                                      }
+                docker {
+                    image 'cjburchell/goci:1.13'
+                    args '-v $WORKSPACE:$PROJECT_PATH'
+                }
+            }
             steps {
                 script{
                             sh """cd ${PROJECT_PATH} && go list ./... | grep -v /vendor/ > projectPaths"""
@@ -132,48 +133,49 @@ pipeline{
             }
         }
 
-    stage('Push') {
-        parallel {
-            stage ('Push API') {
-                steps {
-                    script {
-                        docker.withRegistry('', 'dockerhub') {
-                           def image = docker.image("${DOCKER_IMAGE_API}")
-                           image.push("${DOCKER_TAG}")
-                           if( env.BRANCH_NAME == "master") {
-                                image.push("latest")
-                           }
-                        }
-                    }
-                }
-            }
-            stage ('Push Client') {
-                steps {
-                    script {
-                        docker.withRegistry('', 'dockerhub') {
-                           def image = docker.image("${DOCKER_IMAGE_CLIENT}")
-                           image.push("${DOCKER_TAG}")
-                           if( env.BRANCH_NAME == "master") {
-                                image.push("latest")
-                           }
-                        }
-                    }
-                }
-            }
-            stage ('Push Processor') {
-                steps {
-                    script {
-                        docker.withRegistry('', 'dockerhub') {
-                           def image = docker.image("${DOCKER_IMAGE_PROCESSOR}")
-                           image.push("${DOCKER_TAG}")
-                           if( env.BRANCH_NAME == "master") {
-                                image.push("latest")
-                           }
-                        }
-                    }
-                }
-            }
-        }
+		stage('Push') {
+			parallel {
+				stage ('Push API') {
+					steps {
+						script {
+							docker.withRegistry('', 'dockerhub') {
+							   def image = docker.image("${DOCKER_IMAGE_API}")
+							   image.push("${DOCKER_TAG}")
+							   if( env.BRANCH_NAME == "master") {
+									image.push("latest")
+							   }
+							}
+						}
+					}
+				}
+				stage ('Push Client') {
+					steps {
+						script {
+							docker.withRegistry('', 'dockerhub') {
+							   def image = docker.image("${DOCKER_IMAGE_CLIENT}")
+							   image.push("${DOCKER_TAG}")
+							   if( env.BRANCH_NAME == "master") {
+									image.push("latest")
+							   }
+							}
+						}
+					}
+				}
+				stage ('Push Processor') {
+					steps {
+						script {
+							docker.withRegistry('', 'dockerhub') {
+							   def image = docker.image("${DOCKER_IMAGE_PROCESSOR}")
+							   image.push("${DOCKER_TAG}")
+							   if( env.BRANCH_NAME == "master") {
+									image.push("latest")
+							   }
+							}
+						}
+					}
+				}
+			}
+		}
     }
 
     post {
@@ -195,5 +197,4 @@ pipeline{
               }
         }
     }
-
 }
