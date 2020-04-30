@@ -3,10 +3,11 @@ WORKDIR /servers
 COPY servers .
 WORKDIR /servers/api
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main
+RUN ls
 
 FROM scratch
 
-COPY --from=serverbuilder /server  /servers/api/main
+COPY --from=serverbuilder /servers/api/main  /server/main
 
 WORKDIR  /server
 
