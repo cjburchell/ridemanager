@@ -94,7 +94,7 @@ pipeline{
                 stage('Build API') {
                     steps {
                         script {
-                            def image = docker.build("${DOCKER_IMAGE_API}", "-f Dockerfile-api")
+                            def image = docker.build("${DOCKER_IMAGE_API}", "-f Dockerfile-api", ".")
                             image.tag("${DOCKER_TAG}")
                             if( env.BRANCH_NAME == "master") {
                                 image.tag("latest")
@@ -105,7 +105,7 @@ pipeline{
                 stage('Build Client') {
                     steps {
                         script {
-                            def image = docker.build("${DOCKER_IMAGE_CLIENT}", "-f Dockerfile")
+                            def image = docker.build("${DOCKER_IMAGE_CLIENT}", "-f Dockerfile", ".")
                             image.tag("${DOCKER_TAG}")
                             if( env.BRANCH_NAME == "master") {
                                 image.tag("latest")
@@ -116,7 +116,7 @@ pipeline{
                 stage('Build Processor') {
                     steps {
                         script {
-                            def image = docker.build("${DOCKER_IMAGE_PROCESSOR}", "-f Dockerfile-processor")
+                            def image = docker.build("${DOCKER_IMAGE_PROCESSOR}", "-f Dockerfile-processor", ".")
                             image.tag("${DOCKER_TAG}")
                             if( env.BRANCH_NAME == "master") {
                                 image.tag("latest")
