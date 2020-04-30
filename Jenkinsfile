@@ -117,6 +117,8 @@ pipeline{
         always {
               script{
 				  sh "docker system prune -f || true"
+                  sh "docker image prune -af || true"
+                  
                   if ( currentBuild.currentResult == "SUCCESS" ) {
                     slackSend color: "good", message: "Job: ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} was successful"
                   }
