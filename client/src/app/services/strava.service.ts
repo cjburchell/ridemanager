@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ITokenService} from './token.service';
 import {IRouteSummary, ISegmentSummary} from './contracts/strava';
 import {IPoint} from './contracts/activity';
+import {ISettingsService} from './settings.service';
 
 export abstract class IStravaService {
   public abstract getStaredSegments(page: number, perPage: number): Promise<ISegmentSummary[]>;
@@ -17,64 +18,67 @@ export abstract class IStravaService {
   providedIn: 'root'
 })
 export class StravaService implements IStravaService {
-    public getRouteMap(routeId: number): Promise<IPoint[]> {
+    async getRouteMap(routeId: number): Promise<IPoint[]> {
       const httpOptions = {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.token.getToken()
         })
       };
 
-      return this.http.get<IPoint[]>(`api/v1/strava/routes/${routeId}/map`, httpOptions).toPromise();
+      return this.http.get<IPoint[]>(`${await this.settings.getApiUrl()}/strava/routes/${routeId}/map`, httpOptions).toPromise();
     }
-    public getSegmentMap(segmentId: number): Promise<IPoint[]> {
+
+    async getSegmentMap(segmentId: number): Promise<IPoint[]> {
       const httpOptions = {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.token.getToken()
         })
       };
 
-      return this.http.get<IPoint[]>(`api/v1/strava/segments/${segmentId}/map`, httpOptions).toPromise();
+      return this.http.get<IPoint[]>(`${await this.settings.getApiUrl()}/strava/segments/${segmentId}/map`, httpOptions).toPromise();
     }
 
-  constructor(private http: HttpClient, private token: ITokenService) { }
+  constructor(private http: HttpClient, private token: ITokenService, private settings: ISettingsService) { }
 
-  getStaredSegments(page: number, perPage: number): Promise<ISegmentSummary[]> {
+  async getStaredSegments(page: number, perPage: number): Promise<ISegmentSummary[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<ISegmentSummary[]>(`api/v1/strava/segments/starred?page=${page}&perPage=${perPage}`, httpOptions).toPromise();
+    return this.http.get<ISegmentSummary[]>(
+      `${await this.settings.getApiUrl()}/strava/segments/starred?page=${page}&perPage=${perPage}`, httpOptions).toPromise();
   }
 
-  getRoutes(page: number, perPage: number): Promise<IRouteSummary[]> {
+  async getRoutes(page: number, perPage: number): Promise<IRouteSummary[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IRouteSummary[]>(`api/v1/strava/routes?page=${page}&perPage=${perPage}`, httpOptions).toPromise();
+    return this.http.get<IRouteSummary[]>(
+      `${await this.settings.getApiUrl()}/strava/routes?page=${page}&perPage=${perPage}`, httpOptions).toPromise();
   }
 
-  getRoute(routeId: number): Promise<IRouteSummary> {
+  async getRoute(routeId: number): Promise<IRouteSummary> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IRouteSummary>(`api/v1/strava/routes/${routeId}`, httpOptions).toPromise();
+    return this.http.get<IRouteSummary>(`${await this.settings.getApiUrl()}/strava/routes/${routeId}`, httpOptions).toPromise();
   }
 
-  getSegment(segmentId: number): Promise<ISegmentSummary> {
+  async getSegment(segmentId: number): Promise<ISegmentSummary> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<ISegmentSummary>(`api/v1/strava/segments/${segmentId}`, httpOptions).toPromise();
+    return this.http.get<ISegmentSummary>(`${await this.settings.getApiUrl()}/strava/segments/${segmentId}`, httpOptions).toPromise();
   }
 }

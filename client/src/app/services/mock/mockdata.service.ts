@@ -25522,6 +25522,10 @@ export class MockDataService implements IActivityService, ISettingsService, IStr
     return new Promise<boolean>(resolve => resolve(true));
   }
 
+  getApiUrl(): Promise<string> {
+    return new Promise<string>(resolve => resolve('test'));
+  }
+
   checkLogin(): Promise<boolean> {
     return new Promise<boolean>(resolve => resolve(true));
   }

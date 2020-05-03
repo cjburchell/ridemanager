@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cjburchell/ridemanager/api/settings"
+	"github.com/cjburchell/ridemanager/client_server/settings"
 
 	"github.com/cjburchell/go-uatu"
 	"github.com/gorilla/mux"
@@ -18,7 +18,7 @@ type handler struct {
 
 // SetupDataRoute setup the route
 func Setup(r *mux.Router, configuration settings.Configuration, logger log.ILog) {
-	dataRoute := r.PathPrefix("/api/v1/settings").Subrouter()
+	dataRoute := r.PathPrefix("/client/settings").Subrouter()
 	handle := handler{configuration, logger}
 	dataRoute.HandleFunc("/{Setting}", handle.getSettings).Methods("GET")
 }
@@ -32,7 +32,9 @@ func (h handler) getSettings(w http.ResponseWriter, r *http.Request) {
 	case "stravaClientId":
 		result = fmt.Sprintf("%d", h.StravaClientId)
 	case "stravaRedirect":
-		result = h.StravaRedirectURI
+		result = fmt.Sprintf("%s/login", h.ApiAddress)
+	case "apiAddress":
+		result = h.ApiAddress
 	case "mapboxAccessToken":
 		result = h.MapboxToken
 	}

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ITokenService} from './token.service';
 import {IActivity, IParticipant} from './contracts/activity';
+import {ISettingsService} from './settings.service';
 
 export abstract class IActivityService {
   public abstract createActivity(activity: IActivity): Promise<string>;
@@ -33,116 +34,120 @@ export abstract class IActivityService {
 })
 export class ActivityService implements IActivityService {
 
-  constructor(private http: HttpClient, private token: ITokenService) {
+  constructor(private http: HttpClient, private token: ITokenService, private settings: ISettingsService) {
   }
 
-  createActivity(activity: IActivity): Promise<string> {
+  async createActivity(activity: IActivity): Promise<string> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<string>('api/v1/activity', activity, httpOptions).toPromise();
+    return this.http.post<string>(`${await this.settings.getApiUrl()}/activity`, activity, httpOptions).toPromise();
   }
 
-  updateActivity(activity: IActivity): Promise<any> {
+  async updateActivity(activity: IActivity): Promise<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.patch(`api/v1/activity/${activity.activity_id}`, activity, httpOptions).toPromise();
+    return this.http.patch( `${await this.settings.getApiUrl()}/activity/${activity.activity_id}`, activity, httpOptions).toPromise();
   }
 
-  deleteActivity(activity: IActivity): Promise<any> {
+  async deleteActivity(activity: IActivity): Promise<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.delete(`api/v1/activity/${activity.activity_id}`, httpOptions).toPromise();
+    return this.http.delete(`${await this.settings.getApiUrl()}/activity/${activity.activity_id}`, httpOptions).toPromise();
   }
 
-  getActivity(activityId: string): Promise<IActivity> {
+  async getActivity(activityId: string): Promise<IActivity> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity>(`api/v1/activity/${activityId}`, httpOptions).toPromise();
+    return this.http.get<IActivity>(`${await this.settings.getApiUrl()}/activity/${activityId}`, httpOptions).toPromise();
   }
 
-  getActivities(): Promise<IActivity[]> {
+  async getActivities(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/public`, httpOptions).toPromise();
+    return this.http.get<IActivity[]>(`${await this.settings.getApiUrl()}/activity/public`, httpOptions).toPromise();
   }
 
-  getJoined(): Promise<IActivity[]> {
+  async getJoined(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/joined`, httpOptions).toPromise();
+    return this.http.get<IActivity[]>(`${await this.settings.getApiUrl()}/activity/joined`, httpOptions).toPromise();
   }
 
-  getMyActivities(): Promise<IActivity[]> {
+  async getMyActivities(): Promise<IActivity[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.get<IActivity[]>(`api/v1/activity/my`, httpOptions).toPromise();
+    return this.http.get<IActivity[]>(`${await this.settings.getApiUrl()}/activity/my`, httpOptions).toPromise();
   }
 
-  addParticipant(activity: IActivity, participant: IParticipant): Promise<boolean> {
+  async addParticipant(activity: IActivity, participant: IParticipant): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/participant`, participant, httpOptions).toPromise();
+    return this.http.post<boolean>(
+      `${await this.settings.getApiUrl()}/activity/${activity.activity_id}/participant`, participant, httpOptions).toPromise();
   }
 
-  leaveActivity(activity: IActivity, athleteId: string): Promise<boolean> {
+  async leaveActivity(activity: IActivity, athleteId: string): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.delete<boolean>(`api/v1/activity/${activity.activity_id}/participant/${athleteId}`, httpOptions).toPromise();
+    return this.http.delete<boolean>(
+      `${await this.settings.getApiUrl()}/activity/${activity.activity_id}/participant/${athleteId}`, httpOptions).toPromise();
   }
 
-  updateUserResults(activity: IActivity, athleteId: string): Promise<boolean> {
+  async updateUserResults(activity: IActivity, athleteId: string): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update/${athleteId}`, null, httpOptions).toPromise();
+    return this.http.post<boolean>(
+      `${await this.settings.getApiUrl()}/activity/${activity.activity_id}/update/${athleteId}`, null, httpOptions).toPromise();
   }
 
-  updateResults(activity: IActivity): Promise<boolean> {
+  async updateResults(activity: IActivity): Promise<boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.token.getToken()
       })
     };
 
-    return this.http.post<boolean>(`api/v1/activity/${activity.activity_id}/update`, null, httpOptions).toPromise();
+    return this.http.post<boolean>(
+      `${await this.settings.getApiUrl()}/activity/${activity.activity_id}/update`, null, httpOptions).toPromise();
   }
 }

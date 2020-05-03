@@ -14,11 +14,9 @@ import (
 
 	activityRoute "github.com/cjburchell/ridemanager/api/routes/activity-route"
 	loginRoute "github.com/cjburchell/ridemanager/api/routes/login-route"
-	settingsRoute "github.com/cjburchell/ridemanager/api/routes/settings-route"
 	statusRoute "github.com/cjburchell/ridemanager/api/routes/status-route"
 	stravaRoute "github.com/cjburchell/ridemanager/api/routes/strava-route"
 	userRoute "github.com/cjburchell/ridemanager/api/routes/user-route"
-
 	"github.com/cjburchell/ridemanager/api/settings"
 	"github.com/cjburchell/ridemanager/common/service/data"
 
@@ -63,7 +61,6 @@ func startHTTPServer(config settings.Configuration, service data.IService, logge
 	activityRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	stravaRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	statusRoute.Setup(r, logger)
-	settingsRoute.Setup(r, config, logger)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 

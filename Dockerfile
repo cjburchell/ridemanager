@@ -2,9 +2,9 @@ FROM node:12.14-alpine as uibuilder
 WORKDIR /client
 COPY client .
 RUN npm install
-RUN node_modules/@angular/cli/bin/ng build --prod
+RUN node_modules/@angular/cli/bin/ng build --
 
-FROM golang:1.13 as serverbuilder
+FROM golang:1.14 as serverbuilder
 WORKDIR /servers
 COPY servers .
 WORKDIR /servers/client_server

@@ -1,4 +1,4 @@
-FROM golang:1.13 as serverbuilder
+FROM golang:1.14 as serverbuilder
 WORKDIR /servers
 COPY servers .
 WORKDIR /servers/api

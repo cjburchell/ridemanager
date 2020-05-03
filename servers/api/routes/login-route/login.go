@@ -90,7 +90,7 @@ func (h handler) failure(err error, w http.ResponseWriter, r *http.Request) {
 	if err == stravaService.AuthorizationDeniedErr {
 		message += "The user clicked the 'Do not Authorize' button on the previous page."
 	} else if err == stravaService.InvalidCredentialsErr {
-		message += "You provided an incorrect client_id or client_secret.\nDid you remember to set them at the begininng of this file?"
+		message += "You provided an incorrect client_id or client_secret.\nDid you remember to set them at the beginning of this file?"
 	} else if err == stravaService.InvalidCodeErr {
 		message += "The temporary token was not recognized, this shouldn't happen normally"
 	} else if err == stravaService.ServerErr {

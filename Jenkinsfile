@@ -9,7 +9,6 @@ pipeline{
     }
 
     parameters {
-            booleanParam(name: 'UnitTests', defaultValue: false, description: 'Should unit tests run?')
     		booleanParam(name: 'Lint', defaultValue: true, description: 'Should Lint run?')
         }
 
@@ -31,7 +30,7 @@ pipeline{
                 stage('Go Vet') {
                     agent {
                         docker {
-                            image 'cjburchell/goci:1.13'
+                            image 'cjburchell/goci:1.14'
                             args '-v $WORKSPACE:$PROJECT_PATH'
                         }
                     }
@@ -48,7 +47,7 @@ pipeline{
                 stage('Go Lint') {
                     agent {
                         docker {
-                            image 'cjburchell/goci:1.13'
+                            image 'cjburchell/goci:1.14'
                             args '-v $WORKSPACE:$PROJECT_PATH'
                         }
                     }

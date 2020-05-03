@@ -10,7 +10,6 @@ import (
 
 const defaultMongoUrl = "localhost"
 const defaultPort = 8091
-const defaultStravaRedirectURI = "http://localhost:8091/api/v1/login"
 const defaultJwtSecret = "test"
 
 type Configuration struct {
@@ -18,9 +17,7 @@ type Configuration struct {
 	Port               int
 	StravaClientId     int
 	StravaClientSecret string
-	StravaRedirectURI  string
 	JwtSecret          string
-	MapboxToken        string
 }
 
 func Get(logger log.ILog) (*Configuration, error) {
@@ -29,9 +26,7 @@ func Get(logger log.ILog) (*Configuration, error) {
 		Port:               env.GetInt("PORT", defaultPort),
 		StravaClientId:     env.GetInt("STRAVA_CLIENT_ID", 0),
 		StravaClientSecret: env.Get("STRAVA_CLIENT_SECRET", ""),
-		StravaRedirectURI:  env.Get("STRAVA_REDIRECT_URI", defaultStravaRedirectURI),
 		JwtSecret:          env.Get("JWT_SECRET", defaultJwtSecret),
-		MapboxToken:        env.Get("MAPBOX_ACCESS_TOKEN", ""),
 	}
 
 	err := config.verify(logger)
@@ -49,9 +44,7 @@ func (config Configuration) verify(logger log.ILog) error {
 		warningMessage += fmt.Sprintf("\nMONGO_URL set to default value (%s)", config.MongoUrl)
 	}
 
-	if config.StravaRedirectURI == defaultStravaRedirectURI {
-		warningMessage += fmt.Sprintf("\nSTRAVA_REDIRECT_URI set to default value (%s)", config.StravaRedirectURI)
-	}
+
 
 	if config.JwtSecret == defaultJwtSecret {
 		warningMessage += fmt.Sprintf("\nJWT_SECRET set to default value (%s)", config.JwtSecret)
@@ -62,9 +55,6 @@ func (config Configuration) verify(logger log.ILog) error {
 	}
 
 	errorMessage := ""
-	if config.MapboxToken == "" {
-		errorMessage += "\nMAPBOX_ACCESS_TOKEN Not set"
-	}
 
 	if config.StravaClientId == 0 {
 		errorMessage += "\nSTRAVA_CLIENT_ID Not set"

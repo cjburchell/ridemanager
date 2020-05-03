@@ -4,25 +4,16 @@ services:
       image: "mongo:3"
       ports:
         - "27017:27017"
-  nats:
-      image: "nats:1.1.0"
-      ports:
-        - 4222:4222/tcp
   server-client:
       build:
         context: .
         dockerfile: Dockerfile
       environment:
-         - DATABASE_URL=mongodb:27017
          - LOG_CONSOLE=true
-         - LOG_LEVEL=Debug
          - LOG_USE_NATS=false
-         - LOG_USE_NATS=false;
          - LOG_LEVEL=Debug;
-         - MONGO_URL=localhost:32768;
-         - STRAVA_CLIENT_ID=12880;
-         - STRAVA_CLIENT_SECRET=c61800b62c34c0866c20a22bd4cddf6a1b40aa23;
-         - STRAVA_REDIRECT_URI=http://localhost:8091/api/v1/login/validate
+         - API_LOCATION=http://localhost:8092/api/v1
+         - MAPBOX_ACCESS_TOKEN=pk.eyJ1IjoiY2pidXJjaGVsbCIsImEiOiJjaXJzc2hpNDMwaTY0ZmZtNnViZzg5NmRrIn0.LSuKYxyhwBDpHCtjim-g0A
       ports:
           - "8091:8091"
   server-api:
@@ -30,16 +21,12 @@ services:
         context: .
         dockerfile: Dockerfile-api
     environment:
-      - DATABASE_URL=mongodb:27017
+      - MONGO_URL=mongodb:27017
       - LOG_CONSOLE=true
       - LOG_LEVEL=Debug
       - LOG_USE_NATS=false
-      - LOG_USE_NATS=false;
-      - LOG_LEVEL=Debug;
-      - MONGO_URL=localhost:32768;
       - STRAVA_CLIENT_ID=12880;
       - STRAVA_CLIENT_SECRET=c61800b62c34c0866c20a22bd4cddf6a1b40aa23;
-      - STRAVA_REDIRECT_URI=http://localhost:8091/api/v1/login/validate
     ports:
       - "8092:8091"
   server-processor:
@@ -47,13 +34,9 @@ services:
         context: .
         dockerfile: Dockerfile-processor
     environment:
-      - DATABASE_URL=mongodb:27017
+      - MONGO_URL=mongodb:27017
       - LOG_CONSOLE=true
       - LOG_LEVEL=Debug
       - LOG_USE_NATS=false
-      - LOG_USE_NATS=false;
-      - LOG_LEVEL=Debug;
-      - MONGO_URL=localhost:32768;
       - STRAVA_CLIENT_ID=12880;
       - STRAVA_CLIENT_SECRET=c61800b62c34c0866c20a22bd4cddf6a1b40aa23;
-      - STRAVA_REDIRECT_URI=http://localhost:8091/api/v1/login/validate

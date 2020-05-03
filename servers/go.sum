@@ -3,8 +3,6 @@ github.com/antihax/optional v1.0.0 h1:xK2lYat7ZLaVVcIuj82J8kIro4V6kDe0AUDFboUCwc
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/cjburchell/go-uatu v0.0.0-20200102205442-b88a75ff9c21 h1:Aq3y9Vt68B87NKQI+6k/XN133wkZ+HLHD0AkJ/2hFAY=
 github.com/cjburchell/go-uatu v0.0.0-20200102205442-b88a75ff9c21/go.mod h1:OKlHw8ugzzn2zt1N0M4VDSOs6WYXzeJ6QO/Hxr4gilY=
-github.com/cjburchell/strava-go v0.0.0-20200104030700-ba9c584ec48e h1:HW1SYdjbY24dnvG0kO7YqjKfuwN8ZsMvOiN//+rBf3o=
-github.com/cjburchell/strava-go v0.0.0-20200104030700-ba9c584ec48e/go.mod h1:jBFUN8SBgG7Y0xs9kkfHsulEV4oJA7sHRlIeQuHmFak=
 github.com/cjburchell/strava-go v0.0.0-20200105041017-48a6762541bb h1:c8iO8y+dO42nK4sdJtqrQgO3hxVQ/qiSe6ld7bLbUaE=
 github.com/cjburchell/strava-go v0.0.0-20200105041017-48a6762541bb/go.mod h1:jBFUN8SBgG7Y0xs9kkfHsulEV4oJA7sHRlIeQuHmFak=
 github.com/cjburchell/tools-go v0.0.0-20181126150745-9a148bb98f00 h1:kYM2it0mrYMbpCmsnsqFEbdf47XT9RpzWyu/m9gBUCY=

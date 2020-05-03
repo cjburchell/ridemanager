@@ -16,7 +16,7 @@ func Setup(r *mux.Router, logger log.ILog) {
 	r.HandleFunc("/@status", handle.getStatus).Methods("GET")
 }
 
-func (h handler) getStatus(w http.ResponseWriter, r *http.Request) {
+func (h handler) getStatus(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_, err := w.Write([]byte("Ok"))
 	if err != nil {

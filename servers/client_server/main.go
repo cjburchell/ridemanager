@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	settingsRoute "github.com/cjburchell/ridemanager/client_server/routes/settings-route"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/cjburchell/ridemanager/client_server/settings"
 
-	clientRoute "github.com/cjburchell/ridemanager/client_server/client-route"
+	clientRoute "github.com/cjburchell/ridemanager/client_server/routes/client-route"
 
 	"github.com/cjburchell/go-uatu"
 
@@ -41,6 +42,7 @@ func startHTTPServer(config settings.Configuration, logger log.ILog) *http.Serve
 	r := mux.NewRouter()
 
 	clientRoute.Setup(r, config.ClientLocation, logger)
+	settingsRoute.Setup(r, config, logger)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 
