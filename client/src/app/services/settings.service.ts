@@ -21,7 +21,7 @@ export class SettingsService implements ISettingsService {
 
   async getApiUrl(): Promise<string> {
     if (this.apiUrl === undefined) {
-      this.apiUrl = await this.getSetting('apiAddress');
+      this.apiUrl = '/api/v1/';
     }
 
     return new Promise<string>(resolve => resolve(this.apiUrl));

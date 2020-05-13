@@ -16,7 +16,7 @@ type validateWritable struct {
 }
 
 func (v validateWritable) Middleware(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
 		user, err := token.GetUser(req, v.service)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -54,5 +54,5 @@ func (v validateWritable) Middleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		next(w, req)
-	})
+	}
 }
