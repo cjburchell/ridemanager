@@ -4,7 +4,7 @@ import (
 	"mime"
 	"net/http"
 
-	"github.com/cjburchell/go-uatu"
+	"github.com/cjburchell/uatu-go"
 	"github.com/gorilla/mux"
 )
 

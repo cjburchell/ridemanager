@@ -8,6 +8,11 @@ import (
 	"os/signal"
 	"time"
 
+	clientRoute "github.com/cjburchell/ridemanager/api/routes/client-route"
+	settingsRoute "github.com/cjburchell/ridemanager/api/routes/settings-route"
+	"github.com/cjburchell/settings-go"
+	"github.com/cjburchell/tools-go/env"
+
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
 
 	"github.com/cjburchell/ridemanager/api/routes/token"
@@ -17,19 +22,20 @@ import (
 	statusRoute "github.com/cjburchell/ridemanager/api/routes/status-route"
 	stravaRoute "github.com/cjburchell/ridemanager/api/routes/strava-route"
 	userRoute "github.com/cjburchell/ridemanager/api/routes/user-route"
-	"github.com/cjburchell/ridemanager/api/settings"
+	serverSettings "github.com/cjburchell/ridemanager/api/settings"
 	"github.com/cjburchell/ridemanager/common/service/data"
 
-	"github.com/cjburchell/go-uatu"
+	log "github.com/cjburchell/uatu-go"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	logger := log.Create()
+	set := settings.Get(env.Get("ConfigFile", ""))
+	logger := log.Create(set)
 
-	config, err := settings.Get(logger)
+	config, err := serverSettings.Get(logger, set)
 	if err != nil {
 		logger.Fatal(err, "Unable to verify settings")
 	}
@@ -50,7 +56,7 @@ func main() {
 	os.Exit(0)
 }
 
-func startHTTPServer(config settings.Configuration, service data.IService, logger log.ILog) *http.Server {
+func startHTTPServer(config serverSettings.Configuration, service data.IService, logger log.ILog) *http.Server {
 	r := mux.NewRouter()
 
 	tokenValidator := token.GetValidator(config.JwtSecret)
@@ -61,6 +67,8 @@ func startHTTPServer(config settings.Configuration, service data.IService, logge
 	activityRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	stravaRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	statusRoute.Setup(r, logger)
+	clientRoute.Setup(r, config.ClientLocation, logger)
+	settingsRoute.Setup(r, config, logger)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 

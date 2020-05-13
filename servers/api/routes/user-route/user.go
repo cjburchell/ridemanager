@@ -6,7 +6,7 @@ import (
 
 	"github.com/cjburchell/ridemanager/common/service/data/models"
 
-	"github.com/cjburchell/go-uatu"
+	"github.com/cjburchell/uatu-go"
 
 	"github.com/cjburchell/ridemanager/api/routes/token"
 

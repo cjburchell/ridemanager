@@ -4,25 +4,23 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/cjburchell/ridemanager/processor/settings"
-
-	"github.com/cjburchell/ridemanager/common/service/stravaService"
-
 	"github.com/cjburchell/ridemanager/common/service/activity"
-
-	"github.com/cjburchell/ridemanager/common/service/data/models"
-
 	"github.com/cjburchell/ridemanager/common/service/data"
+	"github.com/cjburchell/ridemanager/common/service/data/models"
+	"github.com/cjburchell/ridemanager/common/service/stravaService"
+	appSettings "github.com/cjburchell/ridemanager/processor/settings"
+	"github.com/cjburchell/settings-go"
+	"github.com/cjburchell/tools-go/env"
+	"github.com/cjburchell/uatu-go"
 
 	"github.com/robfig/cron"
-
-	"github.com/cjburchell/go-uatu"
 )
 
 func main() {
-	logger := log.Create()
+	set := settings.Get(env.Get("ConfigFile", ""))
+	logger := log.Create(set)
 
-	config, err := settings.Get(logger)
+	config, err := appSettings.Get(logger, set)
 	if err != nil {
 		logger.Fatal(err, "Unable to verify settings")
 	}

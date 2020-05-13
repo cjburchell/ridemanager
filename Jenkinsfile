@@ -3,14 +3,9 @@ pipeline{
     environment {
             DOCKER_IMAGE_API = "cjburchell/ridemanager-api"
             DOCKER_IMAGE_PROCESSOR = "cjburchell/ridemanager-processor"
-            DOCKER_IMAGE_CLIENT = "cjburchell/ridemanager-client"
             DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
             PROJECT_PATH = "/code"
     }
-
-    parameters {
-    		booleanParam(name: 'Lint', defaultValue: true, description: 'Should Lint run?')
-        }
 
     stages{
         stage('Setup') {
@@ -25,7 +20,6 @@ pipeline{
         }
 
         stage('Static Analysis') {
-            when { expression { params.Lint } }
             parallel {
                 stage('Go Vet') {
                     agent {
@@ -68,18 +62,7 @@ pipeline{
                 stage('Build API') {
                     steps {
                         script {
-                            def image = docker.build("${DOCKER_IMAGE_API}", "-f Dockerfile-api .")
-                            image.tag("${DOCKER_TAG}")
-                            if( env.BRANCH_NAME == "master") {
-                                image.tag("latest")
-                            }
-                        }
-                    }
-                }
-                stage('Build Client') {
-                    steps {
-                        script {
-                            def image = docker.build("${DOCKER_IMAGE_CLIENT}")
+                            def image = docker.build("${DOCKER_IMAGE_API}")
                             image.tag("${DOCKER_TAG}")
                             if( env.BRANCH_NAME == "master") {
                                 image.tag("latest")
@@ -108,19 +91,6 @@ pipeline{
 						script {
 							docker.withRegistry('', 'dockerhub') {
 							   def image = docker.image("${DOCKER_IMAGE_API}")
-							   image.push("${DOCKER_TAG}")
-							   if( env.BRANCH_NAME == "master") {
-									image.push("latest")
-							   }
-							}
-						}
-					}
-				}
-				stage ('Push Client') {
-					steps {
-						script {
-							docker.withRegistry('', 'dockerhub') {
-							   def image = docker.image("${DOCKER_IMAGE_CLIENT}")
 							   image.push("${DOCKER_TAG}")
 							   if( env.BRANCH_NAME == "master") {
 									image.push("latest")

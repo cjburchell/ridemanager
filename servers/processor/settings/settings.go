@@ -2,9 +2,9 @@ package settings
 
 import (
 	"fmt"
+	"github.com/cjburchell/settings-go"
 
-	log "github.com/cjburchell/go-uatu"
-	"github.com/cjburchell/tools-go/env"
+	log "github.com/cjburchell/uatu-go"
 	"github.com/pkg/errors"
 )
 
@@ -18,12 +18,12 @@ type Configuration struct {
 	StravaClientSecret string
 }
 
-func Get(logger log.ILog) (*Configuration, error) {
+func Get(logger log.ILog, settings settings.ISettings) (*Configuration, error) {
 	config := &Configuration{
-		MongoUrl:           env.Get("MONGO_URL", defaultMongoUrl),
-		PollInterval:       env.Get("POLL_INTERVAL", defaultPollInterval),
-		StravaClientId:     env.GetInt("STRAVA_CLIENT_ID", 0),
-		StravaClientSecret: env.Get("STRAVA_CLIENT_SECRET", ""),
+		MongoUrl:           settings.Get("MONGO_URL", defaultMongoUrl),
+		PollInterval:       settings.Get("POLL_INTERVAL", defaultPollInterval),
+		StravaClientId:     settings.GetInt("STRAVA_CLIENT_ID", 0),
+		StravaClientSecret: settings.Get("STRAVA_CLIENT_SECRET", ""),
 	}
 
 	err := config.verify(logger)

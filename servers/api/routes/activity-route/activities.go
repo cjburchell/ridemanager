@@ -8,10 +8,10 @@ import (
 
 	"github.com/cjburchell/ridemanager/common/service/update"
 
-	"github.com/cjburchell/go-uatu"
 	activityService "github.com/cjburchell/ridemanager/common/service/activity"
 	"github.com/cjburchell/ridemanager/common/service/data/models"
 	"github.com/cjburchell/tools-go/slice"
+	"github.com/cjburchell/uatu-go"
 
 	"github.com/cjburchell/ridemanager/api/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/data"

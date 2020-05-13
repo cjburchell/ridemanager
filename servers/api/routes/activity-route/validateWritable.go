@@ -3,10 +3,10 @@ package activityroute
 import (
 	"net/http"
 
-	log "github.com/cjburchell/go-uatu"
 	"github.com/cjburchell/ridemanager/api/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/cjburchell/ridemanager/common/service/data/models"
+	log "github.com/cjburchell/uatu-go"
 	"github.com/gorilla/mux"
 )
 

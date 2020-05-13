@@ -4,22 +4,10 @@ services:
       image: "mongo:3"
       ports:
         - "27017:27017"
-  server-client:
-      build:
-        context: .
-        dockerfile: Dockerfile
-      environment:
-         - LOG_CONSOLE=true
-         - LOG_USE_NATS=false
-         - LOG_LEVEL=Debug;
-         - API_LOCATION=http://localhost:8092/api/v1
-         - MAPBOX_ACCESS_TOKEN=pk.eyJ1IjoiY2pidXJjaGVsbCIsImEiOiJjaXJzc2hpNDMwaTY0ZmZtNnViZzg5NmRrIn0.LSuKYxyhwBDpHCtjim-g0A
-      ports:
-          - "8091:8091"
   server-api:
     build:
         context: .
-        dockerfile: Dockerfile-api
+        dockerfile: Dockerfile
     environment:
       - MONGO_URL=mongodb:27017
       - LOG_CONSOLE=true
@@ -27,8 +15,10 @@ services:
       - LOG_USE_NATS=false
       - STRAVA_CLIENT_ID=12880;
       - STRAVA_CLIENT_SECRET=c61800b62c34c0866c20a22bd4cddf6a1b40aa23;
+      - STRAVA_LOGIN_REDIRECT_URL=http://localhost:8091/api/v1/login
+      - MAPBOX_ACCESS_TOKEN=pk.eyJ1IjoiY2pidXJjaGVsbCIsImEiOiJjaXJzc2hpNDMwaTY0ZmZtNnViZzg5NmRrIn0.LSuKYxyhwBDpHCtjim-g0A
     ports:
-      - "8092:8091"
+      - "8091:8091"
   server-processor:
     build:
         context: .
