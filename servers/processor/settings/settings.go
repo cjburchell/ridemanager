@@ -2,6 +2,7 @@ package settings
 
 import (
 	"fmt"
+
 	"github.com/cjburchell/settings-go"
 
 	log "github.com/cjburchell/uatu-go"
@@ -20,10 +21,10 @@ type Configuration struct {
 
 func Get(logger log.ILog, settings settings.ISettings) (*Configuration, error) {
 	config := &Configuration{
-		MongoUrl:           settings.Get("MONGO_URL", defaultMongoUrl),
-		PollInterval:       settings.Get("POLL_INTERVAL", defaultPollInterval),
-		StravaClientId:     settings.GetInt("STRAVA_CLIENT_ID", 0),
-		StravaClientSecret: settings.Get("STRAVA_CLIENT_SECRET", ""),
+		MongoUrl:           settings.Get("MongoUrl", defaultMongoUrl),
+		PollInterval:       settings.Get("PollInterval", defaultPollInterval),
+		StravaClientId:     settings.GetInt("StravaClientId", 0),
+		StravaClientSecret: settings.Get("StravaClientSecret", ""),
 	}
 
 	err := config.verify(logger)
@@ -38,7 +39,7 @@ func (config Configuration) verify(logger log.ILog) error {
 
 	warningMessage := ""
 	if config.MongoUrl == defaultMongoUrl {
-		warningMessage += fmt.Sprintf("\nMONGO_URL set to default value (%s)", config.MongoUrl)
+		warningMessage += fmt.Sprintf("\nMongoUrl set to default value (%s)", config.MongoUrl)
 	}
 
 	if warningMessage != "" {
@@ -47,11 +48,11 @@ func (config Configuration) verify(logger log.ILog) error {
 
 	errorMessage := ""
 	if config.StravaClientId == 0 {
-		errorMessage += "\nSTRAVA_CLIENT_ID Not set"
+		errorMessage += "\nStravaClientId Not set"
 	}
 
 	if config.StravaClientSecret == "" {
-		errorMessage += "\nSTRAVA_CLIENT_SECRET Not set"
+		errorMessage += "\nStravaClientSecret Not set"
 	}
 
 	if errorMessage != "" {

@@ -1,0 +1,6 @@
+Logging:
+
+MongoUrl: localhost
+PollInterval:
+StravaClientId: 0
+StravaClientSecret: ""

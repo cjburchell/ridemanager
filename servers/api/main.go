@@ -8,32 +8,33 @@ import (
 	"os/signal"
 	"time"
 
-	clientRoute "github.com/cjburchell/ridemanager/api/routes/client-route"
-	settingsRoute "github.com/cjburchell/ridemanager/api/routes/settings-route"
+	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/common/service/stravaService"
+
 	"github.com/cjburchell/settings-go"
 	"github.com/cjburchell/tools-go/env"
 
-	"github.com/cjburchell/ridemanager/common/service/stravaService"
-
-	"github.com/cjburchell/ridemanager/api/routes/token"
-
 	activityRoute "github.com/cjburchell/ridemanager/api/routes/activity-route"
+	clientRoute "github.com/cjburchell/ridemanager/api/routes/client-route"
 	loginRoute "github.com/cjburchell/ridemanager/api/routes/login-route"
+	settingsRoute "github.com/cjburchell/ridemanager/api/routes/settings-route"
 	statusRoute "github.com/cjburchell/ridemanager/api/routes/status-route"
 	stravaRoute "github.com/cjburchell/ridemanager/api/routes/strava-route"
 	userRoute "github.com/cjburchell/ridemanager/api/routes/user-route"
+
 	serverSettings "github.com/cjburchell/ridemanager/api/settings"
 	"github.com/cjburchell/ridemanager/common/service/data"
 
 	log "github.com/cjburchell/uatu-go"
+	logSettings "github.com/cjburchell/uatu-go/settings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	set := settings.Get(env.Get("ConfigFile", ""))
-	logger := log.Create(set)
+	set := settings.Get(env.Get("ConfigFile", "config.yaml"))
+	logger := log.Create(logSettings.Get(set.GetSection("Logging")))
 
 	config, err := serverSettings.Get(logger, set)
 	if err != nil {
@@ -62,13 +63,14 @@ func startHTTPServer(config serverSettings.Configuration, service data.IService,
 	tokenValidator := token.GetValidator(config.JwtSecret)
 	tokenBuilder := token.GetBuilder(config.JwtSecret)
 	authenticator := stravaService.GetAuthenticator(config.StravaClientId, config.StravaClientSecret)
+
 	loginRoute.Setup(r, service, tokenValidator, tokenBuilder, authenticator, logger)
 	userRoute.Setup(r, service, tokenValidator, logger)
 	activityRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	stravaRoute.Setup(r, service, tokenValidator, authenticator, logger)
 	statusRoute.Setup(r, logger)
-	clientRoute.Setup(r, config.ClientLocation, logger)
 	settingsRoute.Setup(r, config, logger)
+	clientRoute.Setup(r, config.ClientLocation, logger)
 
 	loggedRouter := handlers.LoggingHandler(log.Writer{Level: log.DEBUG}, r)
 

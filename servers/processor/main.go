@@ -11,14 +11,15 @@ import (
 	appSettings "github.com/cjburchell/ridemanager/processor/settings"
 	"github.com/cjburchell/settings-go"
 	"github.com/cjburchell/tools-go/env"
-	"github.com/cjburchell/uatu-go"
+	log "github.com/cjburchell/uatu-go"
+	logSettings "github.com/cjburchell/uatu-go/settings"
 
 	"github.com/robfig/cron"
 )
 
 func main() {
-	set := settings.Get(env.Get("ConfigFile", ""))
-	logger := log.Create(set)
+	set := settings.Get(env.Get("ConfigFile", "config.yaml"))
+	logger := log.Create(logSettings.Get(set.GetSection("Logging")))
 
 	config, err := appSettings.Get(logger, set)
 	if err != nil {

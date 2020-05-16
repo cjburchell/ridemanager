@@ -13,7 +13,7 @@ const defaultMongoUrl = "localhost"
 const defaultPort = 8091
 const defaultJwtSecret = "test"
 const defaultClientLocation = "client/dist/ridemanager-client"
-const defaultStravaRedirect = "http://localhost:8091/api/v1/login"
+const defaultStravaRedirect = "http://localhost:8091/api/v1/login/validate"
 
 type Configuration struct {
 	MongoUrl            string
