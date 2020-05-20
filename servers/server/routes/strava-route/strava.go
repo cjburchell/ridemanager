@@ -7,7 +7,7 @@ import (
 
 	"github.com/cjburchell/ridemanager/common/service/data/models"
 
-	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/server/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
 	"github.com/cjburchell/uatu-go"

@@ -6,6 +6,7 @@ import (
 	"github.com/satori/go.uuid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 type service struct {
@@ -243,8 +244,15 @@ func (s service) GetActivity(activityId models.ActivityId) (*models.Activity, er
 	return &activity, err
 }
 
-func (s *service) setup(address string) error {
-	session, err := mgo.Dial(address)
+func (s *service) setup(address, userName, password string) error {
+	info := &mgo.DialInfo{
+		Addrs:          []string{address},
+		Timeout:        60 * time.Second,
+		Username:       userName,
+		Password:       password,
+	}
+
+	session, err := mgo.DialWithInfo(info)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -260,8 +268,8 @@ func (s *service) setup(address string) error {
 	return nil
 }
 
-func NewService(address string) (IService, error) {
+func NewService(settings Settings) (IService, error) {
 	service := &service{}
-	err := service.setup(address)
+	err := service.setup(settings.Mongo.Address, settings.Mongo.UserName, settings.Mongo.Password)
 	return service, err
 }

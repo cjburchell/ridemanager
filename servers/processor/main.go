@@ -26,7 +26,7 @@ func main() {
 		logger.Fatal(err, "Unable to verify settings")
 	}
 
-	dataService, err := data.NewService(config.MongoUrl)
+	dataService, err := data.NewService(data.GetSettings(set.GetSection("Data")))
 	if err != nil {
 		logger.Fatal(err, "Unable to Connect to mongo")
 	}

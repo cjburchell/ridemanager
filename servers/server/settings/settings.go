@@ -9,16 +9,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-const defaultMongoUrl = "localhost"
 const defaultPort = 8091
 const defaultJwtSecret = "test"
 const defaultClientLocation = "client/dist/ridemanager-client"
 const defaultStravaRedirect = "http://localhost:8091/api/v1/login/validate"
 
+// Configuration of the server
 type Configuration struct {
-	MongoUrl            string
 	Port                int
-	StravaClientId      int
+	StravaClientID      int
 	StravaClientSecret  string
 	JwtSecret           string
 	ClientLocation      string
@@ -26,16 +25,16 @@ type Configuration struct {
 	StravaLoginRedirect string
 }
 
+// Get the server settings
 func Get(logger log.ILog, settings settings.ISettings) (*Configuration, error) {
 	config := &Configuration{
-		MongoUrl:            settings.Get("MONGO_URL", defaultMongoUrl),
-		Port:                settings.GetInt("PORT", defaultPort),
-		StravaClientId:      settings.GetInt("STRAVA_CLIENT_ID", 0),
-		StravaClientSecret:  settings.Get("STRAVA_CLIENT_SECRET", ""),
-		JwtSecret:           settings.Get("JWT_SECRET", defaultJwtSecret),
-		ClientLocation:      settings.Get("CLIENT_LOCATION", defaultClientLocation),
-		MapboxToken:         settings.Get("MAPBOX_ACCESS_TOKEN", ""),
-		StravaLoginRedirect: settings.Get("STRAVA_LOGIN_REDIRECT_URL", defaultStravaRedirect),
+		Port:                settings.GetInt("Port", defaultPort),
+		StravaClientID:      settings.GetInt("StravaClientId", 0),
+		StravaClientSecret:  settings.Get("StravaClientSecret", ""),
+		JwtSecret:           settings.Get("JwtSecret", defaultJwtSecret),
+		ClientLocation:      settings.Get("ClientLocation", defaultClientLocation),
+		MapboxToken:         settings.Get("MapboxToken", ""),
+		StravaLoginRedirect: settings.Get("StravaLoginRedirectURL", defaultStravaRedirect),
 	}
 
 	err := config.verify(logger)
@@ -49,20 +48,16 @@ func Get(logger log.ILog, settings settings.ISettings) (*Configuration, error) {
 func (config Configuration) verify(logger log.ILog) error {
 
 	warningMessage := ""
-	if config.MongoUrl == defaultMongoUrl {
-		warningMessage += fmt.Sprintf("\nMONGO_URL set to default value (%s)", config.MongoUrl)
-	}
-
 	if config.JwtSecret == defaultJwtSecret {
-		warningMessage += fmt.Sprintf("\nJWT_SECRET set to default value (%s)", config.JwtSecret)
+		warningMessage += fmt.Sprintf("\nJwtSecret set to default value (%s)", config.JwtSecret)
 	}
 
 	if config.ClientLocation == defaultClientLocation {
-		warningMessage += fmt.Sprintf("\nCLIENT_LOCATION set to default value (%s)", config.ClientLocation)
+		warningMessage += fmt.Sprintf("\nClientLocation set to default value (%s)", config.ClientLocation)
 	}
 
 	if config.StravaLoginRedirect == defaultStravaRedirect {
-		warningMessage += fmt.Sprintf("\nSTRAVA_LOGIN_REDIRECT_URL set to default value (%s)", config.StravaLoginRedirect)
+		warningMessage += fmt.Sprintf("\nStravaLoginRedirectURL set to default value (%s)", config.StravaLoginRedirect)
 	}
 
 	if warningMessage != "" {
@@ -71,7 +66,7 @@ func (config Configuration) verify(logger log.ILog) error {
 
 	errorMessage := ""
 
-	if config.StravaClientId == 0 {
+	if config.StravaClientID == 0 {
 		errorMessage += "\nSTRAVA_CLIENT_ID Not set"
 	}
 

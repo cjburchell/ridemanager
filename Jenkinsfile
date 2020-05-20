@@ -1,7 +1,7 @@
 pipeline{
     agent any
     environment {
-            DOCKER_IMAGE_API = "cjburchell/ridemanager-api"
+            DOCKER_IMAGE_API = "cjburchell/ridemanager"
             DOCKER_IMAGE_PROCESSOR = "cjburchell/ridemanager-processor"
             DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
             PROJECT_PATH = "/code"
@@ -59,7 +59,7 @@ pipeline{
 
         stage('Build') {
             parallel {
-                stage('Build API') {
+                stage('Build Server') {
                     steps {
                         script {
                             def image = docker.build("${DOCKER_IMAGE_API}")
@@ -86,7 +86,7 @@ pipeline{
 
 		stage('Push') {
 			parallel {
-				stage ('Push API') {
+				stage ('Push Server') {
 					steps {
 						script {
 							docker.withRegistry('', 'dockerhub') {

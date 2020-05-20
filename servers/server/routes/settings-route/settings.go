@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cjburchell/ridemanager/api/settings"
+	"github.com/cjburchell/ridemanager/server/settings"
 
 	log "github.com/cjburchell/uatu-go"
 	"github.com/gorilla/mux"
@@ -30,7 +30,7 @@ func (h handler) getSettings(w http.ResponseWriter, r *http.Request) {
 	result := ""
 	switch setting {
 	case "stravaClientId":
-		result = fmt.Sprintf("%d", h.StravaClientId)
+		result = fmt.Sprintf("%d", h.StravaClientID)
 	case "stravaRedirect":
 		result = h.StravaLoginRedirect
 	case "mapboxAccessToken":

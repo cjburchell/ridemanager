@@ -3,7 +3,7 @@ package activityroute
 import (
 	"net/http"
 
-	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/server/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/cjburchell/ridemanager/common/service/data/models"
 	log "github.com/cjburchell/uatu-go"

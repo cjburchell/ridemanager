@@ -13,7 +13,7 @@ import (
 	"github.com/cjburchell/tools-go/slice"
 	"github.com/cjburchell/uatu-go"
 
-	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/server/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/gorilla/mux"
 )

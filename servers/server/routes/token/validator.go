@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/context"
 )
 
+// Validator interface
 type Validator interface {
 	ValidateMiddleware(next http.HandlerFunc) http.HandlerFunc
 }
@@ -17,6 +18,7 @@ type validator struct {
 	jwtSecret string
 }
 
+// GetValidator gets the token validator
 func GetValidator(jwt string) Validator {
 	return validator{jwt}
 }

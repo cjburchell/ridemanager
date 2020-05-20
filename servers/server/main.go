@@ -8,21 +8,21 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/server/routes/token"
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
 
 	"github.com/cjburchell/settings-go"
 	"github.com/cjburchell/tools-go/env"
 
-	activityRoute "github.com/cjburchell/ridemanager/api/routes/activity-route"
-	clientRoute "github.com/cjburchell/ridemanager/api/routes/client-route"
-	loginRoute "github.com/cjburchell/ridemanager/api/routes/login-route"
-	settingsRoute "github.com/cjburchell/ridemanager/api/routes/settings-route"
-	statusRoute "github.com/cjburchell/ridemanager/api/routes/status-route"
-	stravaRoute "github.com/cjburchell/ridemanager/api/routes/strava-route"
-	userRoute "github.com/cjburchell/ridemanager/api/routes/user-route"
+	activityRoute "github.com/cjburchell/ridemanager/server/routes/activity-route"
+	clientRoute "github.com/cjburchell/ridemanager/server/routes/client-route"
+	loginRoute "github.com/cjburchell/ridemanager/server/routes/login-route"
+	settingsRoute "github.com/cjburchell/ridemanager/server/routes/settings-route"
+	statusRoute "github.com/cjburchell/ridemanager/server/routes/status-route"
+	stravaRoute "github.com/cjburchell/ridemanager/server/routes/strava-route"
+	userRoute "github.com/cjburchell/ridemanager/server/routes/user-route"
 
-	serverSettings "github.com/cjburchell/ridemanager/api/settings"
+	serverSettings "github.com/cjburchell/ridemanager/server/settings"
 	"github.com/cjburchell/ridemanager/common/service/data"
 
 	log "github.com/cjburchell/uatu-go"
@@ -41,7 +41,7 @@ func main() {
 		logger.Fatal(err, "Unable to verify settings")
 	}
 
-	dataService, err := data.NewService(config.MongoUrl)
+	dataService, err := data.NewService(data.GetSettings(set.GetSection("Data")))
 	if err != nil {
 		logger.Fatal(err, "Unable to Connect to mongo")
 	}
@@ -62,7 +62,7 @@ func startHTTPServer(config serverSettings.Configuration, service data.IService,
 
 	tokenValidator := token.GetValidator(config.JwtSecret)
 	tokenBuilder := token.GetBuilder(config.JwtSecret)
-	authenticator := stravaService.GetAuthenticator(config.StravaClientId, config.StravaClientSecret)
+	authenticator := stravaService.GetAuthenticator(config.StravaClientID, config.StravaClientSecret)
 
 	loginRoute.Setup(r, service, tokenValidator, tokenBuilder, authenticator, logger)
 	userRoute.Setup(r, service, tokenValidator, logger)

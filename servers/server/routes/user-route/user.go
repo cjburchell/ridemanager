@@ -1,4 +1,4 @@
-package user_route
+package useroute
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/cjburchell/uatu-go"
 
-	"github.com/cjburchell/ridemanager/api/routes/token"
+	"github.com/cjburchell/ridemanager/server/routes/token"
 
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/gorilla/mux"
@@ -18,6 +18,7 @@ type handler struct {
 	log log.ILog
 }
 
+// Setup the user route
 func Setup(r *mux.Router, service data.IService, validator token.Validator, logger log.ILog) {
 	dataRoute := r.PathPrefix("/api/v1/user").Subrouter()
 	handle := handler{logger}
@@ -32,6 +33,7 @@ func Setup(r *mux.Router, service data.IService, validator token.Validator, logg
 		})).Methods("GET")
 }
 
+// Achievements type
 type Achievements struct {
 	FirstCount    int `json:"first_count"`
 	SecondCount   int `json:"second_count"`
