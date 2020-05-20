@@ -4,10 +4,10 @@ go 1.14
 
 require (
 	github.com/antihax/optional v1.0.0
-	github.com/cjburchell/settings-go v1.1.18
-	github.com/cjburchell/strava-go v1.0.0
-	github.com/cjburchell/tools-go v1.0.1
-	github.com/cjburchell/uatu-go v1.1.18
+	github.com/cjburchell/settings-go v1.1.19
+	github.com/cjburchell/strava-go v1.0.6
+	github.com/cjburchell/tools-go v1.0.10
+	github.com/cjburchell/uatu-go v1.1.21
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/handlers v1.4.0

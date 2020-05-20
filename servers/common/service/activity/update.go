@@ -3,8 +3,8 @@ package activity
 import (
 	"github.com/cjburchell/ridemanager/common/service/data"
 	"github.com/cjburchell/ridemanager/common/service/data/models"
+	"github.com/cjburchell/ridemanager/common/service/results"
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
-	"github.com/cjburchell/ridemanager/common/service/update"
 )
 
 func UpdateAll(activities []*models.Activity, service data.IService, updateStanding bool, authenticator stravaService.Authenticator) error {
@@ -37,12 +37,13 @@ func updateActivityStandings(activity *models.Activity, service data.IService, a
 		if err != nil {
 			return err
 		}
-		err = update.ParticipantsResults(participant, activity, stravaService.GetTokenManager(authenticator, participant.Athlete.Id, service, &user.StravaToken))
+
+		err = results.UpdateParticipant(participant, activity, stravaService.GetTokenManager(authenticator, participant.Athlete.Id, service, &user.StravaToken))
 		if err != nil {
 			return err
 		}
 	}
 
-	update.Standings(activity)
+	results.Update(activity)
 	return nil
 }

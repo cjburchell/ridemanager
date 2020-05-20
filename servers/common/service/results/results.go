@@ -1,4 +1,4 @@
-package update
+package results
 
 import (
 	"sort"
@@ -8,15 +8,6 @@ import (
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
 	"github.com/cjburchell/strava-go"
 )
-
-func filterSegments(ss []strava.DetailedSegmentEffort, test func(strava.DetailedSegmentEffort) bool) (ret []strava.DetailedSegmentEffort) {
-	for _, s := range ss {
-		if test(s) {
-			ret = append(ret, s)
-		}
-	}
-	return
-}
 
 func filterResults(ss []models.Result, test func(models.Result) bool) (ret []models.Result) {
 	for _, s := range ss {
@@ -45,11 +36,7 @@ func filterResultItem(ss []models.ResultItem, test func(models.ResultItem) bool)
 	return
 }
 
-func inTimeSpan(start, end, check time.Time) bool {
-	return check.After(start) && check.Before(end)
-}
-
-func Standings(activity *models.Activity) {
+func Update(activity *models.Activity) {
 	if activity.ActivityType == models.ActivityTypes.Triathlon || activity.ActivityType == models.ActivityTypes.Race {
 		return
 	}
@@ -103,40 +90,68 @@ func Standings(activity *models.Activity) {
 	}
 }
 
-func ParticipantsResults(participant *models.Participant, activity *models.Activity, accessToken stravaService.TokenManager) error {
+func getSegments(service stravaService.IService, segmentId int64, startTime, endTime time.Time) ([]strava.DetailedSegmentEffort, error) {
+	// Get list of activities within the time range of the race
+	summeryActivities, err := service.GetActivities(startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+
+	var efforts = make([]strava.DetailedSegmentEffort, 0)
+	// look in each activity for a matching segment
+	for _, summery :=range summeryActivities {
+		details, err := service.GetActivity(summery.Id, true)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, segment := range details.SegmentEfforts {
+			if segment.Segment.Id == segmentId {
+				efforts = append(efforts, segment)
+			}
+		}
+	}
+
+	return efforts, nil
+}
+
+func findBestSegmentEffort(service stravaService.IService, segmentId int64, startTime, endTime time.Time) (*strava.DetailedSegmentEffort, error)  {
+	efforts, err := getSegments(service, segmentId, startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	if len(efforts) == 0 {
+		return nil, nil
+	}
+
+	var bestEffort *strava.DetailedSegmentEffort = nil
+	for _, effort := range efforts {
+		if bestEffort == nil {
+			bestEffort = &effort
+			continue
+		}
+
+		if bestEffort.ElapsedTime > effort.ElapsedTime {
+			bestEffort = &effort
+		}
+	}
+
+	return bestEffort, nil
+}
+
+func UpdateParticipant(participant *models.Participant, activity *models.Activity, accessToken stravaService.TokenManager) error {
 	participant.Results = make([]models.Result, len(activity.Stages))
 
-	ss := stravaService.NewService(accessToken)
+	service := stravaService.NewService(accessToken)
 
 	for index, stage := range activity.Stages {
 		participant.Results[index].SegmentId = stage.SegmentId
 		participant.Results[index].StageNumber = stage.Number
 
-		efforts, err := ss.SegmentsListEfforts(stage.SegmentId, 0, 100)
+		bestEffort, err := findBestSegmentEffort(service, stage.SegmentId, activity.StartTime, activity.EndTime)
 		if err != nil {
 			return err
 		}
-
-		efforts = filterSegments(efforts, func(summary strava.DetailedSegmentEffort) bool {
-			return inTimeSpan(activity.StartTime, activity.EndTime, summary.StartDate)
-		})
-
-		if len(efforts) == 0 {
-			continue
-		}
-
-		var bestEffort *strava.DetailedSegmentEffort = nil
-		for _, effort := range efforts {
-			if bestEffort == nil {
-				bestEffort = &effort
-				continue
-			}
-
-			if bestEffort.ElapsedTime > effort.ElapsedTime {
-				bestEffort = &effort
-			}
-		}
-
 		if bestEffort == nil {
 			continue
 		}

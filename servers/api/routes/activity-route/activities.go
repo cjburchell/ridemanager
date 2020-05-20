@@ -6,7 +6,7 @@ import (
 
 	"github.com/cjburchell/ridemanager/common/service/stravaService"
 
-	"github.com/cjburchell/ridemanager/common/service/update"
+	"github.com/cjburchell/ridemanager/common/service/results"
 
 	activityService "github.com/cjburchell/ridemanager/common/service/activity"
 	"github.com/cjburchell/ridemanager/common/service/data/models"
@@ -59,13 +59,13 @@ func (h handle) updateResults(activity *models.Activity) error {
 			return err
 		}
 
-		err = update.ParticipantsResults(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
+		err = results.UpdateParticipant(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
 		if err != nil {
 			return err
 		}
 	}
 
-	update.Standings(activity)
+	results.Update(activity)
 
 	return nil
 }
@@ -161,14 +161,14 @@ func (h handle) addParticipant(writer http.ResponseWriter, request *http.Request
 
 	activity.UpdateState()
 
-	err = update.ParticipantsResults(&participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
+	err = results.UpdateParticipant(&participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
 	if err != nil {
 		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	update.Standings(activity)
+	results.Update(activity)
 
 	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
@@ -214,14 +214,14 @@ func (h handle) updateActivityParticipantState(writer http.ResponseWriter, reque
 		return
 	}
 
-	err = update.ParticipantsResults(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
+	err = results.UpdateParticipant(participant, activity, stravaService.GetTokenManager(h.authenticator, participant.Athlete.Id, h.dataService, &user.StravaToken))
 	if err != nil {
 		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	update.Standings(activity)
+	results.Update(activity)
 
 	err = h.dataService.UpdateActivity(*activity)
 	if err != nil {
@@ -362,7 +362,7 @@ func (h handle) getMyActivities(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = activityService.UpdateAll(activities, h.dataService, false, nil)
+	err = activityService.UpdateAll(activities, h.dataService, false, h.authenticator)
 	if err != nil {
 		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -394,7 +394,7 @@ func (h handle) getJoinedActivities(writer http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	err = activityService.UpdateAll(activities, h.dataService, false, nil)
+	err = activityService.UpdateAll(activities, h.dataService, false, h.authenticator)
 	if err != nil {
 		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -419,7 +419,7 @@ func (h handle) getPublicActivities(writer http.ResponseWriter, _ *http.Request)
 		return
 	}
 
-	err = activityService.UpdateAll(activities, h.dataService, false, nil)
+	err = activityService.UpdateAll(activities, h.dataService, false, h.authenticator)
 	if err != nil {
 		h.log.Error(err)
 		writer.WriteHeader(http.StatusInternalServerError)

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/antihax/optional"
 	"github.com/cjburchell/strava-go"
@@ -17,14 +18,38 @@ type IService interface {
 	GetRoutes(athleteId int32, page int32, perPage int32) ([]strava.Route, error)
 	GetRoute(routeId int32) (*strava.Route, error)
 	GetSegment(segmentId int64) (*strava.DetailedSegment, error)
-	SegmentsListEfforts(segmentId int32, page int32, perPage int32) ([]strava.DetailedSegmentEffort, error)
 	GetRouteStreams(routeId int64) (*strava.StreamSet, error)
 	GetSegmentStream(segmentId int64, streamTypes []string) (*strava.StreamSet, error)
+	GetActivity(activityID int64, includeAllEfforts bool) (*strava.DetailedActivity, error)
+	GetActivities(startTime, endTime time.Time)([]strava.SummaryActivity, error)
 }
 
 type service struct {
 	client *strava.APIClient
 	token  TokenManager
+}
+
+func (s service) GetActivity(activityID int64, includeAllEfforts bool) (*strava.DetailedActivity, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.ActivitiesApi.GetActivityById(ctx, activityID, &strava.GetActivityByIdOpts{IncludeAllEfforts:optional.NewBool(includeAllEfforts)})
+	return &result, err
+}
+
+func (s service) GetActivities(startTime, endTime time.Time) ([]strava.SummaryActivity, error) {
+	ctx, err := s.getContext()
+	if err != nil {
+		return nil, err
+	}
+
+	result, _, err := s.client.ActivitiesApi.GetLoggedInAthleteActivities(ctx, &strava.GetLoggedInAthleteActivitiesOpts{
+		Before:  optional.NewInt64(endTime.Unix()),
+		After:   optional.NewInt64(startTime.Unix()),
+	})
+	return result, err
 }
 
 func (s service) GetRoutes(athleteId int32, page int32, perPage int32) ([]strava.Route, error) {
@@ -158,19 +183,6 @@ func (s service) GetStaredSegments(page int32, perPage int32) ([]strava.SummaryS
 	}
 
 	result, _, err := s.client.SegmentsApi.GetLoggedInAthleteStarredSegments(ctx, &strava.GetLoggedInAthleteStarredSegmentsOpts{
-		Page:    optional.NewInt32(page + 1),
-		PerPage: optional.NewInt32(perPage),
-	})
-	return result, err
-}
-
-func (s service) SegmentsListEfforts(segmentId int32, page int32, perPage int32) ([]strava.DetailedSegmentEffort, error) {
-	ctx, err := s.getContext()
-	if err != nil {
-		return nil, err
-	}
-
-	result, _, err := s.client.SegmentEffortsApi.GetEffortsBySegmentId(ctx, segmentId, &strava.GetEffortsBySegmentIdOpts{
 		Page:    optional.NewInt32(page + 1),
 		PerPage: optional.NewInt32(perPage),
 	})
