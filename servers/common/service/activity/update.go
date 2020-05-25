@@ -32,7 +32,7 @@ func UpdateAll(activities []*models.Activity, service data.IService, updateStand
 }
 
 func updateActivityStandings(activity *models.Activity, service data.IService, authenticator stravaService.Authenticator) error {
-	for _, participant := range activity.Participants {
+	/*for _, participant := range activity.Participants {
 		user, err := service.GetUser(participant.Athlete.Id)
 		if err != nil {
 			return err
@@ -42,7 +42,7 @@ func updateActivityStandings(activity *models.Activity, service data.IService, a
 		if err != nil {
 			return err
 		}
-	}
+	}*/
 
 	results.Update(activity)
 	return nil

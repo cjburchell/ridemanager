@@ -33,6 +33,8 @@ func main() {
 
 	authenticator := stravaService.GetAuthenticator(config.StravaClientId, config.StravaClientSecret)
 
+
+
 	cronTasks := startProcessor(config.PollInterval, dataService, authenticator, logger)
 	defer cronTasks.Stop()
 

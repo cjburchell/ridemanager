@@ -1,6 +1,6 @@
 <div class="main-header">
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <a class="navbar-brand" (click)="showToMain($event)" href="/main">Ride Manager</a>
+    <a class="navbar-brand" (click)="showToMain($event)" href="/main"><img style="height: 35px"  src="../../../assets/images/rm.svg"/></a>
 
    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myNavbar">
       <span class="navbar-toggler-icon"></span>
@@ -20,6 +20,8 @@
            </a>
            <div class="dropdown-menu">
              <a class="dropdown-item" [href]="'https://www.strava.com/athletes/' + user?.strava_athlete_id" target="_blank">Profile</a>
+             <a class="dropdown-item" href="/main/options" target="_blank">Settings</a>
+             <div class="dropdown-divider"></div>
              <button class="dropdown-item" (click)="onLogOut()">Log Out</button>
            </div>
          </li>
