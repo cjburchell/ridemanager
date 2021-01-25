@@ -10,8 +10,8 @@ COPY servers .
 WORKDIR /servers/server
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main
 
-FROM alpine:latest as certs
-RUN apk --update add ca-certificates
+FROM alpine:3.13 as certs
+RUN apk --no-cache add ca-certificates=20191127-r4
 
 FROM scratch
 
