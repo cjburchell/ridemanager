@@ -157,6 +157,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "ridemanager-client"
+    }
+  },
+  "defaultProject": "ridemanager-client",
+  "cli": {
+    "analytics": "950a2bd7-69ca-4e20-ad15-3df961bc0b48"
+  }
 }

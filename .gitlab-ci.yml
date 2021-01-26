@@ -1,0 +1,134 @@
+image: golang:1.14
+
+variables:
+  VERSION: 2.0.0
+  IMAGE_TAG: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+  IMAGE_PROCESSOR: $CI_REGISTRY_IMAGE/processor
+  CONTROLER_TAG: $CI_REGISTRY_IMAGE/processor/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+
+
+before_script:
+  - export GO_PROJECT_PATH="$GOPATH/src/github.com/$CI_PROJECT_NAMESPACE"
+  - echo $GO_PROJECT_PATH
+  - mkdir -p $GO_PROJECT_PATH
+  - ln -s $(pwd) $GO_PROJECT_PATH
+  - export GO_PROJECT_PATH="$GO_PROJECT_PATH/$CI_PROJECT_NAME"
+  - echo $GO_PROJECT_PATH
+  - cd $GO_PROJECT_PATH
+
+stages:
+  - style
+  - build
+  - test
+
+go-vet:
+  stage: style
+  script:
+    - cd servers
+    - go fmt $(go list ./... | grep -v /vendor/)
+    - go vet $(go list ./... | grep -v /vendor/)
+
+go-lint:
+  stage: style
+  before_script:
+    - go get -u golang.org/x/lint/golint/...
+  script:
+    - out=$(golint $(go list ./... | grep -v "vendor"))
+    - if [ "$out" ]; then echo "$out"; exit 1; fi
+
+docker-lint-server:
+  stage: style
+  inherit:
+    default: false
+  image: hadolint/hadolint:latest-debian
+  script:
+    - hadolint Dockerfile | tee -a  server_docker_lint.txt
+  artifacts:
+    paths:
+      - server_docker_lint.txt
+    expire_in: 1 week
+
+docker-lint-processor:
+  stage: style
+  inherit:
+    default: false
+  image: hadolint/hadolint:latest-debian
+  script:
+    - hadolint Dockerfile-processor | tee -a  processor_docker_lint.txt
+  artifacts:
+    paths:
+      - processor_docker_lint.txt
+    expire_in: 1 week
+
+docker-build-master-server:
+  inherit:
+    default: false
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push $CI_REGISTRY_IMAGE
+    - docker tag $CI_REGISTRY_IMAGE $CI_REGISTRY_IMAGE:$VERSION
+    - docker push $CI_REGISTRY_IMAGE:$VERSION
+    - docker tag $CI_REGISTRY_IMAGE $IMAGE_TAG
+    - docker push $IMAGE_TAG
+  only:
+    - master
+
+docker-build-server:
+  image: docker:latest
+  inherit:
+    default: false
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  except:
+    - master
+
+docker-build-master-processor:
+  inherit:
+    default: false
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$IMAGE_PROCESSOR" -f Dockerfile-processor .
+    - docker push $IMAGE_PROCESSOR
+    - docker tag $IMAGE_PROCESSOR $IMAGE_PROCESSOR:$VERSION
+    - docker push $IMAGE_PROCESSOR:$VERSION
+    - docker tag $IMAGE_PROCESSOR $CONTROLER_TAG
+    - docker push $CONTROLER_TAG
+  only:
+    - master
+
+docker-build-processor:
+  image: docker:latest
+  inherit:
+    default: false
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t $CONTROLER_TAG -f Dockerfile-processor .
+    - docker push $CONTROLER_TAG
+  except:
+    - master
+
+include:
+  - template: Container-Scanning.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml

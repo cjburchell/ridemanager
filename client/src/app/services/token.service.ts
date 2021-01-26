@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Router} from '@angular/router';
+import {ISettingsService} from './settings.service';
 
 export abstract class ITokenService {
   public abstract async checkLogin(): Promise<boolean>;
@@ -22,7 +23,8 @@ export class TokenService implements ITokenService {
   private tokenKey = 'app_token';
 
   constructor(private http: HttpClient,
-              private router: Router) {
+              private router: Router,
+              private settings: ISettingsService) {
   }
 
   getToken(): string {
@@ -49,7 +51,7 @@ export class TokenService implements ITokenService {
 
     let isValid = false;
     try {
-      isValid = await this.http.get<boolean>(`api/v1/login/status`, httpOptions).toPromise();
+      isValid = await this.http.get<boolean>(`${await this.settings.getApiUrl()}/login/status`, httpOptions).toPromise();
     } catch (e) {
     }
 
