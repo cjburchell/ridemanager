@@ -35,7 +35,7 @@
     "chart.js": "^2.9.3",
     "jquery": "^3.5.0",
     "mapbox-gl": "^1.10.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "ng-pick-datetime": "^7.0.0",
     "ng2-charts": "^2.3.0",
     "ngx-bootstrap": "^5.3.2",
